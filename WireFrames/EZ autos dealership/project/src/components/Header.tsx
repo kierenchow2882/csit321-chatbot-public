@@ -1,11 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { SearchIcon, DollarSign, HelpCircle, PhoneCall, Car, Menu, X, Home } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { SearchIcon, DollarSign, HelpCircle, PhoneCall, Car, Menu, X, Home, LogIn, UserCircle } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 import { NavigationLink } from '../types';
+import { supabase } from '../lib/supabase';
 
 const Header: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [user, setUser] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
 
   const navLinks: NavigationLink[] = [
     { name: 'Home', path: '/', icon: 'home' },
@@ -17,16 +23,61 @@ const Header: React.FC = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 10) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
+      setIsScrolled(window.scrollY > 10);
     };
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  useEffect(() => {
+    // Check current auth status
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user || null);
+      if (session?.user) {
+        checkUserRole(session.user.id);
+      }
+    });
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user || null);
+      if (session?.user) {
+        checkUserRole(session.user.id);
+      } else {
+        setIsAdmin(false);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const checkUserRole = async (userId: string) => {
+    const { data } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', userId)
+      .single();
+    
+    setIsAdmin(data?.role === 'admin');
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setDropdownOpen(false);
+    navigate('/');
+  };
 
   const renderIcon = (iconName: string) => {
     switch (iconName) {
@@ -77,6 +128,57 @@ const Header: React.FC = () => {
               <span>{link.name}</span>
             </Link>
           ))}
+
+          {user ? (
+            <div className="relative" ref={dropdownRef}>
+              <button 
+                onClick={() => setDropdownOpen(!dropdownOpen)}
+                className={`flex items-center space-x-2 font-medium ${
+                  isScrolled ? 'text-gray-700 hover:text-blue-600' : 'text-gray-100 hover:text-white'
+                }`}
+              >
+                <UserCircle size={20} />
+                <span>Account</span>
+              </button>
+              {dropdownOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                  {isAdmin && (
+                    <Link
+                      to="/admin"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={() => setDropdownOpen(false)}
+                    >
+                      Admin Dashboard
+                    </Link>
+                  )}
+                  <button
+                    onClick={handleLogout}
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="flex items-center space-x-4">
+              <Link
+                to="/login"
+                className={`flex items-center space-x-1 font-medium ${
+                  isScrolled ? 'text-gray-700 hover:text-blue-600' : 'text-gray-100 hover:text-white'
+                }`}
+              >
+                <LogIn size={18} />
+                <span>Sign In</span>
+              </Link>
+              <Link
+                to="/register"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors"
+              >
+                Register
+              </Link>
+            </div>
+          )}
         </nav>
 
         {/* Mobile menu button */}
@@ -107,6 +209,49 @@ const Header: React.FC = () => {
                 <span>{link.name}</span>
               </Link>
             ))}
+            {user ? (
+              <>
+                {isAdmin && (
+                  <Link
+                    to="/admin"
+                    className="flex items-center space-x-2 py-3 border-b border-gray-200 text-gray-700"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <UserCircle size={18} />
+                    <span>Admin Dashboard</span>
+                  </Link>
+                )}
+                <button
+                  onClick={() => {
+                    handleLogout();
+                    setMobileMenuOpen(false);
+                  }}
+                  className="flex items-center space-x-2 py-3 text-gray-700 w-full"
+                >
+                  <LogIn size={18} />
+                  <span>Sign Out</span>
+                </button>
+              </>
+            ) : (
+              <>
+                <Link
+                  to="/login"
+                  className="flex items-center space-x-2 py-3 border-b border-gray-200 text-gray-700"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <LogIn size={18} />
+                  <span>Sign In</span>
+                </Link>
+                <Link
+                  to="/register"
+                  className="flex items-center space-x-2 py-3 text-gray-700"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <UserCircle size={18} />
+                  <span>Register</span>
+                </Link>
+              </>
+            )}
           </div>
         </div>
       )}

@@ -9,6 +9,9 @@ import SearchPage from './pages/SearchPage';
 import FinancialPlanner from './pages/FinancialPlanner';
 import FAQ from './pages/FAQ';
 import Contact from './pages/Contact';
+import Login from './components/Login';
+import Register from './components/Register';
+import AdminDashboard from './components/AdminDashboard';
 
 function App() {
   return (
@@ -26,6 +29,9 @@ function App() {
           <Route path="/finance" element={<FinancialPlanner />} />
           <Route path="/faq" element={<FAQ />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/admin" element={<AdminDashboard />} />
         </Routes>
         <ChatBot />
         <Footer />
