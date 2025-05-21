@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { supabase } from '../../lib/supabase';
 import { Plus, Search, Edit2, Trash2 } from 'lucide-react';
+import { getTeamMembers, createTeamMember, deleteTeamMember } from '../../lib/api';
 
 interface TeamMember {
   id: string;
@@ -29,13 +29,8 @@ const TeamMembers: React.FC = () => {
 
   const fetchTeamMembers = async () => {
     try {
-      const { data, error } = await supabase
-        .from('team_members')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setMembers(data || []);
+      const data = await getTeamMembers();
+      setMembers(data);
     } catch (error) {
       console.error('Error fetching team members:', error);
     } finally {
@@ -46,15 +41,20 @@ const TeamMembers: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const { error } = await supabase
-        .from('team_members')
-        .insert([formData]);
-
-      if (error) throw error;
+      await createTeamMember(formData);
       setShowAddModal(false);
       fetchTeamMembers();
     } catch (error) {
       console.error('Error adding team member:', error);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteTeamMember(id);
+      fetchTeamMembers();
+    } catch (error) {
+      console.error('Error deleting team member:', error);
     }
   };
 
@@ -133,7 +133,10 @@ const TeamMembers: React.FC = () => {
                   <button className="text-blue-600 hover:text-blue-900 mr-3">
                     <Edit2 size={18} />
                   </button>
-                  <button className="text-red-600 hover:text-red-900">
+                  <button 
+                    className="text-red-600 hover:text-red-900"
+                    onClick={() => handleDelete(member.id)}
+                  >
                     <Trash2 size={18} />
                   </button>
                 </td>
@@ -143,7 +146,6 @@ const TeamMembers: React.FC = () => {
         </table>
       </div>
 
-      {/* Add Member Modal */}
       {showAddModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
