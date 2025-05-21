@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { supabase } from '../../lib/supabase';
 import { Search, MessageSquare, Download } from 'lucide-react';
-import { getChatHistory } from '../../lib/api';
 
 interface ChatMessage {
   id: string;
@@ -23,8 +23,13 @@ const ChatHistory: React.FC = () => {
 
   const fetchMessages = async () => {
     try {
-      const data = await getChatHistory();
-      setMessages(data);
+      const { data, error } = await supabase
+        .from('chat_history')
+        .select('*')
+        .order('created_at', { ascending: true });
+
+      if (error) throw error;
+      setMessages(data || []);
     } catch (error) {
       console.error('Error fetching chat history:', error);
     } finally {

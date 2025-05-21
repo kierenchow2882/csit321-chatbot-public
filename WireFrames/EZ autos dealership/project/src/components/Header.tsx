@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { SearchIcon, DollarSign, HelpCircle, PhoneCall, Car, Menu, X, Home, LogIn, UserCircle } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { NavigationLink } from '../types';
-import { getProfile, logout } from '../lib/api';
+import { supabase } from '../lib/supabase';
 
 const Header: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -31,18 +31,25 @@ const Header: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const profile = await getProfile();
-        setUser(profile.user);
-        setIsAdmin(profile.role === 'admin');
-      } catch (error) {
-        setUser(null);
+    // Check current auth status
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user || null);
+      if (session?.user) {
+        checkUserRole(session.user.id);
+      }
+    });
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user || null);
+      if (session?.user) {
+        checkUserRole(session.user.id);
+      } else {
         setIsAdmin(false);
       }
-    };
+    });
 
-    checkAuth();
+    return () => subscription.unsubscribe();
   }, []);
 
   useEffect(() => {
@@ -56,16 +63,20 @@ const Header: React.FC = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  const checkUserRole = async (userId: string) => {
+    const { data } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', userId)
+      .single();
+    
+    setIsAdmin(data?.role === 'admin');
+  };
+
   const handleLogout = async () => {
-    try {
-      await logout();
-      setUser(null);
-      setIsAdmin(false);
-      setDropdownOpen(false);
-      navigate('/');
-    } catch (error) {
-      console.error('Logout failed:', error);
-    }
+    await supabase.auth.signOut();
+    setDropdownOpen(false);
+    navigate('/');
   };
 
   const renderIcon = (iconName: string) => {
