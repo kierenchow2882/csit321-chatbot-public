@@ -1,0 +1,73 @@
+version: "3.1"
+
+intents:
+  - greet
+  - goodbye
+  - affirm
+  - deny
+  - ask_coe_prices
+  - ask_vehicle_info
+  - ask_pricing
+  - book_test_drive
+  - ask_maintenance
+  - ask_registration
+  - ask_features
+  - out_of_scope
+
+entities:
+  - car_brand
+  - car_model
+
+responses:
+  utter_greet:
+  - text: "👋 Hi! I'm CleverCompanion, your intelligent assistant. How can I help you today?"
+
+  utter_goodbye:
+  - text: "Thank you for using CleverCompanion! Have a great day! 🚗"
+
+  utter_coe_prices:
+  - text: "Here are the latest COE prices for all categories:\n\n🚗 **Category A** (Up to 1600cc): $95,000\n🚙 **Category B** (Above 1600cc): $108,000\n🏍️ **Category D** (Motorcycles): $8,500\n🚚 **Category E** (Commercial): $65,000\n\n*Prices updated as of latest bidding exercise*"
+
+  utter_vehicle_info:
+  - text: "I can provide detailed information about any vehicle model. Which specific car would you like to know more about?"
+
+  utter_pricing:
+  - text: "I can help you with vehicle pricing. Please specify the car model you're interested in for accurate pricing information."
+
+  utter_test_drive:
+  - text: "I can help you schedule a test drive. Which vehicle model are you interested in testing?"
+
+  utter_maintenance:
+  - text: "For maintenance services, I recommend:\n\n🔧 **Regular Service**: Every 10,000km\n🛢️ **Oil Change**: Every 5,000-7,500km\n🛞 **Tire Check**: Every 6 months\n\nWhat specific maintenance help do you need?"
+
+  utter_registration:
+  - text: "For vehicle registration, you'll need:\n\n📋 **Documents**: IC, Insurance, Inspection Certificate\n💰 **Fees**: Registration fee + COE + Additional charges\n⏰ **Process**: Visit LTA or authorized dealer\n\nNeed help with any specific step?"
+
+  utter_features:
+  - text: "I can assist you with vehicle information, pricing, test drives, and maintenance guidance. Use the buttons below for quick access to these services."
+
+  utter_out_of_scope:
+  - text: "I specialize in automotive services. Please ask about vehicles, pricing, test drives, or maintenance. How can I help with your automotive needs?"
+
+  utter_default:
+  - text: "I didn't quite understand that. Could you please rephrase your question about vehicles, pricing, or services?"
+
+actions:
+  - action_get_coe_prices
+  - action_get_vehicle_info
+  - action_book_test_drive
+  - utter_greet
+  - utter_goodbye
+  - utter_coe_prices
+  - utter_vehicle_info
+  - utter_pricing
+  - utter_test_drive
+  - utter_maintenance
+  - utter_registration
+  - utter_features
+  - utter_out_of_scope
+  - utter_default
+
+session_config:
+  session_expiration_time: 60
+  carry_over_slots_to_new_session: true

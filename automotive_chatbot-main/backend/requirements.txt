@@ -1,0 +1,91 @@
+# ========================================
+# Automotive Chatbot Platform v2.1
+# Python Dependencies - Compatible with Python 3.8+
+# ========================================
+
+# API Framework - Latest stable versions
+fastapi>=0.68.0
+uvicorn[standard]>=0.15.0
+python-multipart==0.0.12
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+pydantic>=1.8.0,<2.0.0
+
+# Database - MongoDB for chatbot data
+motor>=3.0.0
+pymongo>=4.0.0
+sqlalchemy>=1.4.0,<2.0.0
+
+# Conversational AI Engine - Updated for Python 3.9+
+rasa>=3.6.0,<4.0.0
+rasa-sdk>=3.6.0,<4.0.0
+
+# OpenAI for enhanced responses
+openai>=1.0.0,<2.0.0
+
+# RAG (Retrieval-Augmented Generation) Stack - Compatible versions
+langchain>=0.1.0,<1.0.0
+langchain-openai>=0.1.0,<1.0.0
+langchain-community>=0.1.0,<1.0.0
+chromadb>=0.4.0,<0.7.0
+sentence-transformers>=2.2.0,<3.0.0
+tiktoken>=0.5.0,<1.0.0
+
+# Web Scraping for Real-time COE Data
+beautifulsoup4>=4.10.0
+aiohttp>=3.8.0,<4.0.0
+requests>=2.25.0
+lxml>=4.6.0
+
+# Utilities & Environment Management
+python-dotenv>=0.19.0
+websockets>=10.0,<11.0
+bcrypt>=4.0.0,<5.0.0
+packaging>=23.0
+
+# Development & Testing
+pytest>=7.0.0,<9.0.0
+httpx>=0.24.0
+pytest-asyncio>=0.21.0,<1.0.0
+
+# Performance & Monitoring
+rich>=13.0.0,<14.0.0
+loguru>=0.7.0,<1.0.0
+
+# Vector Store Dependencies
+numpy>=1.21.0,<2.0.0
+pandas>=1.3.0,<3.0.0
+
+# Singapore-specific dependencies
+holidays>=0.30,<1.0  # For Singapore public holidays
+
+# Production deployment
+gunicorn>=21.0.0,<24.0.0  # For production WSGI server
+
+# Type checking (development)
+mypy>=1.5.0,<2.0.0
+types-requests>=2.31.0,<3.0.0
+
+# Async Dependencies
+asyncio-mqtt>=0.11.0
+
+# ========================================
+# Installation Notes:
+# 
+# 1. Create virtual environment:
+#    python -m venv .venv
+#    .venv\Scripts\activate  (Windows)
+#    source .venv/bin/activate  (Linux/Mac)
+#
+# 2. Install dependencies:
+#    pip install -r requirements.txt
+#
+# 3. For development with auto-reload:
+#    pip install watchdog
+#
+# 4. Environment variables required:
+#    OPENAI_API_KEY=your_key_here
+#    LTA_API_KEY=your_singapore_lta_key
+#    MONGODB_URL=mongodb://localhost:27017
+#    MONGODB_DB=automotive_chatbot
+# ======================================== 

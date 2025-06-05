@@ -1,0 +1,229 @@
+version: "3.1"
+
+nlu:
+- intent: greet
+  examples: |
+    - hello
+    - hi
+    - hey
+    - good morning
+    - good afternoon
+    - good evening
+    - hi there
+    - hey there
+
+- intent: goodbye
+  examples: |
+    - bye
+    - goodbye
+    - see you later
+    - talk to you later
+    - have a good day
+    - thanks, bye
+    - see you
+
+- intent: affirm
+  examples: |
+    - yes
+    - yep
+    - yeah
+    - of course
+    - that sounds good
+    - correct
+    - right
+    - sure
+    - absolutely
+
+- intent: deny
+  examples: |
+    - no
+    - nope  
+    - I don't think so
+    - don't like that
+    - no way
+    - not really
+    - nah
+
+- intent: ask_coe_prices
+  examples: |
+    - coe price
+    - coe prices
+    - latest coe price
+    - latest coe prices
+    - current coe price
+    - current coe prices
+    - what is the coe price
+    - what are the coe prices
+    - how much is coe
+    - coe bidding results
+    - coe premium
+    - certificate of entitlement price
+    - certificate of entitlement prices
+    - coe
+    - COE
+    - latest coe
+    - current coe
+    - coe today
+    - coe this month
+    - what's the COE price
+    - current COE rates
+    - COE pricing
+    - COE cost today
+    - COE category A price
+    - COE category B price
+
+- intent: ask_vehicle_info
+  examples: |
+    - tell me about [toyota](car_brand)
+    - what about [honda](car_brand)
+    - [honda civic](car_model)
+    - [toyota camry](car_model)
+    - [mercedes](car_brand)
+    - [bmw](car_brand)
+    - [audi](car_brand)
+    - [hyundai](car_brand)
+    - [kia](car_brand)
+    - [nissan](car_brand)
+    - [mazda](car_brand)
+    - [subaru](car_brand)
+    - [volkswagen](car_brand)
+    - [volvo](car_brand)
+    - [lexus](car_brand)
+    - [infiniti](car_brand)
+    - show me [toyota](car_brand) cars
+    - what [honda](car_brand) models do you have
+    - [civic](car_model)
+    - [camry](car_model)
+    - [accord](car_model)
+    - [corolla](car_model)
+    - [altima](car_model)
+    - toyota
+    - honda
+    - bmw
+    - mercedes
+    - tell me about your cars
+    - what cars do you have
+    - what models are available
+    - show me your vehicles
+    - what types of cars do you sell
+
+- intent: ask_pricing
+  examples: |
+    - pricing
+    - price
+    - prices
+    - how much
+    - cost
+    - costs
+    - what's the price
+    - what are the prices
+    - vehicle prices
+    - car prices
+    - vehicle pricing
+    - car pricing
+    - price list
+    - price range
+    - budget
+    - affordable cars
+    - expensive cars
+    - cheap cars
+    - how much does it cost
+    - tell me the price
+    - how much is it
+    - what's the cost
+
+- intent: book_test_drive
+  examples: |
+    - book a test drive
+    - schedule a test drive
+    - can I test drive
+    - test drive
+    - arrange test drive
+    - book test drive
+    - schedule test drive
+    - I want to test drive
+    - can I book a test drive
+    - how to book test drive
+    - test drive booking
+    - drive test
+    - try the car
+    - can I schedule a test drive
+    - I'd like to test a car
+    - how do I book a test drive
+    - arrange a test drive
+
+- intent: ask_maintenance
+  examples: |
+    - maintenance
+    - service
+    - servicing
+    - repair
+    - change oil
+    - oil change
+    - tire change
+    - brake service
+    - engine service
+    - car wash
+    - maintenance tips
+    - service schedule
+    - when to service
+    - how often service
+    - maintenance cost
+    - service cost
+    - repair cost
+    - warranty
+    - parts
+    - when should I service my car
+    - maintenance schedule
+    - service intervals
+    - how often should I service
+    - maintenance requirements
+
+- intent: ask_registration
+  examples: |
+    - registration
+    - how to register
+    - vehicle registration
+    - car registration
+    - register car
+    - register vehicle
+    - registration process
+    - registration documents
+    - registration fee
+    - registration requirements
+    - paperwork
+    - documents needed
+    - LTA registration
+    - transfer ownership
+
+- intent: ask_features
+  examples: |
+    - what can you do
+    - what can u do
+    - features
+    - services
+    - what do you offer
+    - what services
+    - how can you help
+    - what help can you provide
+    - capabilities
+    - functions
+    - what are your features
+    - what services do you provide
+    - guide me
+    - help please
+
+- intent: out_of_scope
+  examples: |
+    - I want to order food
+    - what's the weather
+    - tell me a joke
+    - play music
+    - book a hotel
+    - flight booking
+    - restaurant recommendation
+    - movie times
+    - news
+    - sports scores
+    - any
+    - anything
