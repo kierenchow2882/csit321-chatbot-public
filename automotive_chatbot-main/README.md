@@ -42,7 +42,11 @@
 
 ## 🚀 Quick Start
 
-### 1. Unified Installation
+**👉 For simple 3-step setup, see [QUICK_START.md](QUICK_START.md)**
+
+### Alternative: Detailed Setup
+
+#### 1. Unified Installation
 
 Choose your platform and run the setup:
 
