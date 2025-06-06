@@ -323,6 +323,21 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🔧 Troubleshooting
 
+### Setup Script Hanging on Database Configuration
+
+**Problem**: The setup script hangs when setting up MongoDB, waiting for user input.
+
+**Solution**: The setup now uses non-interactive MongoDB configuration by default. If you encounter this issue with older versions:
+
+```bash
+# Force non-interactive setup
+python mongodb_setup_simple.py
+
+# Or set environment variable for advanced setup
+set MONGODB_INTERACTIVE_SETUP=true
+python setup.py
+```
+
 ### Windows-Specific Quick Fix
 
 If you encounter setup issues on Windows, run the Windows-specific fix script first:

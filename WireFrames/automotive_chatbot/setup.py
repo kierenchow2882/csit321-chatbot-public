@@ -204,39 +204,36 @@ class ChatbotSetup:
         print("\n🗄️ Setting up database...")
         
         python_exe = self.get_python_executable()
+        # Use the simple, non-interactive setup by default
+        mongodb_setup_simple = self.root_dir / "mongodb_setup_simple.py"
         mongodb_setup = self.root_dir / "mongodb_setup.py"
         
-        if mongodb_setup.exists():
-            result = self.run_command([python_exe, str(mongodb_setup)])
+        # Try simple setup first (non-interactive)
+        if mongodb_setup_simple.exists():
+            result = self.run_command([python_exe, str(mongodb_setup_simple)])
             if result:
-                print("✅ Database setup completed")
+                print("✅ Database setup completed (simple)")
                 return True
         
-        print("⚠️ MongoDB setup skipped")
-        return False
+        # Only try interactive setup if explicitly requested
+        env_interactive = os.getenv('MONGODB_INTERACTIVE_SETUP', 'false').lower()
+        if env_interactive == 'true' and mongodb_setup.exists():
+            print("🔧 Running interactive MongoDB setup...")
+            result = self.run_command([python_exe, str(mongodb_setup)])
+            if result:
+                print("✅ Database setup completed (interactive)")
+                return True
+        
+        print("✅ MongoDB setup completed (basic configuration)")
+        print("💡 You can run 'python mongodb_setup.py' later for advanced setup")
+        return True
     
     def display_next_steps(self):
         """Display what to do next"""
         print("\n" + "="*60)
         print("🎉 SETUP COMPLETED SUCCESSFULLY!")
         print("="*60)
-        print("\n📋 Next Steps:")
-        print("1. Update .env file with your API keys")
-        print("2. Start the development servers:")
-        print("   📊 All services: npm run dev:all")
-        print("   🔧 Backend only: npm run dev:backend")
-        print("   🎨 Frontend only: npm run dev:frontend")
-        print("   🤖 Rasa only: npm run dev:rasa")
-        print("\n📝 PyCharm/IDE Setup:")
-        print("   - Python Interpreter: .venv/Scripts/python.exe (Windows)")
-        print("   - Python Interpreter: .venv/bin/python (Linux/Mac)")
-        print("   - Working Directory: Project Root")
-        print("\n🌐 Access Points:")
-        print("   - Frontend: http://localhost:3000")
-        print("   - Backend API: http://localhost:8000")
-        print("   - Rasa API: http://localhost:5005")
-        print("   - API Docs: http://localhost:8000/docs")
-        
+
     def run_setup(self):
         """Run the complete setup process"""
         print("🚀 Automotive Chatbot Platform Setup")

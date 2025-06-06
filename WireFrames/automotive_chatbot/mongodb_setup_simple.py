@@ -7,10 +7,14 @@ import os
 import sys
 
 def create_env_file():
-    """Create a basic .env file for the backend."""
+    """Create a basic .env file for the backend and root."""
     try:
+        # Create backend .env file
         backend_dir = os.path.join(os.path.dirname(__file__), 'backend')
-        env_file = os.path.join(backend_dir, '.env')
+        backend_env_file = os.path.join(backend_dir, '.env')
+        
+        # Create root .env file
+        root_env_file = os.path.join(os.path.dirname(__file__), '.env')
         
         env_content = """# MongoDB Configuration
 MONGODB_CONNECTION_STRING=mongodb://localhost:27017/automotive_chatbot
@@ -27,12 +31,27 @@ JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
 
 # CORS Origins
 CORS_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
+
+# Optional: Authentication settings
+AUTH_ENABLED=false
+
+# Optional: Logging level
+LOG_LEVEL=INFO
 """
         
-        with open(env_file, 'w') as f:
-            f.write(env_content)
+        # Create backend directory if it doesn't exist
+        os.makedirs(backend_dir, exist_ok=True)
         
-        print(f"+ Created environment file: {env_file}")
+        # Write backend .env file
+        with open(backend_env_file, 'w') as f:
+            f.write(env_content)
+        print(f"+ Created backend environment file: {backend_env_file}")
+        
+        # Write root .env file
+        with open(root_env_file, 'w') as f:
+            f.write(env_content)
+        print(f"+ Created root environment file: {root_env_file}")
+        
         return True
         
     except Exception as e:
