@@ -48,27 +48,28 @@ backend/
    - Data validation
    - Type definitions
 
-## Latest Dependencies (2025)
+## Current Dependencies
 
-The backend uses the latest stable versions of all dependencies:
+The backend uses stable, compatible versions of all dependencies:
 
 ### Core Framework
-- **FastAPI 0.109.2**: Latest stable version with enhanced performance and security
-- **Uvicorn 0.27.1**: ASGI server with improved async handling
+- **FastAPI 0.88.0**: Compatible with Pydantic 1.x and Rasa 3.6.20
+- **Uvicorn 0.20.0**: ASGI server compatible with older FastAPI
+- **Pydantic 1.10.9**: Compatible with both FastAPI and Rasa
 
 ### Database
-- **Motor 3.7.1**: Latest async MongoDB driver (released May 14, 2025)
-- **PyMongo 4.9.0**: Latest MongoDB Python driver with full compatibility
-- **Note**: Motor will be deprecated May 14, 2026 in favor of PyMongo Async driver
+- **Motor 2.5.1**: Async MongoDB driver compatible with pymongo 3.x
+- **PyMongo 3.13.0**: MongoDB driver compatible with Rasa requirements
 
 ### Chatbot Engine
-- **Rasa 3.6.13**: Latest stable version with improved NLU and dialogue management
-- **Rasa SDK 3.6.1**: Latest SDK for custom actions
+- **Rasa 3.6.20**: Stable version with proven NLU and dialogue management
+- **Rasa SDK 3.6.2**: Latest SDK compatible with Rasa 3.6.20
 
-### Security & Authentication
-- **python-jose[cryptography] 3.3.0**: JWT token handling
-- **passlib[bcrypt] 1.7.4**: Password hashing
-- **bcrypt 4.0.1**: Secure password encryption
+### Network & Communication
+- **websockets 10.4**: Compatible with Rasa SDK
+- **sanic 21.12.2**: Compatible with Rasa SDK
+- **aiohttp 3.8.0-4.0.0**: Async HTTP client/server
+- **packaging 20.9**: Compatible with Rasa (no LegacyVersion issues)
 
 ## Setup
 

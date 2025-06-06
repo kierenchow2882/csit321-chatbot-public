@@ -8,16 +8,21 @@
     "start": "next start",
 
     "lint": "next lint",
-    "dev:all": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
-    "dev:all-with-rasa": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\" \"npm run dev:rasa\"",
+    "dev:all": "npm run show:startup-message && concurrently --kill-others-on-fail -c \"bgBlue.bold,bgGreen.bold,bgMagenta.bold\" -n \"BACKEND,FRONTEND,RASA\" \"npm run dev:backend\" \"npm run dev:frontend\" \"npm run dev:rasa\"",
+    "dev:core": "npm run show:core-message && concurrently --kill-others-on-fail -c \"bgBlue.bold,bgGreen.bold\" -n \"BACKEND,FRONTEND\" \"npm run dev:backend\" \"npm run dev:frontend\"",
     "dev:frontend": "cd frontend && npm run dev",
     "dev:backend": "cd backend && \"..\\.venv\\Scripts\\python.exe\" -m uvicorn api.main:app --reload --host localhost --port 8000",
-    "dev:rasa": "cd backend && ../.venv/Scripts/python.exe -m rasa run --enable-api --cors \"*\" --port 5005 -i localhost",
+    "dev:rasa": "cd backend && \"..\\.venv\\Scripts\\python.exe\" -m rasa run --enable-api --cors \"*\" --port 5005 -i localhost",
+    "show:startup-message": "echo. && echo 🚀 STARTING AUTOMOTIVE CHATBOT PLATFORM... && echo. && echo 📱 Frontend: http://localhost:3000 (starting...) && echo 🔧 Backend API: http://localhost:8000 (starting...) && echo 📚 API Docs: http://localhost:8000/docs (starting...) && echo 🤖 Rasa API: http://localhost:5005 (starting...) && echo 💾 MongoDB: mongodb://localhost:27017 && echo. && echo ⏳ Services are starting up... && echo.",
+    "show:core-message": "echo. && echo 🚀 STARTING CORE PLATFORM (Backend + Frontend)... && echo. && echo 📱 Frontend: http://localhost:3000 (starting...) && echo 🔧 Backend API: http://localhost:8000 (starting...) && echo 📚 API Docs: http://localhost:8000/docs (starting...) && echo 💾 MongoDB: mongodb://localhost:27017 && echo. && echo ⏳ Core services are starting up... && echo.",
+    "show:access-points": "echo. && echo 🚀 AUTOMOTIVE CHATBOT PLATFORM READY! && echo. && echo 📱 Frontend: http://localhost:3000 && echo 🔧 Backend API: http://localhost:8000 && echo 📚 API Docs: http://localhost:8000/docs && echo 🤖 Rasa API: http://localhost:5005 && echo 💾 MongoDB: mongodb://localhost:27017 && echo. && echo ✅ All services started successfully! && echo.",
     "install:frontend": "cd frontend && npm install",
     "install:backend": "cd backend && pip install -r requirements.txt",
-    "db:setup": "python mongodb_setup_simple.py",
+    "install:all": "npm run install:frontend && npm run install:backend",
+    "db:setup": "python mongodb_setup.py",
     "db:check": "python -c \"import pymongo; print('MongoDB connection OK')\"",
-    "status": "echo 'Checking services...' && curl -f http://localhost:3000 && curl -f http://localhost:8000/health && curl -f http://localhost:5005/status"
+    "status": "echo Checking services... && curl -f http://localhost:3000 && curl -f http://localhost:8000/health && curl -f http://localhost:5005/status",
+    "rasa:train": "cd backend && \"..\\.venv\\Scripts\\python.exe\" -m rasa train"
   },
   "dependencies": {
     "@heroicons/react": "^2.1.1",

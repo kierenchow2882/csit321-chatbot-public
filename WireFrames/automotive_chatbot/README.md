@@ -1,541 +1,411 @@
-# CleverCompanion - Intelligent Chatbot Platform
+# 🚗 Automotive Chatbot Platform
 
-**CleverCompanion** is a comprehensive AI-powered chatbot platform built with React (Next.js), FastAPI, Rasa, and MongoDB. It features an admin dashboard, embeddable widgets, and real-time chat capabilities.
+**An intelligent conversational AI platform for automotive services in Singapore**
 
-## ✨ Features
+[![Python](https://img.shields.io/badge/Python-3.9+-blue.svg)](https://python.org)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-green.svg)](https://fastapi.tiangolo.com)
+[![Next.js](https://img.shields.io/badge/Next.js-15+-black.svg)](https://nextjs.org)
+[![Rasa](https://img.shields.io/badge/Rasa-3.6+-purple.svg)](https://rasa.com)
+[![MongoDB](https://img.shields.io/badge/MongoDB-7.0+-green.svg)](https://mongodb.com)
 
-### 🤖 **Core AI Engine**
-- **Rasa-powered NLU/NLG** - Advanced natural language understanding
-- **FastAPI Backend** - High-performance REST API with auto-documentation
-- **Multi-model Support** - Handles automotive queries, COE pricing, vehicle information
-- **Context Awareness** - Maintains conversation context and user preferences
-- **Real-time Responses** - Low-latency chat experience
+## 🎯 Overview
 
-### 🎛️ **Admin Dashboard**
-- **Story Management** - Create, edit, delete conversation flows
-- **NLU Training** - Manage intents, entities, and training data
-- **Rules Engine** - Define business logic and response rules
-- **Analytics Dashboard** - Conversation metrics and user insights
-- **Model Training** - One-click Rasa model training and deployment
-- **Backup/Restore** - Complete system state management
+This platform provides an intelligent chatbot for automotive queries in Singapore, featuring:
 
-### 🔗 **Embeddable Widgets**
-- **Universal Embedding** - Drop-in JavaScript widget for any website
-- **React Component** - Pre-built component for React applications
-- **Customizable UI** - Themes, colors, positioning, and styling
-- **Mobile Responsive** - Optimized for all device sizes
-- **Cross-domain Support** - CORS-enabled for secure embedding
+- **🤖 Conversational AI** powered by Rasa
+- **🔍 Real-time data** integration (COE prices, car information)
+- **📱 Modern web interface** built with Next.js
+- **🔧 RESTful API** backend with FastAPI
+- **💾 MongoDB database** for data persistence
+- **🇸🇬 Singapore-focused** automotive expertise
 
-### 🚗 **Automotive Specialization**
-- **COE Price Integration** - Real-time Singapore COE bidding results
-- **Vehicle Database** - Comprehensive car specifications and pricing
-- **Maintenance Scheduling** - Service reminders and recommendations
-- **Test Drive Booking** - Integration with dealership systems
-- **Insurance Guidance** - Policy recommendations and comparisons
+## ⚡ Quick Start
 
-### 🔧 Developer Experience
-- **Unified Setup** - One-click installation for all dependencies
-- **Cross-Platform** - Windows, macOS, Linux support
-- **IDE Integration** - PyCharm, VSCode configurations
-- **Hot Reload** - Development server with auto-refresh
-- **Docker Support** - Containerized deployment
-
-## 🚀 Quick Start
-
-**👉 For simple 3-step setup, see [QUICK_START.md](QUICK_START.md)**
-
-### Alternative: Detailed Setup
-
-#### 1. Unified Installation
-
-Choose your platform and run the setup:
-
-#### Windows (PyCharm/Command Prompt)
+### **Core Platform** (Simplified - No Complex Dependencies!)
 ```bash
+git clone <repository-url>
+cd WireFrames/automotive_chatbot
 python setup.py
-# OR
-setup.bat
+npm run dev:all              # Frontend + Backend (stable)
 ```
 
-#### macOS/Linux (VSCode/Terminal)
+**🎉 Your platform will be ready at:**
+- **Frontend**: http://localhost:3000 ✅
+- **Backend API**: http://localhost:8000 ✅
+- **API Docs**: http://localhost:8000/docs ✅
+
+### **🎉 STABLE PLATFORM - Clean Architecture!**
+
+**✅ Production-Ready**: Using proven dependency configuration from working projects!
+
+**Current Platform Status**: ✅ **CORE FEATURES FULLY WORKING** - Stable FastAPI backend with modern stack!
+
+**🔥 Two-Tier Architecture**: 
 ```bash
-python3 setup.py
-# OR
-chmod +x setup.sh && ./setup.sh
+# Core Platform (Always Works)
+python setup.py
+npm run dev:all              # Frontend + Backend (stable)
+
+# Advanced AI Features (Optional)
+pip install rasa>=3.6.0,<4.0.0
+pip install rasa-sdk>=3.6.0,<4.0.0
+npm run dev:all-with-rasa    # Includes Rasa (requires manual setup)
 ```
 
-### 2. Environment Configuration
+**✅ Perfect for Development**: Clean separation of stable core platform from advanced AI features!
 
-Update `.env` file with your API keys:
-```env
-OPENAI_API_KEY=your_openai_key_here
-LTA_API_KEY=your_singapore_lta_key
-MONGODB_URL=mongodb://localhost:27017
-MONGODB_DB=automotive_chatbot
-```
+## 🔧 Troubleshooting
 
-### 3. Start Development
+### Common Issues and Fixes
 
+**Problem 1: Core Platform Issues**
 ```bash
-# Start all services (Frontend + Backend + Rasa)
-npm run dev:all
-
-# Or start individually
-npm run dev:frontend    # Next.js frontend (port 3000)
-npm run dev:backend     # FastAPI backend (port 8000)
-npm run dev:rasa        # Rasa server (port 5005)
+# Using stable, tested dependency versions
+pip install -r backend/requirements.txt
+# FastAPI 0.104.1 + Pydantic 2.x + Modern stack (proven working configuration)
 ```
 
-## 🔗 Embedding CleverCompanion
+**Problem 2: Database Connection**
+- MongoDB: pymongo 4.6.x + motor 3.3.x (stable modern versions)
+- Check MongoDB is running: `mongosh` or `mongo`
 
-### Quick Embed (Any Website)
+**Problem 3: Authentication Setup**
+- Using python-jose[cryptography] 3.3.0 for stable JWT handling
+- Includes bcrypt for password hashing
 
-```html
-<!-- Add this to your website's HTML -->
-<script src="https://your-domain.com/embed.js"></script>
-<script>
-  window.CleverCompanionConfig = {
-    title: 'CleverCompanion',
-    primaryColor: '#3B82F6',
-    apiEndpoint: 'https://your-domain.com/api/chat'
-  };
-</script>
+**Problem 4: Advanced AI Features (Rasa)**
+```bash
+# Install separately for AI features
+pip install rasa>=3.6.0,<4.0.0
+pip install rasa-sdk>=3.6.0,<4.0.0
+
+# Note: May require additional cryptography setup on Windows
+# See: https://cryptography.io/en/latest/installation/#windows
 ```
 
-### Advanced Configuration
-
-```javascript
-window.CleverCompanionConfig = {
-  title: 'CleverCompanion',
-  subtitle: 'Your Intelligent Assistant',
-  primaryColor: '#3B82F6',
-  backgroundColor: '#FFFFFF',
-  textColor: '#1F2937',
-  position: 'bottom-right', // 'bottom-left', 'bottom-right'
-  apiEndpoint: 'https://your-api-domain.com/api/chat',
-  welcomeMessage: 'Hello! How can I help you today?',
-  placeholder: 'Type your message...',
-  height: '500px',
-  width: '400px',
-};
-
-// Programmatic API
-window.CleverCompanion.open();    // Open chat
-window.CleverCompanion.close();   // Close chat
-window.CleverCompanion.sendMessage('Hello'); // Send message
+**Problem 5: spaCy Installation (for AI features)**
+```bash
+# Download spaCy model for NLP
+python -m spacy download en_core_web_sm
 ```
 
-## 🎛️ Admin Dashboard
+## 📋 Prerequisites
 
-Access the admin dashboard at `http://localhost:3000/admin`
-
-**Demo Credentials:** `admin_demo_token`
-
-### Features:
-- **📚 Stories Management** - Visual editor for conversation flows
-- **🧠 NLU Training** - Intent and entity management
-- **⚙️ Configuration** - Domain and response templates
-- **🏋️ Model Training** - One-click Rasa training
-- **📊 Analytics** - Usage statistics and insights
-- **💾 Backup/Restore** - Automated data protection
+- **Python 3.9+** installed
+- **Node.js 18+** and npm installed
+- **MongoDB** running locally (or MongoDB Atlas)
+- **Git** for version control
 
 ## 🏗️ Architecture
 
 ```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Frontend      │    │    Backend      │    │   Rasa Server   │
-│   (Next.js)     │◄──►│   (FastAPI)     │◄──►│   (Port 5005)   │
-│   Port 3000     │    │   Port 8000     │    │                 │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-         │                        │                        │
-         ▼                        ▼                        ▼
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│  Widget Embed   │    │    MongoDB      │    │   Vector DB     │
-│  (embed.js)     │    │   (Database)    │    │  (ChromaDB)     │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
+automotive_chatbot/
+├── frontend/          # Next.js React application
+├── backend/           # FastAPI Python backend
+│   ├── api/          # API routes and endpoints
+│   ├── data/         # Rasa training data
+│   └── requirements.txt # Single dependency file
+├── docs/             # Documentation
+├── setup.py          # One-command setup script
+└── package.json      # npm scripts and dependencies
 ```
 
-## 🛠️ Development Setup
+## 🚀 Features
 
-### IDE Configuration
+### For End Users
+- **Natural Language Queries**: Ask about cars in plain English
+- **Real-time COE Data**: Current Certificate of Entitlement prices
+- **Car Information**: Specifications, pricing, comparisons
+- **Loan Calculations**: Financing options and bank information
+- **Singapore-specific**: Local automotive market expertise
 
-#### PyCharm
-1. Open project in PyCharm
-2. File → Settings → Project → Python Interpreter
-3. Add Interpreter → Existing Environment
-4. Select: `.venv/Scripts/python.exe` (Windows) or `.venv/bin/python` (macOS/Linux)
+### For Developers
+- **RESTful API**: Well-documented endpoints
+- **WebSocket Support**: Real-time chat capabilities  
+- **Database Integration**: MongoDB for data persistence
+- **AI Training Data**: Customizable Rasa conversation flows
+- **Modern Stack**: FastAPI + Next.js + MongoDB + Rasa
 
-#### VSCode
-1. Open project in VSCode
-2. Ctrl+Shift+P → "Python: Select Interpreter"
-3. Select: `.venv/bin/python` or `.venv/Scripts/python.exe`
+## 📖 Documentation
+
+| Document | Description |
+|----------|-------------|
+| [**Quick Start**](docs/QUICK_START.md) | Get up and running in minutes |
+| [**Usage Guide**](docs/USAGE.md) | Comprehensive platform usage |
+| [**Rasa Setup**](docs/RASA_SETUP.md) | AI training and configuration |
+| [**Integration Guide**](docs/INTEGRATION_GUIDE.md) | API integration examples |
+| [**User Manual**](docs/USER_MANUAL.md) | End-user guide |
+| [**MongoDB Setup**](docs/MONGODB_SETUP.md) | Database configuration |
+
+## 🛠️ Development
 
 ### Available Scripts
-
 ```bash
-# Development
-npm run dev              # Frontend only
-npm run dev:backend      # Backend only  
-npm run dev:rasa         # Rasa only
-npm run dev:all          # All services
+# Development  
+npm run dev:all              # Start all services (Frontend + Backend + Rasa)
+npm run dev:frontend         # Frontend only
+npm run dev:backend          # Backend only
+npm run dev:rasa             # Rasa only
+
+# Installation
+npm run install:all          # Install all dependencies
+npm run install:frontend     # Install frontend deps
+npm run install:backend      # Install backend deps
+
+# AI & Training
+npm run rasa:train           # Train Rasa model
+npm run spacy:download       # Download language model
 
 # Database
-npm run db:setup         # Setup MongoDB
-npm run db:check         # Check DB connection
+npm run db:setup             # Setup MongoDB
+npm run db:check             # Check connection
 
-# Utilities
-npm run status           # Check all services
+# Testing
+npm run status               # Check all services
 ```
 
-## 📂 Project Structure
+### Tech Stack
+- **Backend**: FastAPI, Python 3.9+, Rasa 3.6+
+- **Frontend**: Next.js 15+, React 19+, TypeScript
+- **Database**: MongoDB 7.0+
+- **AI/ML**: Rasa, spaCy, Transformers
+- **Deployment**: Uvicorn, Gunicorn
 
-```
-automotive_chatbot/
-├── 📁 frontend/                 # Next.js frontend
-│   ├── 📁 src/
-│   │   ├── 📁 app/
-│   │   │   ├── 📁 admin/        # Admin dashboard
-│   │   │   │   ├── page.tsx     # Main dashboard
-│   │   │   │   └── stories/     # Stories management
-│   │   │   └── page.tsx         # Main chat interface
-│   │   └── 📁 components/
-│   │       └── EmbeddableWidget.tsx
-│   └── 📄 package.json
-├── 📁 backend/                  # FastAPI backend
-│   ├── 📁 api/
-│   │   ├── 📁 routes/
-│   │   │   ├── admin.py         # Admin API routes
-│   │   │   ├── chatbots.py      # Chat endpoints
-│   │   │   └── widget_api.py    # Widget API
-│   │   └── main.py
-│   ├── 📁 data/                 # Rasa training data
-│   │   ├── stories.yml          # Conversation flows
-│   │   ├── nlu.yml              # Training examples
-│   │   └── rules.yml            # Conversation rules
-│   ├── domain.yml               # Chatbot domain
-│   ├── config.yml               # Rasa configuration
-│   └── requirements.txt
-├── 📁 public/
-│   └── embed.js                 # Embeddable widget script
-├── 📁 docs/
-│   └── embedding-guide.md       # Widget integration guide
-├── setup.py                     # Unified setup script
-├── setup.bat                    # Windows setup
-├── setup.sh                     # Unix setup
-└── package.json                 # Root package configuration
+## 🔧 Configuration
+
+### Environment Variables
+Create `.env` in project root:
+```env
+# API Keys
+OPENAI_API_KEY=your_openai_key_here
+LTA_API_KEY=your_singapore_lta_key
+
+# Database
+MONGODB_URL=mongodb://localhost:27017
+MONGODB_DB=automotive_chatbot
+
+# Services
+FRONTEND_URL=http://localhost:3000
+BACKEND_URL=http://localhost:8000
+RASA_URL=http://localhost:5005
 ```
 
-## 🌟 Key Features
+### Single Requirements File
+All Python dependencies are in `backend/requirements.txt` - no multiple requirement files needed.
 
-### Real-time COE Integration
-- Live Certificate of Entitlement pricing from Singapore LTA
-- Automated data updates every 15 minutes
-- Historical trend analysis
+## 📱 API Endpoints
 
-### RAG-Enhanced Responses
-- Vector similarity search for relevant context
-- OpenAI GPT integration for natural responses
-- Automotive knowledge base with 10,000+ entries
+### Chat API
+```bash
+POST /api/chat
+{
+  "message": "What's the price of Toyota Camry?",
+  "user_id": "user123",
+  "session_id": "session456"
+}
+```
 
-### Production Ready
-- Docker containerization
-- Environment-based configuration
-- Comprehensive error handling
-- Rate limiting and security
+### Car Information
+```bash
+GET /api/cars                    # List all cars
+GET /api/cars/toyota             # Toyota models
+GET /api/cars?model=camry        # Specific model
+```
+
+### COE Data
+```bash
+GET /api/coe/current             # Current COE prices
+GET /api/coe/history             # Historical data
+```
+
+### Service Health
+```bash
+GET /health                      # Backend health
+GET /status                      # System status
+```
+
+## 🤖 AI Training
+
+The platform uses Rasa for conversational AI:
+
+```bash
+# Train the model
+npm run rasa:train
+
+# Validate training data
+cd backend && rasa data validate
+
+# Test in interactive mode
+cd backend && rasa shell
+```
+
+Training data is in `backend/data/`:
+- `nlu.yml` - User intents and examples
+- `stories.yml` - Conversation flows
+- `domain.yml` - Bot responses and actions
 
 ## 🚀 Deployment
 
-### Docker Deployment
+### Local Development
 ```bash
-# Build and run with Docker Compose
-docker-compose up -d
-
-# Or build manually
-docker build -t automotive-chatbot .
-docker run -p 3000:3000 -p 8000:8000 automotive-chatbot
+python setup.py
+npm run dev:all
 ```
 
-### Production Environment
+### Production
 ```bash
-# Frontend build
+# Build frontend
 cd frontend && npm run build
 
-# Backend with Gunicorn
-cd backend && gunicorn api.main:app --host 0.0.0.0 --port 8000
+# Start production backend
+cd backend && uvicorn api.main:app --host 0.0.0.0 --port 8000
 
-# Rasa production server
+# Start Rasa server
 cd backend && rasa run --enable-api --cors "*" --port 5005
 ```
 
-## 📊 API Documentation
+## 🧪 Testing
 
-- **Main API**: `http://localhost:8000/docs`
-- **Admin API**: `http://localhost:8000/docs#/admin`
-- **Widget API**: `http://localhost:8000/docs#/widget`
-- **Rasa API**: `http://localhost:5005/docs`
+### Quick Health Check
+```bash
+npm run status
+```
 
-## 🔒 Security
+### Individual Service Tests
+```bash
+# Backend API
+curl http://localhost:8000/health
 
-- JWT token authentication for admin routes
-- CORS configuration for production
-- Input validation and sanitization
-- Rate limiting on all endpoints
-- Secure environment variable handling
+# Rasa API  
+curl http://localhost:5005/status
 
-## 📈 Analytics & Monitoring
+# Frontend
+curl http://localhost:3000
+```
 
-The admin dashboard provides:
-- Real-time usage statistics
-- Conversation flow analytics
-- User interaction patterns
-- Model performance metrics
-- Error rate monitoring
+### Chat API Test
+```bash
+curl -X POST http://localhost:8000/api/chat \
+  -H "Content-Type: application/json" \
+  -d '{"message": "Hello", "user_id": "test"}'
+```
+
+## 🚨 Troubleshooting
+
+### Common Issues
+
+#### "rasa: command not found"
+```bash
+.venv\Scripts\activate
+pip install -r backend/requirements.txt
+```
+
+#### MongoDB connection error
+```bash
+# Windows
+net start MongoDB
+
+# Mac
+brew services start mongodb-community
+
+# Check connection
+python -c "import pymongo; pymongo.MongoClient().server_info()"
+```
+
+#### Port conflicts
+```bash
+# Check what's using the ports
+netstat -an | findstr :3000
+netstat -an | findstr :8000
+netstat -an | findstr :5005
+
+# Kill processes if needed
+taskkill /PID <process_id> /F
+```
+
+## 📊 Project Status
+
+- ✅ **Core Platform**: Stable and functional
+- ✅ **Single Requirements File**: Streamlined dependencies
+- ✅ **Comprehensive setup.py**: One-command installation
+- ✅ **API Endpoints**: Complete and documented
+- ✅ **AI Training**: Automotive-focused model
+- ✅ **Frontend Interface**: Responsive web app
+- ✅ **Database Integration**: MongoDB setup
+- ✅ **Documentation**: Comprehensive guides in docs/ folder
+- ✅ **npm Scripts**: All development commands working
+- 🔄 **Continuous Improvement**: Active development
+
+## 🎯 IDE Support
+
+The platform works seamlessly with popular IDEs:
+
+### Visual Studio Code
+- Open project folder
+- Python extension will auto-detect `.venv`
+- Use integrated terminal for npm commands
+
+### JetBrains IDEs (PyCharm, WebStorm)
+- Open project folder
+- Configure Python interpreter: `.venv/Scripts/python.exe`
+- Use built-in terminal for development
+
+### Other IDEs
+- Any IDE with Python and Node.js support
+- Configure virtual environment path
+- Use terminal for npm scripts
 
 ## 🤝 Contributing
 
 1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/amazing-feature`
+2. Create feature branch: `git checkout -b feature/amazing-feature`
 3. Commit changes: `git commit -m 'Add amazing feature'`
 4. Push to branch: `git push origin feature/amazing-feature`
-5. Open a Pull Request
+5. Open Pull Request
 
 ## 📝 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🆘 Support
+## 📞 Support
 
-- **Documentation**: [Full Documentation](docs/)
-- **Issues**: [GitHub Issues](https://github.com/your-repo/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/your-repo/discussions)
+- **Documentation**: Check [docs/](docs/) folder
+- **Issues**: Create GitHub issues for bugs
+- **Questions**: Use discussions for general questions
 
-## 🙏 Acknowledgments
+## 🎉 Acknowledgments
 
-- [Rasa](https://rasa.com/) - Conversational AI framework
-- [FastAPI](https://fastapi.tiangolo.com/) - Modern Python web framework
-- [Next.js](https://nextjs.org/) - React production framework
-- [LangChain](https://langchain.com/) - RAG implementation
-- [Singapore LTA](https://datamall.lta.gov.sg/) - COE data API
+- **Rasa**: Conversational AI framework
+- **FastAPI**: Modern Python web framework
+- **Next.js**: React-based frontend framework
+- **MongoDB**: Database solution
+- **Singapore LTA**: Data source for automotive information
 
 ---
 
-⭐ **Star this repository if you find it helpful!**
+**🚗 Ready to build the future of automotive customer service in Singapore!**
 
-## 🔧 Troubleshooting
+## 🔄 Recent Updates
 
-### Setup Script Hanging on Database Configuration
+### v2.1.0 - Streamlined Setup
+- ✅ **Single requirements.txt**: No more multiple requirement files
+- ✅ **Comprehensive setup.py**: One-command installation
+- ✅ **Updated documentation**: All guides moved to docs/ folder
+- ✅ **Improved npm scripts**: Better Windows PowerShell support
+- ✅ **Access points display**: Shows all URLs after startup
+- ✅ **Enhanced error handling**: Better troubleshooting guides
 
-**Problem**: The setup script hangs when setting up MongoDB, waiting for user input.
+### What's Working
+- ✅ **setup.py**: Complete environment setup
+- ✅ **npm run dev:all**: Starts all services
+- ✅ **npm run rasa:train**: AI model training
+- ✅ **npm run status**: Service health checks
+- ✅ **Documentation**: Comprehensive guides
+- ✅ **Requirements**: Single dependency file
 
-**Solution**: The setup now uses non-interactive MongoDB configuration by default. If you encounter this issue with older versions:
-
-```bash
-# Force non-interactive setup
-python mongodb_setup_simple.py
-
-# Or set environment variable for advanced setup
-set MONGODB_INTERACTIVE_SETUP=true
-python setup.py
-```
-
-### Windows-Specific Quick Fix
-
-If you encounter setup issues on Windows, run the Windows-specific fix script first:
-
-```bash
-python windows-fix.py
-```
-
-This script will:
-- Fix Windows path issues in npm scripts
-- Resolve ESLint dependency conflicts  
-- Install dependencies with proper Windows commands
-- Clean and reinstall problematic packages
-
-**PowerShell Execution Policy Issue:**
-If you get "running scripts is disabled" error, run:
-```powershell
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-```
-
-Or use the PowerShell fix script:
-```powershell
-.\windows-powershell-fix.ps1
-```
-
-### Quick Fix Script
-
-If you encounter setup issues, run the quick fix script first:
-
-```bash
-python quick-fix.py
-```
-
-### Common Issues
-
-#### 1. Windows: `'..' is not recognized as an internal or external command`
-```bash
-# Solution: Use the Windows-specific scripts
-npm run dev:all        # Uses Windows paths
-npm run dev:all-unix   # For WSL/Linux users
-
-# Or run individually:
-npm run dev:frontend
-npm run dev:backend  
-npm run dev:rasa
-```
-
-#### 2. `npm run dev:all` fails with "concurrently not found"
-```bash
-# Solution: Install concurrently
-npm install concurrently
-
-# Or run services individually
-npm run dev:frontend    # Terminal 1
-npm run dev:backend     # Terminal 2  
-npm run dev:rasa        # Terminal 3
-```
-
-#### 3. ESLint dependency conflicts in frontend
-```bash
-# Solution: Install with legacy peer deps
-cd frontend
-rm -rf node_modules package-lock.json  # Linux/Mac
-rmdir /s /q node_modules & del package-lock.json  # Windows
-npm install --legacy-peer-deps
-```
-
-#### 4. Python dependency installation fails
-```bash
-# Solution 1: Use basic requirements first
-cd backend
-pip install -r requirements-basic.txt
-
-# Solution 2: Remove problematic packages and retry
-pip install -r requirements.txt
-
-# Solution 3: Manual installation
-pip install fastapi uvicorn python-multipart pymongo motor
-```
-
-#### 5. `python-cors` package not found
-This has been fixed in the latest requirements.txt. FastAPI has built-in CORS support. If you see this error:
-```bash
-# Update your requirements file or reinstall:
-pip install --upgrade -r backend/requirements.txt
-```
-
-#### 6. Node.js/npm not found (Windows)
-```bash
-# Download and install Node.js from https://nodejs.org/
-# Or add to PATH temporarily:
-set PATH=%PATH%;C:\Program Files\nodejs
-
-# Verify installation:
-npm --version
-```
-
-#### 7. Python version compatibility issues
-```bash
-# Check your Python version
-python --version
-
-# For Python 3.9+, use updated requirements
-pip install --upgrade pip
-pip install -r backend/requirements.txt
-```
-
-#### 8. MongoDB connection issues
-```bash
-# Option 1: Install MongoDB locally
-# Download from https://www.mongodb.com/try/download/community
-
-# Option 2: Use Docker
-docker run -d -p 27017:27017 --name mongodb mongo
-
-# Option 3: Skip MongoDB for basic testing
-# The app will work with limited functionality
-```
-
-#### 9. Unicode encoding errors (Windows)
-```bash
-# Run commands in PowerShell or Command Prompt with UTF-8
-chcp 65001
-python setup.py
-```
-
-### Progressive Setup Approach
-
-If full setup fails, try this progressive approach:
-
-1. **Run Windows fix script:**
-   ```bash
-   python windows-fix.py
-   ```
-
-2. **Install Node.js dependencies only:**
-   ```bash
-   npm install
-   cd frontend && npm install --legacy-peer-deps
-   ```
-
-3. **Install basic Python dependencies:**
-   ```bash
-   cd backend
-   pip install -r requirements-basic.txt
-   ```
-
-4. **Start frontend only:**
-   ```bash
-   npm run dev:frontend
-   ```
-
-5. **Start backend only:**
-   ```bash
-   npm run dev:backend
-   ```
-
-6. **Add advanced features gradually:**
-   ```bash
-   # Install Rasa when ready
-   pip install rasa>=3.6.0
-   
-   # Install RAG features when ready  
-   pip install langchain chromadb sentence-transformers
-   ```
-
-### Platform-Specific Commands
-
-#### Windows (Command Prompt/PowerShell)
-```bash
-# Setup
-python setup.py
-# OR
-setup.bat
-
-# Development
-npm run dev:all          # All services
-npm run dev:frontend     # Frontend only
-npm run dev:backend      # Backend only
-
-# Virtual environment activation
-.venv\Scripts\activate
-```
-
-#### Windows (WSL) / Linux / macOS
-```bash
-# Setup  
-python3 setup.py
-# OR
-chmod +x setup.sh && ./setup.sh
-
-# Development
-npm run dev:all-unix     # All services (Unix paths)
-npm run dev:frontend     # Frontend only
-npm run dev:backend-unix # Backend only (Unix paths)
-
-# Virtual environment activation
-source .venv/bin/activate
-```
-
-## 🛠️ Development Setup
+### Next Steps for Users
+1. Run `python setup.py` for initial setup
+2. Edit `.env` file with your API keys
+3. Start development with `npm run dev:all`
+4. Train AI model with `npm run rasa:train`
+5. Check documentation in `docs/` folder
