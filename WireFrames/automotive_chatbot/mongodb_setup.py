@@ -58,7 +58,7 @@ class MongoDBSetup:
             print("+ MongoDB connection successful!")
             return client
         except (ConnectionFailure, ServerSelectionTimeoutError) as e:
-            print(f"✗ MongoDB connection failed: {e}")
+            print(f"[ERROR] MongoDB connection failed: {e}")
             return None
     
     def setup_database(self):
@@ -82,14 +82,14 @@ class MongoDBSetup:
             for collection_name in collections_to_create:
                 if collection_name not in existing_collections:
                     self.db.create_collection(collection_name)
-                    print(f"✓ Created collection: {collection_name}")
+                    print(f"[SUCCESS] Created collection: {collection_name}")
                 else:
                     print(f"- Collection already exists: {collection_name}")
             
             return True
             
         except Exception as e:
-            print(f"✗ Error setting up database: {e}")
+            print(f"[ERROR] Error setting up database: {e}")
             return False
     
     def insert_sample_data(self):
@@ -112,7 +112,7 @@ class MongoDBSetup:
             # Check if config already exists
             if self.db.chatbot_configs.count_documents({}) == 0:
                 self.db.chatbot_configs.insert_one(sample_config)
-                print("✓ Inserted sample chatbot configuration")
+                print("[SUCCESS] Inserted sample chatbot configuration")
             else:
                 print("- Chatbot configuration already exists")
             
@@ -150,7 +150,7 @@ class MongoDBSetup:
             
             if self.db.nlu_data.count_documents({}) == 0:
                 self.db.nlu_data.insert_many(sample_nlu)
-                print("✓ Inserted sample NLU data")
+                print("[SUCCESS] Inserted sample NLU data")
             else:
                 print("- NLU data already exists")
             
@@ -176,14 +176,14 @@ class MongoDBSetup:
             
             if self.db.stories.count_documents({}) == 0:
                 self.db.stories.insert_many(sample_stories)
-                print("✓ Inserted sample stories")
+                print("[SUCCESS] Inserted sample stories")
             else:
                 print("- Stories already exist")
                 
             return True
             
         except Exception as e:
-            print(f"✗ Error inserting sample data: {e}")
+            print(f"[ERROR] Error inserting sample data: {e}")
             return False
     
     def create_indexes(self):
@@ -195,11 +195,11 @@ class MongoDBSetup:
             self.db.users.create_index("email", unique=True)
             self.db.analytics.create_index("timestamp")
             
-            print("✓ Created database indexes")
+            print("[SUCCESS] Created database indexes")
             return True
             
         except Exception as e:
-            print(f"✗ Error creating indexes: {e}")
+            print(f"[ERROR] Error creating indexes: {e}")
             return False
     
     def save_connection_to_env(self):
@@ -230,11 +230,11 @@ class MongoDBSetup:
             with open(env_file, 'w') as f:
                 f.write('\n'.join(lines))
             
-            print(f"✓ Saved connection string to {env_file}")
+            print(f"[SUCCESS] Saved connection string to {env_file}")
             return True
             
         except Exception as e:
-            print(f"✗ Error saving to .env file: {e}")
+            print(f"[ERROR] Error saving to .env file: {e}")
             return False
     
     def run_setup(self):
@@ -275,9 +275,9 @@ class MongoDBSetup:
             return False
         
         print("\n" + "=" * 50)
-        print("✓ MongoDB setup completed successfully!")
-        print(f"✓ Database: {self.db_name}")
-        print(f"✓ Connection: {self.connection_string}")
+        print("[SUCCESS] MongoDB setup completed successfully!")
+        print(f"[SUCCESS] Database: {self.db_name}")
+        print(f"[SUCCESS] Connection: {self.connection_string}")
         print("\nYou can now start the application with:")
         print("  npm run dev:all")
         
@@ -285,7 +285,7 @@ class MongoDBSetup:
 
 def check_dependencies():
     """Check if required dependencies are installed."""
-                try:
+    try:
         import pymongo
         print("+ PyMongo is installed")
         return True
