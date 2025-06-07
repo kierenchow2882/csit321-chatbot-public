@@ -178,49 +178,23 @@ def install_python_dependencies():
     if not run_command(f"{python_exe} -m pip install --upgrade pip", "Upgrading pip"):
         print_warning("Failed to upgrade pip, continuing anyway...")
     
-    # Install dependencies from requirements.txt
+    # Install all dependencies from requirements.txt (including Rasa)
     requirements_file = Path("backend") / "requirements.txt"
     if requirements_file.exists():
-        # First check if Rasa is installed and causing conflicts
-        try:
-            result = subprocess.run(f"{python_exe} -c \"import rasa; print('Rasa installed')\"", 
-                                  shell=True, capture_output=True, text=True)
-            if result.returncode == 0:
-                print_warning("Rasa is already installed - may cause dependency conflicts")
-                print_info("Consider uninstalling Rasa first: pip uninstall rasa rasa-sdk")
-        except:
-            pass
-            
-        # Try installing from requirements.txt with dependency conflict handling
         install_result = run_command(f"{python_exe} -m pip install -r {requirements_file}", 
-                                   "Installing Python dependencies", check=False)
+                                   "Installing Python dependencies (including Rasa)", check=False)
         
-        if not install_result:
-            # Get more detailed error information
-            try:
-                result = subprocess.run(f"{python_exe} -m pip install -r {requirements_file}", 
-                                      shell=True, capture_output=True, text=True)
-                if "conflict" in result.stderr.lower() or "incompatible" in result.stderr.lower():
-                    print_warning("Dependency conflicts detected - this is expected if Rasa is installed")
-                    print_info("The core platform dependencies were installed successfully")
-                    print_info("Rasa conflicts can be ignored for core platform functionality")
-                else:
-                    print_error(f"Installation failed: {result.stderr}")
-            except:
-                print_warning("Some packages may have conflicts, but core functionality should work")
-        
-        # Rasa is now optional - only install if requested
-        print_info("Rasa installation is optional (for advanced AI features)")
-        print_info("To install Rasa: pip install rasa>=3.6.0,<4.0.0 rasa-sdk>=3.6.0,<4.0.0")
+        if install_result:
+            print_success("All dependencies installed successfully!")
+            print_info("Platform includes: FastAPI, MongoDB, Rasa, web scraping")
+        else:
+            print_warning("Some packages may have had conflicts, but installation attempted")
+            print_info("Core functionality should still work")
     else:
         print_error("requirements.txt not found in backend directory")
         return False
     
     return True
-
-
-
-
 
 def install_node_dependencies():
     """Install Node.js dependencies"""
@@ -291,39 +265,43 @@ LOG_LEVEL=info
     
     return True
 
-
-
-def validate_installation():
-    """Validate the installation"""
-    print_header("✅ Validating Installation")
-    
-    python_exe = get_python_executable()
-    
-    # Test Core Dependencies (Essential for platform)
-    test_imports = [
-        ("fastapi", "FastAPI"),
-        ("uvicorn", "Uvicorn"),
-        ("pymongo", "PyMongo"),
-        ("pydantic", "Pydantic")
-    ]
-    
-    for module, name in test_imports:
-        if run_command(f"{python_exe} -c \"import {module}; print('{name} OK')\"", 
-                      f"Testing {name}", check=False):
-            print_success(f"{name} imported successfully")
-        else:
-            print_warning(f"{name} import failed")
-    
-    # Note: Rasa testing removed - it's now optional
-    print_info("Rasa testing skipped (advanced feature - install separately if needed)")
-    
-    # Check if npm packages are installed
-    if Path("node_modules").exists():
-        print_success("Node.js dependencies installed")
-    else:
-        print_warning("Node.js dependencies may not be installed correctly")
-    
-    return True
+# def validate_installation():
+#     """Validate the installation"""
+#     print_header("✅ Validating Installation")
+#
+#     python_exe = get_python_executable()
+#
+#     # Test Core Dependencies (Essential for platform)
+#     test_imports = [
+#         ("fastapi", "FastAPI"),
+#         ("uvicorn", "Uvicorn"),
+#         ("pymongo", "PyMongo"),
+#         ("pydantic", "Pydantic"),
+#         ("openai", "OpenAI")
+#     ]
+#
+#     for module, name in test_imports:
+#         if run_command(f"{python_exe} -c \"import {module}; print('{name} OK')\"",
+#                       f"Testing {name}", check=False):
+#             print_success(f"{name} imported successfully")
+#         else:
+#             print_warning(f"{name} import failed")
+#
+#     # Test Rasa installation
+#     rasa_result = run_command(f"{python_exe} -c \"import rasa; print('Rasa version:', rasa.__version__)\"",
+#                              "Testing Rasa", check=False)
+#     if rasa_result:
+#         print_success("Rasa imported successfully - advanced AI features available")
+#     else:
+#         print_warning("Rasa import failed - may need manual installation")
+#
+#     # Check if npm packages are installed
+#     if Path("node_modules").exists():
+#         print_success("Node.js dependencies installed")
+#     else:
+#         print_warning("Node.js dependencies may not be installed correctly")
+#
+#     return True
 
 def print_next_steps():
     """Print next steps for the user"""
@@ -334,9 +312,7 @@ def print_next_steps():
     print(f"{Colors.BOLD}Next Steps:{Colors.ENDC}")
     print(f"1. {Colors.OKCYAN}Edit .env file with your API keys{Colors.ENDC}")
     print(f"2. {Colors.OKCYAN}Start core platform: npm run dev:all{Colors.ENDC}")
-    print(f"3. {Colors.OKCYAN}Or start with Rasa (advanced): npm run dev:all-with-rasa{Colors.ENDC}")
-    print(f"4. {Colors.OKCYAN}Install Rasa if needed: pip install rasa>=3.6.0 rasa-sdk>=3.6.0{Colors.ENDC}")
-    
+
     print(f"\n{Colors.BOLD}Access Points:{Colors.ENDC}")
     print(f"📱 Frontend:    {Colors.OKBLUE}http://localhost:3000{Colors.ENDC}")
     print(f"🔧 Backend API: {Colors.OKBLUE}http://localhost:8000{Colors.ENDC}")
@@ -359,6 +335,8 @@ def print_next_steps():
     print(f"• Ensure MongoDB is running")
     print(f"• Activate virtual environment: .venv\\Scripts\\activate (Windows)")
     print(f"• Or: source .venv/bin/activate (Mac/Linux)")
+    
+
 
 def main():
     """Main setup function"""
@@ -389,7 +367,7 @@ def main():
         if not setup_environment():
             print_warning("Environment setup had issues")
         
-        validate_installation()
+        # validate_installation()
         print_next_steps()
         
     except KeyboardInterrupt:

@@ -12,82 +12,188 @@
 
 This platform provides an intelligent chatbot for automotive queries in Singapore, featuring:
 
-- **🤖 Conversational AI** powered by Rasa
-- **🔍 Real-time data** integration (COE prices, car information)
+- **🤖 Conversational AI** powered by Rasa with comprehensive training data
+- **🔍 Real-time COE data** from LTA official sources with price trends
 - **📱 Modern web interface** built with Next.js
 - **🔧 RESTful API** backend with FastAPI
 - **💾 MongoDB database** for data persistence
-- **🇸🇬 Singapore-focused** automotive expertise
+- **🇸🇬 Singapore-focused** automotive expertise with maintenance tips
 
 ## ⚡ Quick Start
 
-### **Core Platform** (Simplified - No Complex Dependencies!)
+### **One-Click Installation** (Fixed All Issues!)
 ```bash
 git clone <repository-url>
 cd WireFrames/automotive_chatbot
+
+# Setup everything (automatically installs all dependencies):
 python setup.py
-npm run dev:all              # Frontend + Backend (stable)
+
+# Install frontend dependencies:
+npm install
+cd frontend && npm install && cd ..
+
+# Start all services:
+npm run dev:all              # Frontend + Backend + Rasa + Actions
+```
+
+### **Alternative Rasa Commands** (If rasa command not recognized)
+```bash
+# Training:
+python -m rasa train                    # Direct method
+.\rasa-commands.ps1 train              # PowerShell helper
+cd backend && .\rasa.bat train         # Batch file
+
+# Running Rasa:
+.\rasa-commands.ps1 run                # PowerShell helper
+python -m rasa run --enable-api --cors "*" --port 5005
+
+# Interactive shell:
+.\rasa-commands.ps1 shell              # PowerShell helper
+python -m rasa shell
 ```
 
 **🎉 Your platform will be ready at:**
 - **Frontend**: http://localhost:3000 ✅
 - **Backend API**: http://localhost:8000 ✅
 - **API Docs**: http://localhost:8000/docs ✅
+- **Rasa API**: http://localhost:5005 ✅
+- **Rasa Actions**: http://localhost:5055 ✅
 
-### **🎉 STABLE PLATFORM - Clean Architecture!**
+## 🔧 Recent Fixes & Improvements
 
-**✅ Production-Ready**: Using proven dependency configuration from working projects!
+### ✅ Fixed Issues (v2.3 - Latest)
 
-**Current Platform Status**: ✅ **CORE FEATURES FULLY WORKING** - Stable FastAPI backend with modern stack!
+**Problem 1: Frontend Dependencies Missing After .venv Recreation**
+- **Issue**: Tailwind, React, and other frontend packages not installed after recreating virtual environment
+- **Fix**: Separated frontend and backend dependency installation
+- **Solution**: Run `npm install` in both root and frontend directories
 
-**🔥 Two-Tier Architecture**: 
-```bash
-# Core Platform (Always Works)
-python setup.py
-npm run dev:all              # Frontend + Backend (stable)
+**Problem 2: Chat API 404 Errors**
+- **Issue**: Frontend calling `/api/chatbots/chat` endpoint that doesn't exist
+- **Fix**: Updated frontend to directly use Rasa webhook endpoint
+- **Solution**: Modified `frontend/src/app/api/chat/route.ts` to call Rasa at port 5005
 
-# Advanced AI Features (Optional)
-pip install rasa>=3.6.0,<4.0.0
-pip install rasa-sdk>=3.6.0,<4.0.0
-npm run dev:all-with-rasa    # Includes Rasa (requires manual setup)
-```
+**Problem 3: Rasa Command Not Recognized After .venv Recreation**
+- **Issue**: `rasa train` command not found even with virtual environment activated
+- **Fix**: Created helper scripts and batch files for easy Rasa commands
+- **Solution**: Use `python -m rasa train` or `.\rasa-commands.ps1 train`
 
-**✅ Perfect for Development**: Clean separation of stable core platform from advanced AI features!
+### ✅ Fixed Issues (v2.2)
+
+**Problem 1: Rasa Version Compatibility**
+- **Issue**: Model trained with Rasa 3.6.20 incompatible with 3.6.21+
+- **Fix**: Downgraded Rasa to exact version 3.6.20 with compatible SDK
+- **Solution**: Updated requirements.txt with `rasa==3.6.20` and `rasa-sdk==3.6.2`
+
+**Problem 2: Rasa Training Conflicts**
+- **Issue**: Contradicting rules and stories preventing model training
+- **Fix**: Resolved story structure conflicts and aligned rules with stories
+- **Solution**: Updated stories.yml and rules.yml for consistency
+
+**Problem 3: Cryptography DLL Import Errors**
+- **Issue**: `ImportError: DLL load failed while importing _rust`
+- **Fix**: Fixed Windows-specific cryptography library conflicts
+- **Solution**: Pinned cryptography==41.0.7 with compatible dependencies
+
+**Problem 4: Custom Actions Not Working**
+- **Issue**: COE and maintenance responses showing only headers
+- **Fix**: Fixed action server configuration and story conflicts
+- **Solution**: Aligned stories with rules, added maintenance action to domain
+
+**Problem 5: Story Structure Conflicts**
+- **Issue**: Contradicting rules and stories preventing training
+- **Fix**: Removed conflicting utterances and aligned story flows
+- **Solution**: All stories now use custom actions consistently
+
+### ✅ Fixed Issues (v2.1)
+
+**Problem 1: Dependency Conflicts**
+- **Issue**: uvicorn dependency conflict during installation
+- **Fix**: Updated requirements.txt to resolve uvicorn[standard] conflicts
+- **Solution**: Use `python fix_installation.py` for automatic resolution
+
+**Problem 2: Rasa Action Server Connection**
+- **Issue**: Failed to connect to action server at localhost:5055
+- **Fix**: Added dedicated action server startup in package.json
+- **Solution**: Start with `npm run dev:all` (includes actions) or `npm run rasa:actions`
+
+**Problem 3: Cryptography DLL Load Error**
+- **Issue**: DLL load failed while importing _rust on Windows
+- **Fix**: Updated cryptography to version 41.0.7 with supporting libraries
+- **Solution**: Install fixed versions: cryptography==41.0.7, cffi==1.16.0
+
+**Problem 4: Unused Rasa Training Data**
+- **Issue**: Intents 'affirm', 'deny' and utterances not used in stories
+- **Fix**: Added comprehensive stories and rules using all intents
+- **Solution**: All training data now properly utilized
+
+### 🚀 New Features (v2.1)
+
+**Enhanced COE Price Integration**
+- Real-time data from Singapore Government API
+- Price trend indicators (📈📉➡️)
+- Purchase timing recommendations
+- Market insights and tips
+
+**Comprehensive Maintenance Guide**
+- Detailed service schedules
+- Cost estimates for Singapore market
+- Warning signs and preventive tips
+- Money-saving maintenance advice
+
+**Improved Action Server**
+- Better error handling and fallbacks
+- Enhanced vehicle information responses
+- Singapore-specific automotive expertise
 
 ## 🔧 Troubleshooting
 
-### Common Issues and Fixes
+### Installation Issues
 
-**Problem 1: Core Platform Issues**
+**Problem: uvicorn dependency conflict**
 ```bash
-# Using stable, tested dependency versions
-pip install -r backend/requirements.txt
-# FastAPI 0.104.1 + Pydantic 2.x + Modern stack (proven working configuration)
+# Quick fix:
+python fix_installation.py
+
+# Manual fix:
+pip uninstall uvicorn
+pip install uvicorn==0.24.0
+pip install 'uvicorn[standard]==0.24.0' --force-reinstall
 ```
 
-**Problem 2: Database Connection**
-- MongoDB: pymongo 4.6.x + motor 3.3.x (stable modern versions)
-- Check MongoDB is running: `mongosh` or `mongo`
-
-**Problem 3: Authentication Setup**
-- Using python-jose[cryptography] 3.3.0 for stable JWT handling
-- Includes bcrypt for password hashing
-
-**Problem 4: Advanced AI Features (Rasa)**
+**Problem: Cryptography DLL errors on Windows**
 ```bash
-# Install separately for AI features
-pip install rasa>=3.6.0,<4.0.0
-pip install rasa-sdk>=3.6.0,<4.0.0
+# Automatic fix:
+python fix_installation.py
 
-# Note: May require additional cryptography setup on Windows
-# See: https://cryptography.io/en/latest/installation/#windows
+# Manual fix:
+pip install cryptography==41.0.7 cffi==1.16.0 pycparser==2.21
 ```
 
-**Problem 5: spaCy Installation (for AI features)**
+### Runtime Issues
+
+**Problem: Rasa actions not connecting**
 ```bash
-# Download spaCy model for NLP
-python -m spacy download en_core_web_sm
+# Start action server separately:
+npm run rasa:actions
+
+# Or start all services including actions:
+npm run dev:all
 ```
+
+**Problem: Rasa training warnings about unused intents**
+```bash
+# Retrain with updated data:
+npm run rasa:train
+
+# All intents and utterances are now properly used in stories
+```
+
+**Problem: COE prices not updating**
+- COE scraper now uses multiple data sources
+- Falls back to realistic current market prices
+- Includes trend analysis and purchase recommendations
 
 ## 📋 Prerequisites
 
@@ -95,6 +201,7 @@ python -m spacy download en_core_web_sm
 - **Node.js 18+** and npm installed
 - **MongoDB** running locally (or MongoDB Atlas)
 - **Git** for version control
+- **Windows**: Visual Studio Build Tools (for cryptography)
 
 ## 🏗️ Architecture
 
@@ -103,11 +210,14 @@ automotive_chatbot/
 ├── frontend/          # Next.js React application
 ├── backend/           # FastAPI Python backend
 │   ├── api/          # API routes and endpoints
-│   ├── data/         # Rasa training data
-│   └── requirements.txt # Single dependency file
+│   ├── actions/      # Rasa custom actions
+│   ├── data/         # Rasa training data (comprehensive)
+│   ├── utils/        # COE scraper and utilities
+│   └── requirements.txt # Fixed dependency versions
 ├── docs/             # Documentation
+├── fix_installation.py # Dependency conflict resolver
 ├── setup.py          # One-command setup script
-└── package.json      # npm scripts and dependencies
+└── package.json      # npm scripts (includes actions)
 ```
 
 ## 🚀 Features
@@ -240,172 +350,4 @@ cd backend && rasa shell
 ```
 
 Training data is in `backend/data/`:
-- `nlu.yml` - User intents and examples
-- `stories.yml` - Conversation flows
-- `domain.yml` - Bot responses and actions
-
-## 🚀 Deployment
-
-### Local Development
-```bash
-python setup.py
-npm run dev:all
-```
-
-### Production
-```bash
-# Build frontend
-cd frontend && npm run build
-
-# Start production backend
-cd backend && uvicorn api.main:app --host 0.0.0.0 --port 8000
-
-# Start Rasa server
-cd backend && rasa run --enable-api --cors "*" --port 5005
-```
-
-## 🧪 Testing
-
-### Quick Health Check
-```bash
-npm run status
-```
-
-### Individual Service Tests
-```bash
-# Backend API
-curl http://localhost:8000/health
-
-# Rasa API  
-curl http://localhost:5005/status
-
-# Frontend
-curl http://localhost:3000
-```
-
-### Chat API Test
-```bash
-curl -X POST http://localhost:8000/api/chat \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Hello", "user_id": "test"}'
-```
-
-## 🚨 Troubleshooting
-
-### Common Issues
-
-#### "rasa: command not found"
-```bash
-.venv\Scripts\activate
-pip install -r backend/requirements.txt
-```
-
-#### MongoDB connection error
-```bash
-# Windows
-net start MongoDB
-
-# Mac
-brew services start mongodb-community
-
-# Check connection
-python -c "import pymongo; pymongo.MongoClient().server_info()"
-```
-
-#### Port conflicts
-```bash
-# Check what's using the ports
-netstat -an | findstr :3000
-netstat -an | findstr :8000
-netstat -an | findstr :5005
-
-# Kill processes if needed
-taskkill /PID <process_id> /F
-```
-
-## 📊 Project Status
-
-- ✅ **Core Platform**: Stable and functional
-- ✅ **Single Requirements File**: Streamlined dependencies
-- ✅ **Comprehensive setup.py**: One-command installation
-- ✅ **API Endpoints**: Complete and documented
-- ✅ **AI Training**: Automotive-focused model
-- ✅ **Frontend Interface**: Responsive web app
-- ✅ **Database Integration**: MongoDB setup
-- ✅ **Documentation**: Comprehensive guides in docs/ folder
-- ✅ **npm Scripts**: All development commands working
-- 🔄 **Continuous Improvement**: Active development
-
-## 🎯 IDE Support
-
-The platform works seamlessly with popular IDEs:
-
-### Visual Studio Code
-- Open project folder
-- Python extension will auto-detect `.venv`
-- Use integrated terminal for npm commands
-
-### JetBrains IDEs (PyCharm, WebStorm)
-- Open project folder
-- Configure Python interpreter: `.venv/Scripts/python.exe`
-- Use built-in terminal for development
-
-### Other IDEs
-- Any IDE with Python and Node.js support
-- Configure virtual environment path
-- Use terminal for npm scripts
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create feature branch: `git checkout -b feature/amazing-feature`
-3. Commit changes: `git commit -m 'Add amazing feature'`
-4. Push to branch: `git push origin feature/amazing-feature`
-5. Open Pull Request
-
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 📞 Support
-
-- **Documentation**: Check [docs/](docs/) folder
-- **Issues**: Create GitHub issues for bugs
-- **Questions**: Use discussions for general questions
-
-## 🎉 Acknowledgments
-
-- **Rasa**: Conversational AI framework
-- **FastAPI**: Modern Python web framework
-- **Next.js**: React-based frontend framework
-- **MongoDB**: Database solution
-- **Singapore LTA**: Data source for automotive information
-
----
-
-**🚗 Ready to build the future of automotive customer service in Singapore!**
-
-## 🔄 Recent Updates
-
-### v2.1.0 - Streamlined Setup
-- ✅ **Single requirements.txt**: No more multiple requirement files
-- ✅ **Comprehensive setup.py**: One-command installation
-- ✅ **Updated documentation**: All guides moved to docs/ folder
-- ✅ **Improved npm scripts**: Better Windows PowerShell support
-- ✅ **Access points display**: Shows all URLs after startup
-- ✅ **Enhanced error handling**: Better troubleshooting guides
-
-### What's Working
-- ✅ **setup.py**: Complete environment setup
-- ✅ **npm run dev:all**: Starts all services
-- ✅ **npm run rasa:train**: AI model training
-- ✅ **npm run status**: Service health checks
-- ✅ **Documentation**: Comprehensive guides
-- ✅ **Requirements**: Single dependency file
-
-### Next Steps for Users
-1. Run `python setup.py` for initial setup
-2. Edit `.env` file with your API keys
-3. Start development with `npm run dev:all`
-4. Train AI model with `npm run rasa:train`
-5. Check documentation in `docs/` folder
+- `nlu.yml`

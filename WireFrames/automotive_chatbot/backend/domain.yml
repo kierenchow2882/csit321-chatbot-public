@@ -25,20 +25,15 @@ responses:
   utter_goodbye:
   - text: "Thank you for using CleverCompanion! Have a great day! 🚗"
 
-  utter_coe_prices:
-  - text: "Here are the latest COE prices for all categories:\n\n🚗 **Category A** (Up to 1600cc): $95,000\n🚙 **Category B** (Above 1600cc): $108,000\n🏍️ **Category D** (Motorcycles): $8,500\n🚚 **Category E** (Commercial): $65,000\n\n*Prices updated as of latest bidding exercise*"
 
-  utter_vehicle_info:
-  - text: "I can provide detailed information about any vehicle model. Which specific car would you like to know more about?"
 
   utter_pricing:
   - text: "I can help you with vehicle pricing. Please specify the car model you're interested in for accurate pricing information."
 
-  utter_test_drive:
-  - text: "I can help you schedule a test drive. Which vehicle model are you interested in testing?"
+
 
   utter_maintenance:
-  - text: "For maintenance services, I recommend:\n\n🔧 **Regular Service**: Every 10,000km\n🛢️ **Oil Change**: Every 5,000-7,500km\n🛞 **Tire Check**: Every 6 months\n\nWhat specific maintenance help do you need?"
+  - text: "🔧 **Comprehensive Car Maintenance Guide**\n\n**📅 Regular Service Schedule:**\n• **Every 5,000km**: Oil & filter change\n• **Every 10,000km**: Full service inspection\n• **Every 20,000km**: Major service (spark plugs, air filter)\n• **Every 40,000km**: Transmission fluid, brake fluid\n\n**🛞 Essential Checks:**\n• **Tire pressure**: Monthly check\n• **Tire rotation**: Every 10,000km\n• **Brake pads**: Inspect every 20,000km\n• **Battery**: Check terminals every 6 months\n\n**💰 Cost Estimates (Singapore):**\n• Basic service: $150-300\n• Major service: $400-800\n• Tire replacement: $400-1200 (set of 4)\n\n**⚠️ Warning Signs:**\n• Strange noises or vibrations\n• Dashboard warning lights\n• Unusual smells or smoke\n• Poor fuel efficiency\n\n**💡 Money-Saving Tips:**\n• Use authorized workshops for warranty\n• Keep maintenance records for resale value\n• Address issues early to prevent costly repairs\n• Consider workshop packages for regular servicing\n\nWhat specific maintenance help do you need?"
 
   utter_registration:
   - text: "For vehicle registration, you'll need:\n\n📋 **Documents**: IC, Insurance, Inspection Certificate\n💰 **Fees**: Registration fee + COE + Additional charges\n⏰ **Process**: Visit LTA or authorized dealer\n\nNeed help with any specific step?"
@@ -56,12 +51,10 @@ actions:
   - action_get_coe_prices
   - action_get_vehicle_info
   - action_book_test_drive
+  - action_get_maintenance_info
   - utter_greet
   - utter_goodbye
-  - utter_coe_prices
-  - utter_vehicle_info
   - utter_pricing
-  - utter_test_drive
   - utter_maintenance
   - utter_registration
   - utter_features

@@ -39,7 +39,7 @@ stories:
 - story: ask maintenance
   steps:
   - intent: ask_maintenance
-  - action: utter_maintenance
+  - action: action_get_maintenance_info
 
 - story: ask registration
   steps:
@@ -74,10 +74,10 @@ stories:
   - intent: book_test_drive
   - action: action_book_test_drive
 
-- story: maintenance inquiry
+- story: maintenance inquiry flow
   steps:
   - intent: ask_maintenance
-  - action: utter_maintenance
+  - action: action_get_maintenance_info
   - intent: ask_pricing
   - action: utter_pricing
 
@@ -95,3 +95,45 @@ stories:
   - action: action_book_test_drive
   - intent: goodbye
   - action: utter_goodbye
+
+- story: test drive with confirmation
+  steps:
+  - intent: book_test_drive
+  - action: action_book_test_drive
+  - intent: affirm
+  - action: utter_greet
+
+- story: test drive with denial
+  steps:
+  - intent: book_test_drive
+  - action: action_book_test_drive
+  - intent: deny
+  - action: utter_features
+
+- story: pricing to features flow
+  steps:
+  - intent: ask_pricing
+  - action: utter_pricing
+  - intent: ask_features
+  - action: utter_features
+
+- story: out of scope with follow up
+  steps:
+  - intent: out_of_scope
+  - action: utter_out_of_scope
+  - intent: ask_features
+  - action: utter_features
+
+- story: coe maintenance combo
+  steps:
+  - intent: ask_coe_prices
+  - action: action_get_coe_prices
+  - intent: ask_maintenance
+  - action: action_get_maintenance_info
+
+- story: vehicle to test drive flow
+  steps:
+  - intent: ask_vehicle_info
+  - action: action_get_vehicle_info
+  - intent: book_test_drive
+  - action: action_book_test_drive

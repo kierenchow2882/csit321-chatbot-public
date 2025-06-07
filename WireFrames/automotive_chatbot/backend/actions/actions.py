@@ -134,45 +134,81 @@ class ActionGetCOEPrices(Action):
                 
                 # Category A (Cars up to 1600cc & 130bhp)
                 cat_a = coe_data['category_a']
-                response += f"🚗 **Category A** (≤1600cc): ${cat_a['current']:,}\n"
+                trend_a = self._get_trend_emoji(cat_a.get('trend', 'stable'))
+                response += f"🚗 **Category A** (≤1600cc & 130bhp): ${cat_a['current']:,} {trend_a}\n"
                 
                 # Category B (Cars above 1600cc or 130bhp)
                 cat_b = coe_data['category_b']
-                response += f"🚙 **Category B** (>1600cc): ${cat_b['current']:,}\n"
+                trend_b = self._get_trend_emoji(cat_b.get('trend', 'stable'))
+                response += f"🚙 **Category B** (>1600cc or >130bhp): ${cat_b['current']:,} {trend_b}\n"
                 
                 # Category D (Motorcycles)
                 if 'category_d' in coe_data:
                     cat_d = coe_data['category_d']
-                    response += f"🏍️ **Category D** (Motorcycles): ${cat_d['current']:,}\n"
+                    trend_d = self._get_trend_emoji(cat_d.get('trend', 'stable'))
+                    response += f"🏍️ **Category D** (Motorcycles): ${cat_d['current']:,} {trend_d}\n"
                 
                 # Category E (Commercial)
                 if 'category_e' in coe_data:
                     cat_e = coe_data['category_e']
-                    response += f"🚚 **Category E** (Commercial): ${cat_e['current']:,}\n"
+                    trend_e = self._get_trend_emoji(cat_e.get('trend', 'stable'))
+                    response += f"🚚 **Category E** (Commercial): ${cat_e['current']:,} {trend_e}\n"
                 
-                response += f"\n*Updated: {cat_a.get('last_updated', 'Recently')}*"
+                # Add timing and purchasing advice
+                response += "\n💡 **COE Purchase Tips:**\n"
+                response += "• Consider off-peak months (typically Mar, Jun, Sep)\n"
+                response += "• Monitor trends for 2-3 months before purchasing\n"
+                response += "• Factor in total cost: Car price + COE + Additional fees\n"
+                response += "• Consult with dealers for latest market insights\n"
+                
+                response += f"\n*Last updated: {cat_a.get('last_updated', 'Recently')}*"
+                response += f"\n*Source: {coe_data.get('source', 'Official data')}*"
+                
+                # Add maintenance reminder
+                response += "\n\n🔧 **Maintenance Reminder:**\nRegular servicing helps maintain your vehicle's COE value!"
+                
             else:
-                # Fallback to static prices if scraping fails
-                response = "Here are the latest COE prices:\n\n"
-                response += "🚗 **Category A** (≤1600cc): $85,000\n"
-                response += "🚙 **Category B** (>1600cc): $98,000\n"
-                response += "🏍️ **Category D** (Motorcycles): $8,500\n"
-                response += "🚚 **Category E** (Commercial): $65,000\n"
-                response += "\n*Prices are updated regularly from official sources*"
+                # Enhanced fallback with current market estimates
+                response = "📊 **Current COE Price Estimates**\n\n"
+                response += "🚗 **Category A** (≤1600cc & 130bhp): $95,000 📈\n"
+                response += "🚙 **Category B** (>1600cc or >130bhp): $110,000 📈\n"
+                response += "🏍️ **Category D** (Motorcycles): $9,500 ➡️\n"
+                response += "🚚 **Category E** (Commercial): $75,000 ➡️\n"
+                response += "\n💡 **Market Insights:**\n"
+                response += "• Prices are based on recent market trends\n"
+                response += "• Category B showing upward pressure\n"
+                response += "• Best to check LTA website for official results\n"
+                response += "• Consider timing your purchase strategically\n"
+                response += "\n*For official prices, visit LTA website*"
             
             dispatcher.utter_message(text=response)
             return []
             
         except Exception as e:
             logging.error(f"Error in ActionGetCOEPrices: {e}")
-            # Fallback response
-            response = "Here are the current COE prices:\n\n"
-            response += "🚗 **Category A** (≤1600cc): $85,000\n"
-            response += "🚙 **Category B** (>1600cc): $98,000\n"
-            response += "🏍️ **Category D** (Motorcycles): $8,500\n"
-            response += "🚚 **Category E** (Commercial): $65,000\n"
+            # Fallback response with helpful information
+            response = "📊 **COE Price Information**\n\n"
+            response += "I'm currently experiencing issues fetching live COE prices.\n\n"
+            response += "**Recent COE Ranges:**\n"
+            response += "🚗 Category A: $90,000 - $100,000\n"
+            response += "🚙 Category B: $105,000 - $115,000\n"
+            response += "🏍️ Category D: $8,000 - $12,000\n"
+            response += "🚚 Category E: $70,000 - $80,000\n\n"
+            response += "📍 **Get Latest Prices:**\n"
+            response += "• Visit LTA website for official results\n"
+            response += "• Check authorized dealers for current quotes\n"
+            response += "• Consider market timing for best value\n"
             dispatcher.utter_message(text=response)
             return []
+    
+    def _get_trend_emoji(self, trend):
+        """Get emoji for price trend"""
+        if trend == 'increasing':
+            return '📈'
+        elif trend == 'decreasing':
+            return '📉'
+        else:
+            return '➡️'
 
 class ActionGetPricing(Action):
     def name(self) -> Text:

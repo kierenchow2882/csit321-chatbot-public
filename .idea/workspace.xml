@@ -5,28 +5,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1e3437a4-e86f-40eb-ab95-6bee1c908d5a" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/WireFrames/automotive_chatbot/docs/BACKEND_CONFIG_EXPLAINED.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/WireFrames/automotive_chatbot/docs/QUICK_START.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/WireFrames/automotive_chatbot/docs/RASA_SETUP.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/WireFrames/automotive_chatbot/docs/USAGE.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/WireFrames/automotive_chatbot/backend/afiai.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/WireFrames/automotive_chatbot/fix_installation.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/WireFrames/automotive_chatbot/rasa-commands.ps1" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/CSIT321-FYP-Chatbot-for-Customer-Support.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/CSIT321-FYP-Chatbot-for-Customer-Support.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WireFrames/automotive_chatbot/QUICK_START.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/WireFrames/automotive_chatbot/RASA_SETUP.md" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/WireFrames/automotive_chatbot/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/WireFrames/automotive_chatbot/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WireFrames/automotive_chatbot/SETUP_FIX.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/WireFrames/automotive_chatbot/backend/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/WireFrames/automotive_chatbot/backend/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WireFrames/automotive_chatbot/backend/config.yml" beforeDir="false" afterPath="$PROJECT_DIR$/WireFrames/automotive_chatbot/backend/config.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WireFrames/automotive_chatbot/backend/requirements-basic.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/WireFrames/automotive_chatbot/backend/requirements-compatible.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/WireFrames/automotive_chatbot/backend/requirements-rasa.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/WireFrames/automotive_chatbot/backend/actions/actions.py" beforeDir="false" afterPath="$PROJECT_DIR$/WireFrames/automotive_chatbot/backend/actions/actions.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WireFrames/automotive_chatbot/backend/data/rules.yml" beforeDir="false" afterPath="$PROJECT_DIR$/WireFrames/automotive_chatbot/backend/data/rules.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WireFrames/automotive_chatbot/backend/data/stories.yml" beforeDir="false" afterPath="$PROJECT_DIR$/WireFrames/automotive_chatbot/backend/data/stories.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WireFrames/automotive_chatbot/backend/domain.yml" beforeDir="false" afterPath="$PROJECT_DIR$/WireFrames/automotive_chatbot/backend/domain.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/WireFrames/automotive_chatbot/backend/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/WireFrames/automotive_chatbot/backend/requirements.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WireFrames/automotive_chatbot/frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/WireFrames/automotive_chatbot/frontend/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WireFrames/automotive_chatbot/mongodb_setup_simple.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/WireFrames/automotive_chatbot/backend/utils/coe_scraper.py" beforeDir="false" afterPath="$PROJECT_DIR$/WireFrames/automotive_chatbot/backend/utils/coe_scraper.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WireFrames/automotive_chatbot/frontend/src/app/api/chat/route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/WireFrames/automotive_chatbot/frontend/src/app/api/chat/route.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/WireFrames/automotive_chatbot/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/WireFrames/automotive_chatbot/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WireFrames/automotive_chatbot/setup.bat" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/WireFrames/automotive_chatbot/setup.py" beforeDir="false" afterPath="$PROJECT_DIR$/WireFrames/automotive_chatbot/setup.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WireFrames/automotive_chatbot/setup.sh" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/WireFrames/automotive_chatbot/start_dev.bat" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -89,15 +83,17 @@
     "ASKED_MARK_IGNORED_FILES_AS_EXCLUDED": "true",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
     "git-widget-placeholder": "yeehau.branch",
-    "last_opened_file_path": "C:/CSIT321-FYP-Chatbot-for-Customer-Support",
+    "ignore.virus.scanning.warn.message": "true",
+    "last_opened_file_path": "C:/CSIT321-FYP-Chatbot-for-Customer-Support/WireFrames/automotive_chatbot",
     "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
   }
 }]]></component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-09665e90c3a7-d3b881c8e49f-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-233.15026.15" />
+        <option value="bundled-python-sdk-dfff61a61320-9cdd278e9d02-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-251.25410.159" />
       </set>
     </attachedChunks>
   </component>

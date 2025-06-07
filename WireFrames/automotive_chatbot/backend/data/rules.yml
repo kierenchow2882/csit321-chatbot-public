@@ -35,7 +35,7 @@ rules:
 - rule: Provide maintenance information
   steps:
   - intent: ask_maintenance
-  - action: utter_maintenance
+  - action: action_get_maintenance_info
 
 - rule: Provide registration information
   steps:
@@ -51,3 +51,20 @@ rules:
   steps:
   - intent: out_of_scope
   - action: utter_out_of_scope
+
+- rule: Handle affirmation
+  steps:
+  - intent: affirm
+  - action: utter_greet
+
+- rule: Handle denial
+  steps:
+  - intent: deny
+  - action: utter_features
+
+- rule: Fallback for unknown intents
+  condition:
+  - active_loop: null
+  steps:
+  - intent: nlu_fallback
+  - action: utter_default

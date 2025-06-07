@@ -1,39 +1,41 @@
 # ========================================
-# Automotive Chatbot Platform v2.1 - Compatible Dependencies
+# Automotive Chatbot Platform v2.1 - All Dependencies
 # Python Dependencies - Tested on Windows Python 3.9+
+# Fixed for Rasa 3.6.20 compatibility and Windows DLL issues
 # ========================================
 
-# Core API Framework - Stable versions
+# Core API Framework - Rasa compatible versions
 fastapi==0.104.1
 uvicorn[standard]==0.24.0
 python-multipart==0.0.6
-pydantic>=2.0.0,<2.6.0
+# Use pydantic v1 for Rasa compatibility
+pydantic>=1.10.0,<2.0.0
 
-# Authentication & Security
-python-jose[cryptography]==3.3.0
+# Authentication & Security - Windows-compatible versions
+python-jose[cryptography]==3.2.0
 passlib[bcrypt]==1.7.4
-bcrypt>=4.0.0,<5.0.0
+bcrypt>=3.2.0,<4.0.0
 
-# Database - MongoDB compatible versions (Rasa-compatible)
-pymongo>=3.8.0,<4.4.0
+# Database - MongoDB compatible versions
+pymongo>=3.10.0,<4.0.0
 motor>=2.5.0,<3.0.0
 
-# Basic Dependencies First
+# Basic Dependencies
 python-dotenv>=1.0.0,<2.0.0
 requests>=2.28.0,<3.0.0
 aiohttp>=3.8.0,<4.0.0
-websockets>=10.0,<11.0
+websockets>=10.0,<12.0
 
 # Utilities
 rich>=13.0.0,<14.0.0
-packaging>=20.0,<21.0
+packaging>=20.0,<24.0
 
 # Development & Testing
 pytest>=7.0.0,<8.0.0
 httpx>=0.24.0,<0.26.0
 
-# Data Processing
-numpy>=1.21.0,<2.0.0
+# Data Processing - Rasa compatible versions
+numpy>=1.21.0,<1.25.0
 pandas>=1.5.0,<2.2.0
 
 # Web Scraping
@@ -43,18 +45,30 @@ lxml>=4.9.0,<5.0.0
 # Singapore-specific
 holidays>=0.30,<1.0
 
+# LLM support
+#openai>=1.0.0,<2.0.0
+#tiktoken>=0.5.0,<1.0.0
+
+# Windows-specific fixes for cryptography DLL issues
+cryptography==40.0.2
+cffi==1.15.1
+pycparser==2.21
+
+# JAX version compatibility - Python 3.9 compatible versions
+jax==0.4.18
+jaxlib==0.4.18
+
+# SQLAlchemy 1.x for Rasa compatibility
+sqlalchemy>=1.4.0,<2.0.0
+
+# JWT token handling - Windows compatible version
+PyJWT>=2.4.0,<2.9.0
+
 # ========================================
-# Advanced Features (Install separately if needed):
-# 
-# For RAG/AI features:
-# pip install langchain>=0.1.0,<1.0.0
-# pip install langchain-openai>=0.1.0,<1.0.0  
-# pip install chromadb>=0.4.0,<1.0.0
-# pip install sentence-transformers>=2.2.0,<3.0.0
-# pip install tiktoken>=0.5.0,<1.0.0
-# pip install openai>=1.0.0,<2.0.0
-#
-# For Rasa (Conversational AI):
-rasa>=3.6.0,<4.0.0
-rasa-sdk>=3.6.0,<4.0.0
-# ======================================== 
+# Rasa Dependencies - Compatible versions
+# ========================================
+rasa==3.6.4
+rasa-sdk==3.6.1
+
+# Additional Windows-specific fixes
+pywin32>=306; sys_platform == "win32"
