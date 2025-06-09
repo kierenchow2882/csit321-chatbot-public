@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { supabase } from '../../lib/supabase';
-import { Search, Star, Trash2, Filter } from 'lucide-react';
+import { Search, Star, Filter } from 'lucide-react';
+import { getFeedback, createFeedback } from '../../lib/api';
 
 interface FeedbackItem {
   id: string;
@@ -24,13 +24,8 @@ const Feedback: React.FC = () => {
 
   const fetchFeedback = async () => {
     try {
-      const { data, error } = await supabase
-        .from('feedback')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setFeedback(data || []);
+      const data = await getFeedback();
+      setFeedback(data);
     } catch (error) {
       console.error('Error fetching feedback:', error);
     } finally {
@@ -38,17 +33,12 @@ const Feedback: React.FC = () => {
     }
   };
 
-  const deleteFeedback = async (id: string) => {
+  const handleArchive = async (id: string) => {
     try {
-      const { error } = await supabase
-        .from('feedback')
-        .delete()
-        .eq('id', id);
-
-      if (error) throw error;
+      await createFeedback({ id, status: 'archived' });
       fetchFeedback();
     } catch (error) {
-      console.error('Error deleting feedback:', error);
+      console.error('Error archiving feedback:', error);
     }
   };
 
@@ -104,10 +94,10 @@ const Feedback: React.FC = () => {
                 </span>
               </div>
               <button
-                onClick={() => deleteFeedback(item.id)}
-                className="text-red-600 hover:text-red-900"
+                onClick={() => handleArchive(item.id)}
+                className="text-gray-600 hover:text-gray-900"
               >
-                <Trash2 size={18} />
+                Archive
               </button>
             </div>
             <p className="text-gray-600 mt-2">{item.comment}</p>

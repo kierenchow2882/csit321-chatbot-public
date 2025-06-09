@@ -1,41 +1,102 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { MessageSquare, X, Send } from 'lucide-react';
+import { createChatMessage } from '../lib/api';
+
+interface Message {
+  text: string;
+  sender: 'user' | 'bot';
+  timestamp: Date;
+}
 
 const ChatBot: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<{ text: string; sender: 'user' | 'bot' }[]>([
-    { text: 'Hello! How can I help you find your perfect vehicle today?', sender: 'bot' }
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      text: 'Hello! How can I help you find your perfect vehicle today?',
+      sender: 'bot',
+      timestamp: new Date()
+    }
   ]);
   const [newMessage, setNewMessage] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const chatSessionId = useRef(crypto.randomUUID());
 
-  const toggleChat = () => {
-    setIsOpen(!isOpen);
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const handleSendMessage = () => {
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  const handleSendMessage = async () => {
     if (newMessage.trim() === '') return;
     
     // Add user message
-    setMessages(prev => [...prev, { text: newMessage, sender: 'user' }]);
-    setNewMessage('');
+    const userMessage: Message = {
+      text: newMessage,
+      sender: 'user',
+      timestamp: new Date()
+    };
     
-    // Simulate bot response after a short delay
-    setTimeout(() => {
-      const botResponses = [
-        "I'd be happy to help you find a vehicle that meets your needs. What type of car are you looking for?",
-        "We have several options that might interest you. Would you like to see our featured vehicles?",
-        "Great question! Our financing options are very flexible. Would you like me to connect you with our financial advisor?",
-        "I can help you schedule a test drive. When would be a good time for you?",
-        "We have several electric and hybrid options available. Would you like me to show you some models?"
-      ];
+    setMessages(prev => [...prev, userMessage]);
+    setNewMessage('');
+    setIsTyping(true);
+
+    try {
+      // Save user message to chat history
+      await createChatMessage({
+        session_id: chatSessionId.current,
+        message: userMessage.text,
+        sender: 'user'
+      });
+
+      // Get bot response from API
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: userMessage.text,
+          session_id: chatSessionId.current
+        })
+      });
+
+      const data = await response.json();
       
-      const randomResponse = botResponses[Math.floor(Math.random() * botResponses.length)];
-      setMessages(prev => [...prev, { text: randomResponse, sender: 'bot' }]);
-    }, 1000);
+      // Add bot response
+      const botMessage: Message = {
+        text: data.response,
+        sender: 'bot',
+        timestamp: new Date()
+      };
+
+      setMessages(prev => [...prev, botMessage]);
+
+      // Save bot message to chat history
+      await createChatMessage({
+        session_id: chatSessionId.current,
+        message: botMessage.text,
+        sender: 'bot'
+      });
+
+    } catch (error) {
+      console.error('Error sending message:', error);
+      setMessages(prev => [...prev, {
+        text: 'I apologize, but I encountered an error. Please try again.',
+        sender: 'bot',
+        timestamp: new Date()
+      }]);
+    } finally {
+      setIsTyping(false);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
       handleSendMessage();
     }
   };
@@ -44,7 +105,7 @@ const ChatBot: React.FC = () => {
     <div className="fixed bottom-6 right-6 z-40">
       {/* Chat toggle button */}
       <button
-        onClick={toggleChat}
+        onClick={() => setIsOpen(!isOpen)}
         className={`flex items-center justify-center p-4 rounded-full shadow-lg transition-colors duration-200 ${
           isOpen ? 'bg-red-500 hover:bg-red-600' : 'bg-blue-600 hover:bg-blue-700'
         } text-white`}
@@ -77,24 +138,41 @@ const ChatBot: React.FC = () => {
                   }`}
                 >
                   {message.text}
+                  <div className="text-xs mt-1 opacity-70">
+                    {message.timestamp.toLocaleTimeString()}
+                  </div>
                 </div>
               </div>
             ))}
+            {isTyping && (
+              <div className="flex justify-start">
+                <div className="bg-gray-100 rounded-lg px-4 py-2 text-gray-800">
+                  <div className="flex space-x-1">
+                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
+                  </div>
+                </div>
+              </div>
+            )}
+            <div ref={messagesEndRef} />
           </div>
           
           {/* Chat input */}
           <div className="border-t border-gray-200 p-3 flex items-center">
-            <input
-              type="text"
+            <textarea
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder="Type your message..."
-              className="flex-1 border border-gray-300 rounded-l-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="flex-1 border border-gray-300 rounded-l-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+              rows={1}
+              style={{ minHeight: '40px', maxHeight: '80px' }}
             />
             <button
               onClick={handleSendMessage}
-              className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-r-md"
+              disabled={isTyping}
+              className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-r-md disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Send size={20} />
             </button>

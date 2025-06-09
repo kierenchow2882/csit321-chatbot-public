@@ -1,0 +1,52 @@
+1. Prerequisites Installation
+Node.js 16+ - Download here
+Python 3.8+ - Download here
+Git - Download here
+2. Clone and Setup
+
+# Clone the repository
+git clone <repository-url>
+cd ez-autos
+
+# Run automated setup script
+# On macOS/Linux:
+chmod +x setup.sh
+./setup.sh
+
+# On Windows:
+setup.bat
+3. Manual Setup (Alternative)
+If the automated script doesn't work:
+
+Backend Setup:
+
+
+# Create virtual environment
+python -m venv venv
+
+# Activate it
+# Windows: venv\Scripts\activate
+# macOS/Linux: source venv/bin/activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Setup database
+python manage.py migrate
+python manage.py ensure_admin
+Frontend Setup:
+
+
+# Install dependencies
+npm install
+4. Start Development Servers
+
+# Terminal 1 - Backend
+python manage.py runserver
+
+# Terminal 2 - Frontend  
+npm run dev
+5. Access the Application
+Frontend: http://localhost:5173
+Backend API: http://localhost:8000
+Admin Login: admin@example.com / admin

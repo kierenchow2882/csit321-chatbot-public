@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { supabase } from '../../lib/supabase';
 import { Plus, Search, FileText, Trash2, Edit2 } from 'lucide-react';
+import { getKnowledgeBase, createKnowledgeBase, deleteKnowledgeBase } from '../../lib/api';
 
 interface KnowledgeItem {
   id: string;
@@ -30,13 +30,8 @@ const KnowledgeBase: React.FC = () => {
 
   const fetchKnowledgeItems = async () => {
     try {
-      const { data, error } = await supabase
-        .from('knowledge_base')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setItems(data || []);
+      const data = await getKnowledgeBase();
+      setItems(data);
     } catch (error) {
       console.error('Error fetching knowledge items:', error);
     } finally {
@@ -47,18 +42,23 @@ const KnowledgeBase: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const { error } = await supabase
-        .from('knowledge_base')
-        .insert([{
-          ...formData,
-          tags: formData.tags.split(',').map(tag => tag.trim()),
-        }]);
-
-      if (error) throw error;
+      await createKnowledgeBase({
+        ...formData,
+        tags: formData.tags.split(',').map(tag => tag.trim()),
+      });
       setShowAddModal(false);
       fetchKnowledgeItems();
     } catch (error) {
       console.error('Error adding knowledge item:', error);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteKnowledgeBase(id);
+      fetchKnowledgeItems();
+    } catch (error) {
+      console.error('Error deleting knowledge item:', error);
     }
   };
 
@@ -99,7 +99,10 @@ const KnowledgeBase: React.FC = () => {
                 <button className="text-blue-600 hover:text-blue-900">
                   <Edit2 size={18} />
                 </button>
-                <button className="text-red-600 hover:text-red-900">
+                <button 
+                  className="text-red-600 hover:text-red-900"
+                  onClick={() => handleDelete(item.id)}
+                >
                   <Trash2 size={18} />
                 </button>
               </div>
@@ -124,7 +127,6 @@ const KnowledgeBase: React.FC = () => {
         ))}
       </div>
 
-      {/* Add Document Modal */}
       {showAddModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
           <div className="bg-white rounded-lg p-6 w-full max-w-md">

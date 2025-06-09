@@ -1,15 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { SearchIcon, DollarSign, HelpCircle, PhoneCall, Car, Menu, X, Home, LogIn, UserCircle } from 'lucide-react';
+import { SearchIcon, DollarSign, HelpCircle, PhoneCall, Car, Menu, X, Home, LogIn, UserCircle, Settings } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { NavigationLink } from '../types';
-import { supabase } from '../lib/supabase';
+import { getProfile, logout } from '../lib/api';
 
 const Header: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<any>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
@@ -31,25 +32,21 @@ const Header: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    // Check current auth status
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user || null);
-      if (session?.user) {
-        checkUserRole(session.user.id);
-      }
-    });
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user || null);
-      if (session?.user) {
-        checkUserRole(session.user.id);
-      } else {
+    const checkAuth = async () => {
+      try {
+        const profile = await getProfile();
+        setUser(profile.user);
+        setIsAdmin(profile.role === 'admin');
+      } catch (error) {
+        // User is not authenticated - this is fine, don't redirect
+        setUser(null);
         setIsAdmin(false);
+      } finally {
+        setAuthChecked(true);
       }
-    });
+    };
 
-    return () => subscription.unsubscribe();
+    checkAuth();
   }, []);
 
   useEffect(() => {
@@ -63,20 +60,29 @@ const Header: React.FC = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const checkUserRole = async (userId: string) => {
-    const { data } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', userId)
-      .single();
-    
-    setIsAdmin(data?.role === 'admin');
-  };
-
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    setDropdownOpen(false);
-    navigate('/');
+    try {
+      await logout();
+      setUser(null);
+      setIsAdmin(false);
+      setDropdownOpen(false);
+      
+      // Clear any session/local storage if used
+      localStorage.clear();
+      sessionStorage.clear();
+      
+      // Force a page reload to clear all state
+      window.location.href = '/';
+    } catch (error) {
+      console.error('Logout failed:', error);
+      // Even if the API call fails, clear local state
+      setUser(null);
+      setIsAdmin(false);
+      setDropdownOpen(false);
+      localStorage.clear();
+      sessionStorage.clear();
+      window.location.href = '/';
+    }
   };
 
   const renderIcon = (iconName: string) => {
@@ -95,6 +101,11 @@ const Header: React.FC = () => {
         return null;
     }
   };
+
+  // Don't render anything until auth check is complete
+  if (!authChecked) {
+    return null;
+  }
 
   return (
     <header 
@@ -138,23 +149,34 @@ const Header: React.FC = () => {
                 }`}
               >
                 <UserCircle size={20} />
-                <span>Account</span>
+                <span>{user.email}</span>
               </button>
               {dropdownOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
-                  {isAdmin && (
+                  {isAdmin ? (
                     <Link
                       to="/admin"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                       onClick={() => setDropdownOpen(false)}
                     >
+                      <Settings size={16} className="mr-2" />
                       Admin Dashboard
+                    </Link>
+                  ) : (
+                    <Link
+                      to="/profile"
+                      className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={() => setDropdownOpen(false)}
+                    >
+                      <UserCircle size={16} className="mr-2" />
+                      My Profile
                     </Link>
                   )}
                   <button
                     onClick={handleLogout}
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                   >
+                    <LogIn size={16} className="mr-2" />
                     Sign Out
                   </button>
                 </div>
@@ -211,14 +233,23 @@ const Header: React.FC = () => {
             ))}
             {user ? (
               <>
-                {isAdmin && (
+                {isAdmin ? (
                   <Link
                     to="/admin"
                     className="flex items-center space-x-2 py-3 border-b border-gray-200 text-gray-700"
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    <UserCircle size={18} />
+                    <Settings size={18} />
                     <span>Admin Dashboard</span>
+                  </Link>
+                ) : (
+                  <Link
+                    to="/profile"
+                    className="flex items-center space-x-2 py-3 border-b border-gray-200 text-gray-700"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <UserCircle size={18} />
+                    <span>My Profile</span>
                   </Link>
                 )}
                 <button

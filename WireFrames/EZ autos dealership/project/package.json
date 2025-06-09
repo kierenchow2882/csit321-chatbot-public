@@ -1,16 +1,18 @@
 {
-  "name": "vite-react-typescript-starter",
+  "name": "ez-autos",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "Car dealership platform with React frontend and Django backend",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "setup": "npm install && echo 'Frontend dependencies installed. Run setup.sh or setup.bat for full setup.'"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.39.7",
+    "axios": "^1.6.7",
     "lucide-react": "^0.344.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -32,5 +34,22 @@
     "typescript": "^5.5.3",
     "typescript-eslint": "^8.3.0",
     "vite": "^5.4.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/ez-autos.git"
+  },
+  "keywords": [
+    "react",
+    "django",
+    "car-dealership",
+    "typescript",
+    "tailwindcss"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
   }
 }

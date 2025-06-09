@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { supabase } from '../../lib/supabase';
 import { Search, Calendar, Check, X, Clock } from 'lucide-react';
+import { getTestDrives, createTestDrive } from '../../lib/api';
 
 interface TestDrive {
   id: string;
@@ -23,13 +23,8 @@ const TestDriveBookings: React.FC = () => {
 
   const fetchBookings = async () => {
     try {
-      const { data, error } = await supabase
-        .from('test_drives')
-        .select('*')
-        .order('booking_date', { ascending: false });
-
-      if (error) throw error;
-      setBookings(data || []);
+      const data = await getTestDrives();
+      setBookings(data);
     } catch (error) {
       console.error('Error fetching bookings:', error);
     } finally {
@@ -37,14 +32,9 @@ const TestDriveBookings: React.FC = () => {
     }
   };
 
-  const updateBookingStatus = async (id: string, status: string) => {
+  const handleStatusUpdate = async (id: string, status: string) => {
     try {
-      const { error } = await supabase
-        .from('test_drives')
-        .update({ status })
-        .eq('id', id);
-
-      if (error) throw error;
+      await createTestDrive({ id, status });
       fetchBookings();
     } catch (error) {
       console.error('Error updating booking status:', error);
@@ -123,13 +113,13 @@ const TestDriveBookings: React.FC = () => {
                   {booking.status === 'pending' && (
                     <div className="flex space-x-2">
                       <button
-                        onClick={() => updateBookingStatus(booking.id, 'approved')}
+                        onClick={() => handleStatusUpdate(booking.id, 'approved')}
                         className="text-green-600 hover:text-green-900"
                       >
                         <Check size={18} />
                       </button>
                       <button
-                        onClick={() => updateBookingStatus(booking.id, 'rejected')}
+                        onClick={() => handleStatusUpdate(booking.id, 'rejected')}
                         className="text-red-600 hover:text-red-900"
                       >
                         <X size={18} />
