@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { getProfile } from '../lib/api';
 import {
   Users, MessageSquare, DollarSign, Search, UserPlus,
-  FileText, Calendar, Star, BookOpen, History, AlertCircle
+  FileText, Calendar, Star, BookOpen, History, AlertCircle, Settings
 } from 'lucide-react';
 import KnowledgeBase from './admin/KnowledgeBase';
 import TestDriveBookings from './admin/TestDriveBookings';
@@ -11,6 +11,7 @@ import Feedback from './admin/Feedback';
 import ChatHistory from './admin/ChatHistory';
 import Analytics from './admin/Analytics';
 import TeamMembers from './admin/TeamMembers';
+import ChatbotSettings from './admin/ChatbotSettings';
 import SessionStatus from './SessionStatus';
 
 interface User {
@@ -53,7 +54,7 @@ const AdminDashboard: React.FC = () => {
   const navigationItems = [
     { id: 'overview', label: 'Overview', icon: Users },
     { id: 'team', label: 'Team Management', icon: UserPlus },
-    { id: 'chatbot', label: 'Chatbot Settings', icon: MessageSquare },
+    { id: 'chatbot', label: 'Chatbot Settings', icon: Settings },
     { id: 'knowledge', label: 'Knowledge Base', icon: BookOpen },
     { id: 'bookings', label: 'Test Drive Bookings', icon: Calendar },
     { id: 'feedback', label: 'Feedback & Reviews', icon: Star },
@@ -66,6 +67,8 @@ const AdminDashboard: React.FC = () => {
     switch (activeSection) {
       case 'team':
         return <TeamMembers />;
+      case 'chatbot':
+        return <ChatbotSettings />;
       case 'knowledge':
         return <KnowledgeBase />;
       case 'bookings':
@@ -85,75 +88,75 @@ const AdminDashboard: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-100 pt-16 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Checking access permissions...</p>
+        <div className="min-h-screen bg-gray-100 pt-16 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
+            <p className="mt-4 text-gray-600">Checking access permissions...</p>
+          </div>
         </div>
-      </div>
     );
   }
 
   if (accessDenied) {
     return (
-      <div className="min-h-screen bg-gray-100 pt-16 flex items-center justify-center">
-        <div className="bg-white rounded-lg shadow-md p-8 max-w-md w-full text-center">
-          <div className="text-red-500 mb-4">
-            <AlertCircle size={48} className="mx-auto" />
-          </div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">Access Denied</h2>
-          <p className="text-gray-600 mb-6">
-            You don't have permission to access the admin dashboard. Please contact an administrator if you believe this is an error.
-          </p>
-          <div className="space-y-3">
-            <button
-              onClick={() => navigate('/')}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors"
-            >
-              Go to Home
-            </button>
-            <button
-              onClick={() => navigate('/login')}
-              className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 px-4 rounded-md transition-colors"
-            >
-              Sign In as Admin
-            </button>
+        <div className="min-h-screen bg-gray-100 pt-16 flex items-center justify-center">
+          <div className="bg-white rounded-lg shadow-md p-8 max-w-md w-full text-center">
+            <div className="text-red-500 mb-4">
+              <AlertCircle size={48} className="mx-auto" />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">Access Denied</h2>
+            <p className="text-gray-600 mb-6">
+              You don't have permission to access the admin dashboard. Please contact an administrator if you believe this is an error.
+            </p>
+            <div className="space-y-3">
+              <button
+                  onClick={() => navigate('/')}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors"
+              >
+                Go to Home
+              </button>
+              <button
+                  onClick={() => navigate('/login')}
+                  className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 px-4 rounded-md transition-colors"
+              >
+                Sign In as Admin
+              </button>
+            </div>
           </div>
         </div>
-      </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 pt-16">
-      <div className="flex">
-        {/* Sidebar */}
-        <div className="w-64 bg-white shadow-md min-h-[calc(100vh-4rem)] fixed">
-          <div className="p-4">
-            <h1 className="text-xl font-bold text-gray-800 truncate">Admin Panel</h1>
+      <div className="min-h-screen bg-gray-100 pt-16">
+        <div className="flex">
+          {/* Sidebar */}
+          <div className="w-64 bg-white shadow-md min-h-[calc(100vh-4rem)] fixed">
+            <div className="p-4">
+              <h1 className="text-xl font-bold text-gray-800 truncate">Admin Panel</h1>
+            </div>
+            <nav className="mt-4">
+              {navigationItems.map((item) => (
+                  <button
+                      key={item.id}
+                      onClick={() => setActiveSection(item.id)}
+                      className={`w-full flex items-center space-x-2 px-4 py-3 text-gray-700 hover:bg-gray-100 ${
+                          activeSection === item.id ? 'bg-blue-50 text-blue-600' : ''
+                      }`}
+                  >
+                    <item.icon size={20} />
+                    <span>{item.label}</span>
+                  </button>
+              ))}
+            </nav>
           </div>
-          <nav className="mt-4">
-            {navigationItems.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => setActiveSection(item.id)}
-                className={`w-full flex items-center space-x-2 px-4 py-3 text-gray-700 hover:bg-gray-100 ${
-                  activeSection === item.id ? 'bg-blue-50 text-blue-600' : ''
-                }`}
-              >
-                <item.icon size={20} />
-                <span>{item.label}</span>
-              </button>
-            ))}
-          </nav>
-        </div>
 
-        {/* Main content */}
-        <div className="flex-1 ml-64 p-8">
-          {renderContent()}
+          {/* Main content */}
+          <div className="flex-1 ml-64 p-8">
+            {renderContent()}
+          </div>
         </div>
       </div>
-    </div>
   );
 };
 
