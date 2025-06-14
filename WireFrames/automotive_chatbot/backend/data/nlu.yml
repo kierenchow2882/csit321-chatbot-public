@@ -6,11 +6,20 @@ nlu:
     - hello
     - hi
     - hey
+    - helo
+    - helo there
+    - helo bot
+    - helo chatbot
+    - hi there
+    - hey there
     - good morning
     - good afternoon
     - good evening
-    - hi there
-    - hey there
+    - helllo
+    - hii
+    - heya
+    - hai
+    - hallo
 
 - intent: goodbye
   examples: |
@@ -48,6 +57,7 @@ nlu:
   examples: |
     - coe price
     - coe prices
+    - COE Prices
     - latest coe price
     - latest coe prices
     - current coe price
@@ -97,6 +107,21 @@ nlu:
     - [accord](car_model)
     - [corolla](car_model)
     - [altima](car_model)
+    - toyota camry
+    - totoyota camry
+    - Toyota Camry
+    - toyota alphard
+    - Toyota Alphard
+    - latest toyota alphard
+    - honda civic
+    - Honda Civic
+    - bmw 3 series
+    - BMW 3 Series
+    - mercedes c class
+    - can i ask about latest toyota alphard
+    - a sedan car
+    - sedan car information
+    - sedan cars
     - toyota
     - honda
     - bmw
@@ -106,6 +131,12 @@ nlu:
     - what models are available
     - show me your vehicles
     - what types of cars do you sell
+    - car information
+    - vehicle information
+    - vehicle details
+    - car details
+    - car specs
+    - vehicle specs
 
 - intent: ask_pricing
   examples: |
@@ -131,6 +162,14 @@ nlu:
     - tell me the price
     - how much is it
     - what's the cost
+    - can i check the price of cat a today
+    - can i check the price of category a today
+    - check price of cat a
+    - check price of category a
+    - price of cat a
+    - price of category a
+    - cat a price today
+    - category a price today
 
 - intent: book_test_drive
   examples: |
@@ -138,6 +177,7 @@ nlu:
     - schedule a test drive
     - can I test drive
     - test drive
+    - Test Drive
     - arrange test drive
     - book test drive
     - schedule test drive
@@ -155,6 +195,7 @@ nlu:
 - intent: ask_maintenance
   examples: |
     - maintenance
+    - Maintenance
     - service
     - servicing
     - repair
@@ -198,20 +239,472 @@ nlu:
 
 - intent: ask_features
   examples: |
+    - features
+    - car features
+    - vehicle features
+    - what features
+    - safety features
+    - technology features
+    - comfort features
+    - entertainment features
+    - specifications
+    - specs
+    - what does it have
+    - what's included
+    - standard features
+    - optional features
+
+- intent: ask_contact
+  examples: |
+    - contact
+    - Contact Us
+    - contact us
+    - phone number
+    - email
+    - address
+    - how to reach you
+    - contact information
+    - get in touch
+    - call you
+    - visit
+    - contact details
+    - how to contact
+    - reach out
+    - contact info
+    - company contact
+    - support contact
+    - sales contact
+    - customer service
+    - helpline
+    - hotline
+
+- intent: ask_store_location
+  examples: |
+    - store
+    - store location
+    - where is your store
+    - shop location
+    - where is the shop
+    - shop address
+    - store address
+    - where can I find you
+    - your location
+    - directions to store
+    - how to get to your store
+    - where are you located
+    - find your store
+
+- intent: ask_operating_hours
+  examples: |
+    - operating hours
+    - what time open
+    - when are you open
+    - opening hours
+    - office hours
+    - working hours
+    - store hours
+
+# Enhanced Singapore-specific intents
+
+- intent: ask_coe_category
+  examples: |
+    - coe category
+    - coe categories
+    - what coe category
+    - which coe category
+    - category A
+    - category B
+    - category C
+    - category D
+    - category E
+    - coe category A price
+    - coe category B price
+    - what's category A
+    - what's category B
+    - difference between coe categories
+    - which category for my car
+    - coe category for 1600cc
+    - coe category for motorcycle
+    - open category
+    - goods vehicle category
+
+- intent: ask_coe_bidding_process
+  examples: |
+    - coe bidding
+    - how does coe bidding work
+    - coe bidding process
+    - when is coe bidding
+    - coe bidding schedule
+    - how to bid for coe
+    - coe bidding exercise
+    - coe bidding results
+    - coe bidding dates
+    - when is next coe bidding
+    - coe auction
+    - bidding exercise
+
+- intent: ask_loan_financing
+  examples: |
+    - loan
+    - car loan
+    - vehicle loan
+    - financing
+    - auto loan
+    - hire purchase
+    - bank loan
+    - loan interest rate
+    - loan terms
+    - down payment
+    - monthly installment
+    - loan calculator
+    - calculate loan
+    - loan calculation
+    - financing options
+    - bank financing
+    - loan approval
+    - credit assessment
+    - how to get car loan
+    - car financing
+    - auto financing
+    - loan rates
+    - finance rates
+    - interest rates
+    - how much loan can I get
+    - loan eligibility
+    - apply for loan
+    - calculator
+    - calculate monthly payment
+    - payment calculator
+
+- intent: ask_insurance
+  examples: |
+    - car insurance
+    - vehicle insurance
+    - auto insurance
+    - motor insurance
+    - insurance premium
+    - insurance cost
+    - comprehensive insurance
+    - third party insurance
+    - insurance coverage
+    - insurance claims
+    - insurance companies
+    - cheapest insurance
+    - best insurance
+    - insurance comparison
+
+- intent: ask_road_tax
+  examples: |
+    - road tax
+    - vehicle tax
+    - annual road tax
+    - road tax cost
+    - road tax payment
+    - road tax renewal
+    - how much is road tax
+    - road tax calculation
+    - road tax rates
+    - when to pay road tax
+
+- intent: ask_parking
+  examples: |
+    - parking
+    - parking rates
+    - parking fees
+    - where to park
+    - parking costs
+    - HDB parking
+    - shopping mall parking
+    - street parking
+    - parking coupons
+    - electronic parking
+    - carpark rates
+    - parking calculator
+
+- intent: ask_fuel_prices
+  examples: |
+    - fuel price
+    - petrol price
+    - diesel price
+    - fuel cost
+    - RON 95 price
+    - RON 98 price
+    - petrol station
+    - fuel consumption
+    - fuel efficiency
+    - miles per gallon
+    - kilometers per liter
+
+- intent: ask_electric_vehicles
+  examples: |
+    - electric car
+    - electric vehicle
+    - EV
+    - hybrid car
+    - tesla
+    - electric vehicle charging
+    - EV charging points
+    - electric car price
+    - hybrid vs electric
+    - EV benefits
+    - EV rebate
+    - electric car range
+    - charging station locations
+
+- intent: ask_depreciation
+  examples: |
+    - car depreciation
+    - vehicle depreciation
+    - resale value
+    - car value
+    - depreciation rate
+    - how much will my car depreciate
+    - car loses value
+    - second hand car value
+    - trade in value
+    - market value
+
+- intent: first_time_buyer
+  examples: |
+    - first time buyer
+    - first car
+    - new to buying cars
+    - never bought a car
+    - first time car buyer
+    - buying my first car
+    - new driver
+    - just got license
+    - complete beginner
+    - don't know about cars
+
+- intent: budget_planning
+  examples: |
+    - budget planning
+    - total cost of ownership
+    - how much to budget
+    - total car cost
+    - annual car cost
+    - monthly car expenses
+    - cost calculator
+    - budget calculator
+    - all inclusive cost
+    - what's the total cost
+
+- intent: ask_second_hand_cars
+  examples: |
+    - second hand car
+    - used car
+    - pre-owned car
+    - second hand vehicles
+    - used car market
+    - used car prices
+    - buying used car
+    - second hand car dealer
+    - certified pre-owned
+    - used car inspection
+
+- intent: compare_cars
+  examples: |
+    - compare cars
+    - car comparison
+    - compare models
+    - compare brands
+    - which is better
+    - difference between
+    - versus
+    - vs
+    - honda vs toyota
+    - civic vs camry
+    - best value for money
+    - which should I choose
+
+- intent: ask_maintenance_cost
+  examples: |
+    - maintenance cost
+    - service cost
+    - how much to maintain
+    - maintenance expenses
+    - service charges
+    - repair costs
+    - parts cost
+    - maintenance budget
+    - annual maintenance cost
+
+- intent: ask_coe_renewal
+  examples: |
+    - coe renewal
+    - renew coe
+    - coe expiry
+    - coe extension
+    - what happens when coe expires
+    - parf rebate
+    - scrap vs renew
+    - coe renewal cost
+    - 10 year coe
+
+- intent: ask_scrap_car
+  examples: |
+    - scrap car
+    - scrap vehicle
+    - end of life vehicle
+    - parf rebate
+    - cevs rebate
+    - how to scrap car
+    - scrap car procedure
+    - authorized scrapper
+    - deregister car
+
+- intent: ask_popular_models
+  examples: |
+    - popular cars
+    - best selling cars
+    - most popular models
+    - top cars in singapore
+    - recommended cars
+    - popular brands
+    - best cars
+    - top models
+    - most bought cars
+
+- intent: ask_climate_considerations
+  examples: |
+    - singapore weather
+    - tropical climate
+    - hot weather
+    - humid weather
+    - air conditioning
+    - cooling system
+    - weather considerations
+    - climate effects on car
+    - sun protection
+    - heat resistance
+
+- intent: ask_brand_recommendations
+  examples: |
+    - which brand
+    - recommend brand
+    - best brand
+    - reliable brand
+    - which car brand
+    - brand comparison
+    - most reliable cars
+    - brand reputation
+    - quality brands
+
+- intent: luxury_vs_economy
+  examples: |
+    - luxury vs economy
+    - premium vs budget
+    - expensive vs cheap
+    - luxury cars
+    - economy cars
+    - budget cars
+    - premium cars
+    - high end cars
+    - affordable cars
+
+- intent: ask_family_cars
+  examples: |
+    - family car
+    - family vehicle
+    - car for family
+    - 7 seater
+    - mpv
+    - family friendly
+    - spacious car
+    - big car
+    - car with children
+    - family sedan
+
+- intent: ask_sports_cars
+  examples: |
+    - sports car
+    - performance car
+    - fast car
+    - sporty car
+    - coupe
+    - convertible
+    - high performance
+    - racing car
+    - luxury sports car
+
+- intent: ask_economic_cars
+  examples: |
+    - economical car
+    - fuel efficient car
+    - cheap to maintain
+    - budget car
+    - affordable car
+    - economical choice
+    - fuel saver
+    - low running cost
+    - cheap car
+
+- intent: ask_clarification
+  examples: |
+    - what do you mean
+    - can you explain
+    - I don't understand
+    - clarify
+    - explain more
+    - what does that mean
+    - confused
+    - not clear
+    - elaborate
+
+- intent: ask_help
+  examples: |
+    - help
+    - I need help
+    - can you help
+    - assist me
+    - support
+    - I'm lost
     - what can you do
     - what can u do
-    - features
-    - services
-    - what do you offer
-    - what services
-    - how can you help
-    - what help can you provide
     - capabilities
     - functions
     - what are your features
     - what services do you provide
     - guide me
     - help please
+
+- intent: ask_contact
+  examples: |
+    - contact
+    - Contact Us
+    - contact us
+    - phone number
+    - email
+    - address
+    - how to reach you
+    - contact information
+    - get in touch
+    - call you
+    - visit
+    - contact details
+    - how to contact
+    - reach out
+    - contact info
+    - company contact
+    - support contact
+    - sales contact
+    - customer service
+    - helpline
+    - hotline
+
+- intent: ask_business_hours
+  examples: |
+    - business hours
+    - what time do you open
+    - what time do you close
+    - business schedule
+    - shop hours
+    - showroom hours
+    - when do you open
+    - when do you close
+    - what are your hours
+    - hours of operation
 
 - intent: out_of_scope
   examples: |
@@ -227,3 +720,17 @@ nlu:
     - sports scores
     - any
     - anything
+
+- intent: confirm_schedule_visit
+  examples: |
+    - yes
+    - yes please
+    - schedule visit
+    - I want to visit
+    - book a visit
+    - I want to schedule
+    - please schedule
+    - confirm
+    - that's correct
+    - ok, schedule
+    - yes, please book

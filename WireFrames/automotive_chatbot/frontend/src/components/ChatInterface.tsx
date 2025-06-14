@@ -1,13 +1,22 @@
 /**
  * Component: ChatInterface
- * Main chat interface component using BCE framework
+ * Main chat interface component with HTTP API calls
  */
 
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { chatController } from '../controllers/ChatController';
-import { ChatMessage } from '../entities/ChatMessage';
+
+interface ChatMessage {
+  id: string;
+  content: string;
+  sender: 'user' | 'bot';
+  timestamp: Date;
+  metadata?: {
+    buttons?: Array<{ title: string; payload: string }>;
+    quick_replies?: Array<{ title: string; payload: string }>;
+  };
+}
 
 interface ChatInterfaceProps {
   className?: string;
@@ -15,25 +24,99 @@ interface ChatInterfaceProps {
 
 export const ChatInterface: React.FC<ChatInterfaceProps> = ({ className = '' }) => {
   const [inputMessage, setInputMessage] = useState('');
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  
-  // Use the controller's state management
-  const {
-    messages,
-    isLoading,
-    error,
-    sendMessage,
-    handleButtonClick,
-    clearChat,
-    getSuggestedQueries,
-  } = chatController.useChatState();
 
-  const suggestedQueries = getSuggestedQueries();
+  // Initialize with welcome message
+  useEffect(() => {
+    setMessages([{
+      id: 'welcome',
+      content: 'Hello! I\'m your automotive assistant. How can I help you today?',
+      sender: 'bot',
+      timestamp: new Date(),
+      metadata: {
+        buttons: [
+          { title: 'COE Prices', payload: 'COE Prices' },
+          { title: 'Test Drive', payload: 'Test Drive' },
+          { title: 'Maintenance', payload: 'Maintenance' },
+          { title: 'Contact Us', payload: 'Contact Us' }
+        ]
+      }
+    }]);
+  }, []);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  const sendMessage = async (messageText: string) => {
+    if (!messageText.trim()) return;
+
+    // Add user message immediately
+    const userMessage: ChatMessage = {
+      id: Date.now().toString(),
+      content: messageText,
+      sender: 'user',
+      timestamp: new Date()
+    };
+
+    setMessages(prev => [...prev, userMessage]);
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      // Send to RASA backend
+      const response = await fetch('http://localhost:5005/webhooks/rest/webhook', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          sender: 'user',
+          message: messageText
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to get response from chatbot');
+      }
+
+      const botResponses = await response.json();
+      
+      // Add bot responses
+      if (botResponses && botResponses.length > 0) {
+        const botMessages = botResponses.map((resp: any, index: number) => ({
+          id: `${Date.now()}-${index}`,
+          content: resp.text || 'I received your message, but I\'m not sure how to respond.',
+          sender: 'bot' as const,
+          timestamp: new Date(),
+          metadata: {
+            buttons: resp.buttons || [],
+            quick_replies: resp.quick_replies || []
+          }
+        }));
+        
+        setMessages(prev => [...prev, ...botMessages]);
+      } else {
+        // Fallback response
+        const fallbackMessage: ChatMessage = {
+          id: Date.now().toString(),
+          content: 'I\'m sorry, I didn\'t receive a proper response. Please try again.',
+          sender: 'bot',
+          timestamp: new Date()
+        };
+        setMessages(prev => [...prev, fallbackMessage]);
+      }
+    } catch (err) {
+      setError('Unable to connect to the chatbot service. Please check if the services are running.');
+      console.error('Chat error:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,6 +125,34 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ className = '' }) 
       setInputMessage('');
     }
   };
+
+  const handleButtonClick = async (payload: string, title: string) => {
+    await sendMessage(payload);
+  };
+
+  const clearChat = () => {
+    setMessages([{
+      id: 'welcome',
+      content: 'Hello! I\'m your automotive assistant. How can I help you today?',
+      sender: 'bot',
+      timestamp: new Date(),
+      metadata: {
+        buttons: [
+          { title: 'COE Prices', payload: 'COE Prices' },
+          { title: 'Test Drive', payload: 'Test Drive' },
+          { title: 'Maintenance', payload: 'Maintenance' },
+          { title: 'Contact Us', payload: 'Contact Us' }
+        ]
+      }
+    }]);
+    setError(null);
+  };
+
+  const suggestedQueries = [
+    "What are the current COE prices?",
+    "How do I book a test drive?", 
+    "What maintenance does my car need?"
+  ];
 
   const handleSuggestedQuery = async (query: string) => {
     await sendMessage(query);

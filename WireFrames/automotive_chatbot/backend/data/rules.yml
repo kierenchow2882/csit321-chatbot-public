@@ -15,7 +15,7 @@ rules:
 - rule: Provide COE prices
   steps:
   - intent: ask_coe_prices
-  - action: action_get_coe_prices
+  - action: action_coe_prices
 
 - rule: Provide vehicle information
   steps:
@@ -25,7 +25,7 @@ rules:
 - rule: Provide pricing information
   steps:
   - intent: ask_pricing
-  - action: utter_pricing
+  - action: action_vehicle_pricing
 
 - rule: Handle test drive booking
   steps:
@@ -46,6 +46,11 @@ rules:
   steps:
   - intent: ask_features
   - action: utter_features
+
+- rule: Provide contact information
+  steps:
+  - intent: ask_contact
+  - action: action_contact_us
 
 - rule: Handle out of scope
   steps:

@@ -1,353 +1,307 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import {
-  ChatBubbleLeftRightIcon,
-  DocumentTextIcon,
-  Cog6ToothIcon,
-  ChartBarIcon,
-  BookOpenIcon,
-  ArchiveBoxIcon,
-  PlayIcon,
-  ExclamationTriangleIcon,
-  CheckCircleIcon,
-  ClockIcon
-} from '@heroicons/react/24/outline';
+import { useState, useEffect, useRef } from 'react';
 
-interface ConfigStatus {
-  [key: string]: {
-    exists: boolean;
-    valid?: boolean;
-    size?: number;
-    modified?: string;
-    error?: string;
-    summary?: any;
-  };
+interface Message {
+  id: string;
+  text: string;
+  sender: 'user' | 'bot';
+  timestamp: Date;
 }
 
-const AdminDashboard = () => {
-  const router = useRouter();
-  const [status, setStatus] = useState<ConfigStatus>({});
-  const [isLoading, setIsLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [token, setToken] = useState('');
+interface RasaResponse {
+  text?: string;
+  buttons?: Array<{
+    title: string;
+    payload: string;
+  }>;
+}
+
+export default function Home() {
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [inputText, setInputText] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Check if admin token exists in localStorage
-    const savedToken = localStorage.getItem('adminToken');
-    if (savedToken) {
-      setToken(savedToken);
-      setIsAuthenticated(true);
-      loadStatus(savedToken);
-    } else {
-      setIsLoading(false);
-    }
+    // Welcome message
+    const welcomeMessage: Message = {
+      id: 'welcome',
+      text: `Hello! Welcome to CleverCompanion, your Singapore Automotive Assistant. I can help you with:
+      
+• COE prices and trends
+• Vehicle recommendations 
+• Test drive bookings
+• Maintenance guides
+• Financing options
+
+How can I assist you today?`,
+      sender: 'bot',
+      timestamp: new Date()
+    };
+    setMessages([welcomeMessage]);
   }, []);
 
-  const handleLogin = async (adminToken: string) => {
-    try {
-      // Test the token with a simple API call
-      const response = await fetch('/api/admin/status', {
-        headers: {
-          'Authorization': `Bearer ${adminToken}`
-        }
-      });
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
-      if (response.ok) {
-        setToken(adminToken);
-        setIsAuthenticated(true);
-        localStorage.setItem('adminToken', adminToken);
-        loadStatus(adminToken);
-      } else {
-        alert('Invalid admin token');
-      }
-    } catch (error) {
-      alert('Error validating token');
-    }
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const loadStatus = async (authToken: string) => {
+  const sendMessage = async (messageText: string) => {
+    if (!messageText.trim()) return;
+
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      text: messageText,
+      sender: 'user',
+      timestamp: new Date()
+    };
+
+    setMessages(prev => [...prev, userMessage]);
+    setInputText('');
+    setIsLoading(true);
+
     try {
-      const response = await fetch('/api/admin/status', {
+      const response = await fetch('http://127.0.0.1:5005/webhooks/rest/webhook', {
+        method: 'POST',
         headers: {
-          'Authorization': `Bearer ${authToken}`
-        }
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          sender: `user_${Date.now()}`,
+          message: messageText
+        })
       });
 
       if (response.ok) {
-        const data = await response.json();
-        setStatus(data);
+        const data: RasaResponse[] = await response.json();
+        
+        if (data && data.length > 0) {
+          data.forEach((botResponse, index) => {
+            setTimeout(() => {
+              const botMessage: Message = {
+                id: `${Date.now()}_${index}`,
+                text: botResponse.text || 'I understand your message, but I\'m not sure how to respond right now.',
+                sender: 'bot',
+                timestamp: new Date()
+              };
+              setMessages(prev => [...prev, botMessage]);
+            }, index * 500);
+          });
+        } else {
+          const fallbackMessage: Message = {
+            id: Date.now().toString(),
+            text: 'I apologize, but I\'m having trouble understanding your request. Could you please try rephrasing?',
+            sender: 'bot',
+            timestamp: new Date()
+          };
+          setMessages(prev => [...prev, fallbackMessage]);
+        }
+      } else {
+        throw new Error('Network response was not ok');
       }
     } catch (error) {
-      console.error('Error loading status:', error);
+      console.error('Chat error:', error);
+      const errorMessage: Message = {
+        id: Date.now().toString(),
+        text: 'I\'m experiencing technical difficulties. Please try again in a moment.',
+        sender: 'bot',
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('adminToken');
-    setIsAuthenticated(false);
-    setToken('');
-    setStatus({});
-  };
-
-  const navigateTo = (path: string) => {
-    router.push(`/admin/${path}?token=${encodeURIComponent(token)}`);
-  };
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading admin dashboard...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return <LoginForm onLogin={handleLogin} />;
-  }
-
-  const getStatusColor = (fileStatus: any) => {
-    if (!fileStatus.exists) return 'text-red-500';
-    if (fileStatus.valid === false) return 'text-red-500';
-    return 'text-green-500';
-  };
-
-  const getStatusIcon = (fileStatus: any) => {
-    if (!fileStatus.exists) return <ExclamationTriangleIcon className="w-5 h-5 text-red-500" />;
-    if (fileStatus.valid === false) return <ExclamationTriangleIcon className="w-5 h-5 text-red-500" />;
-    return <CheckCircleIcon className="w-5 h-5 text-green-500" />;
-  };
-
-  return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div className="flex items-center">
-              <ChatBubbleLeftRightIcon className="w-8 h-8 text-blue-600 mr-3" />
-              <h1 className="text-3xl font-bold text-gray-900">Chatbot Admin Dashboard</h1>
-            </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-500">Admin Panel</span>
-              <button
-                onClick={handleLogout}
-                className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors"
-              >
-                Logout
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <QuickActionCard
-            title="Stories"
-            description="Manage conversation flows"
-            icon={<BookOpenIcon className="w-8 h-8" />}
-            onClick={() => navigateTo('stories')}
-            status={status.stories}
-          />
-          <QuickActionCard
-            title="Intents & NLU"
-            description="Manage training data"
-            icon={<DocumentTextIcon className="w-8 h-8" />}
-            onClick={() => navigateTo('nlu')}
-            status={status.nlu}
-          />
-          <QuickActionCard
-            title="Configuration"
-            description="System settings"
-            icon={<Cog6ToothIcon className="w-8 h-8" />}
-            onClick={() => navigateTo('config')}
-            status={status.domain}
-          />
-          <QuickActionCard
-            title="Analytics"
-            description="Usage statistics"
-            icon={<ChartBarIcon className="w-8 h-8" />}
-            onClick={() => navigateTo('analytics')}
-          />
-        </div>
-
-        {/* System Status */}
-        <div className="bg-white rounded-lg shadow mb-8">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-xl font-semibold text-gray-900">System Status</h2>
-          </div>
-          <div className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {Object.entries(status).map(([key, fileStatus]) => (
-                <div key={key} className="border rounded-lg p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-medium text-gray-900 capitalize">{key}</h3>
-                    {getStatusIcon(fileStatus)}
-                  </div>
-                  <p className={`text-sm ${getStatusColor(fileStatus)}`}>
-                    {!fileStatus.exists ? 'File missing' :
-                     fileStatus.valid === false ? `Error: ${fileStatus.error}` :
-                     'Active'}
-                  </p>
-                  {fileStatus.summary && (
-                    <div className="mt-2 text-xs text-gray-500">
-                      {key === 'stories' && `${fileStatus.summary.total_stories} stories`}
-                      {key === 'nlu' && `${fileStatus.summary.total_intents} intents, ${fileStatus.summary.total_examples} examples`}
-                      {key === 'rules' && `${fileStatus.summary.total_rules} rules`}
-                      {key === 'domain' && `${fileStatus.summary.intents} intents, ${fileStatus.summary.responses} responses`}
-                    </div>
-                  )}
-                  {fileStatus.modified && (
-                    <div className="mt-1 text-xs text-gray-400 flex items-center">
-                      <ClockIcon className="w-3 h-3 mr-1" />
-                      {new Date(fileStatus.modified).toLocaleDateString()}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Training & Deployment */}
-        <div className="bg-white rounded-lg shadow">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-xl font-semibold text-gray-900">Training & Deployment</h2>
-          </div>
-          <div className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <button
-                onClick={() => navigateTo('training')}
-                className="flex items-center justify-center px-4 py-3 border-2 border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors"
-              >
-                <PlayIcon className="w-5 h-5 mr-2" />
-                Train Model
-              </button>
-              <button
-                onClick={() => navigateTo('models')}
-                className="flex items-center justify-center px-4 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                <DocumentTextIcon className="w-5 h-5 mr-2" />
-                View Models
-              </button>
-              <button
-                onClick={() => navigateTo('backup')}
-                className="flex items-center justify-center px-4 py-3 border-2 border-green-600 text-green-600 rounded-lg hover:bg-green-50 transition-colors"
-              >
-                <ArchiveBoxIcon className="w-5 h-5 mr-2" />
-                Backup Data
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const QuickActionCard = ({ title, description, icon, onClick, status }: {
-  title: string;
-  description: string;
-  icon: React.ReactNode;
-  onClick: () => void;
-  status?: any;
-}) => {
-  const isHealthy = status?.exists && status?.valid !== false;
-  
-  return (
-    <div
-      onClick={onClick}
-      className={`bg-white p-6 rounded-lg shadow cursor-pointer transition-all hover:shadow-lg border-l-4 ${
-        isHealthy ? 'border-green-500' : 'border-red-500'
-      }`}
-    >
-      <div className="flex items-center">
-        <div className={`${isHealthy ? 'text-blue-600' : 'text-red-600'} mr-4`}>
-          {icon}
-        </div>
-        <div>
-          <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
-          <p className="text-gray-600 text-sm">{description}</p>
-          {status && (
-            <div className="mt-1">
-              <span className={`text-xs px-2 py-1 rounded-full ${
-                isHealthy ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-              }`}>
-                {isHealthy ? 'Healthy' : 'Needs Attention'}
-              </span>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const LoginForm = ({ onLogin }: { onLogin: (token: string) => void }) => {
-  const [token, setToken] = useState('');
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (token.trim()) {
-      onLogin(token.trim());
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage(inputText);
     }
   };
 
+  const handleQuickAction = (action: string) => {
+    sendMessage(action);
+  };
+
+  const formatMessage = (text: string) => {
+    // Enhanced formatting for COE data and other structured content
+    return text
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/•/g, '&bull;')
+      .replace(/\n/g, '<br>')
+      .replace(/(CAT [ABCE])/g, '<span class="coe-category">$1</span>')
+      .replace(/\$([0-9,]+)/g, '<span class="price-highlight">$$$1</span>')
+      .replace(/(⬇️|⬆️|📈|📊|💰)/g, '<span class="emoji-highlight">$1</span>');
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <div className="mx-auto h-12 w-12 flex items-center justify-center rounded-full bg-blue-100">
-            <ChatBubbleLeftRightIcon className="h-8 w-8 text-blue-600" />
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+      {/* Header */}
+      <header className="bg-white/80 backdrop-blur-sm border-b border-indigo-100 sticky top-0 z-10">
+        <div className="max-w-4xl mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center">
+                <span className="text-white text-xl">🚗</span>
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                  CleverCompanion
+                </h1>
+                <p className="text-sm text-gray-600">Singapore Automotive Assistant</p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-4">
+              <a 
+                href="/dashboard" 
+                className="px-4 py-2 text-indigo-600 hover:text-indigo-700 font-medium transition-colors"
+              >
+                Admin Dashboard
+              </a>
+              <a 
+                href="/chat.html" 
+                className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium"
+              >
+                Landing Page
+              </a>
+            </div>
           </div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Admin Login
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Enter your admin token to access the dashboard
-          </p>
         </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div>
-            <label htmlFor="token" className="sr-only">
-              Admin Token
-            </label>
-            <input
-              id="token"
-              name="token"
-              type="password"
-              required
-              className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-              placeholder="Admin token (starts with admin_)"
-              value={token}
-              onChange={(e) => setToken(e.target.value)}
-            />
+      </header>
+
+      <main className="max-w-4xl mx-auto px-6 py-8">
+        {/* Quick Actions */}
+        <div className="mb-8">
+          <h2 className="text-lg font-semibold text-gray-800 mb-4">Quick Actions</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {['COE Prices', 'Test Drive', 'Maintenance', 'Contact Us'].map((action) => (
+              <button
+                key={action}
+                onClick={() => handleQuickAction(action)}
+                className="p-4 bg-white rounded-xl border border-gray-200 hover:border-indigo-300 hover:shadow-md transition-all duration-200 text-center group"
+              >
+                <div className="text-2xl mb-2 group-hover:scale-110 transition-transform">
+                  {action === 'COE Prices' && '💰'}
+                  {action === 'Test Drive' && '🚗'}
+                  {action === 'Maintenance' && '🔧'}
+                  {action === 'Contact Us' && '📞'}
+                </div>
+                <span className="text-sm font-medium text-gray-700">{action}</span>
+              </button>
+            ))}
           </div>
-          <div>
-            <button
-              type="submit"
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            >
-              Sign in
-            </button>
+        </div>
+
+        {/* Chat Interface */}
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+          {/* Chat Header */}
+          <div className="bg-gradient-to-r from-indigo-500 to-purple-600 px-6 py-4">
+            <h3 className="text-white font-semibold text-lg">Chat with CleverCompanion</h3>
+            <p className="text-indigo-100 text-sm">Get instant help with your automotive needs</p>
           </div>
-          <div className="text-center">
-            <p className="text-xs text-gray-500">
-              For demo purposes, use: <code className="bg-gray-100 px-1 rounded">admin_demo_token</code>
-            </p>
+
+          {/* Messages */}
+          <div className="h-96 overflow-y-auto p-6 space-y-4 bg-gradient-to-b from-gray-50/50 to-white">
+            {messages.map((message) => (
+              <div
+                key={message.id}
+                className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+              >
+                <div
+                  className={`max-w-[80%] rounded-2xl px-4 py-3 ${
+                    message.sender === 'user'
+                      ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-br-md'
+                      : 'bg-white border border-gray-200 text-gray-800 rounded-bl-md shadow-sm'
+                  }`}
+                >
+                  <div 
+                    className={`text-sm leading-relaxed ${message.sender === 'bot' ? 'formatted-content' : ''}`}
+                    dangerouslySetInnerHTML={{ 
+                      __html: message.sender === 'bot' ? formatMessage(message.text) : message.text 
+                    }}
+                  />
+                  <div className={`text-xs mt-2 ${message.sender === 'user' ? 'text-indigo-100' : 'text-gray-500'}`}>
+                    {message.timestamp.toLocaleTimeString('en-SG', { 
+                      hour: '2-digit', 
+                      minute: '2-digit',
+                      hour12: true 
+                    })}
+                  </div>
+                </div>
+              </div>
+            ))}
+            
+            {isLoading && (
+              <div className="flex justify-start">
+                <div className="bg-white border border-gray-200 rounded-2xl rounded-bl-md px-4 py-3 shadow-sm">
+                  <div className="flex items-center space-x-2">
+                    <div className="flex space-x-1">
+                      <div className="w-2 h-2 bg-indigo-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                      <div className="w-2 h-2 bg-indigo-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                      <div className="w-2 h-2 bg-indigo-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                    </div>
+                    <span className="text-xs text-gray-500">CleverCompanion is typing...</span>
+                  </div>
+                </div>
+              </div>
+            )}
+            <div ref={messagesEndRef} />
           </div>
-        </form>
-      </div>
+
+          {/* Input */}
+          <div className="border-t border-gray-100 p-4">
+            <div className="flex items-end space-x-3">
+              <div className="flex-1">
+                <textarea
+                  value={inputText}
+                  onChange={(e) => setInputText(e.target.value)}
+                  onKeyDown={handleKeyPress}
+                  placeholder="Type your message..."
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl resize-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
+                  rows={1}
+                  style={{
+                    minHeight: '48px',
+                    maxHeight: '120px',
+                  }}
+                />
+              </div>
+              <button
+                onClick={() => sendMessage(inputText)}
+                disabled={!inputText.trim() || isLoading}
+                className="w-12 h-12 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl hover:from-indigo-600 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center group"
+              >
+                <span className="text-lg group-hover:scale-110 transition-transform">➤</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <style jsx>{`
+        .formatted-content .coe-category {
+          color: #1e40af;
+          font-weight: 600;
+        }
+        .formatted-content .price-highlight {
+          color: #059669;
+          font-weight: 700;
+          background: rgba(16, 185, 129, 0.1);
+          padding: 2px 4px;
+          border-radius: 4px;
+        }
+        .formatted-content .emoji-highlight {
+          font-size: 1.1em;
+        }
+        .formatted-content strong {
+          color: #1f2937;
+          font-weight: 700;
+        }
+      `}</style>
     </div>
   );
-};
-
-export default AdminDashboard; 
+}
