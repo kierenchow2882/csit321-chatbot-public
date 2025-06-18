@@ -11,139 +11,76 @@
 </head>
 <body>
 <div id="root"></div>
+
+<!-- CleverCompanion Widget Container -->
+<div id="clevercompanion-container"></div>
+
 <script type="module" src="/src/main.tsx"></script>
 
-<!-- External CleverCompanion Widget Integration -->
-<script src="clevercompanion-widget.js"></script>
+<!-- CleverCompanion Widget Script -->
+<script src="http://localhost:3000/clevercompanion-widget.js"></script>
 
 <script>
-  // Page functionality for CleverCompanion integration
-  function startChat() {
+  // Global helper functions for CleverCompanion compatibility
+  window.startChat = function() {
+    console.log('startChat called');
     if (window.CleverCompanionWidget) {
+      console.log('Opening widget via startChat');
       window.CleverCompanionWidget.open();
+    } else {
+      console.log('CleverCompanion Widget not available in startChat');
     }
-  }
+  };
 
-  function quickAction(action) {
+  window.testMessage = function(message) {
+    console.log('testMessage called with:', message);
     if (window.CleverCompanionWidget) {
       window.CleverCompanionWidget.open();
       setTimeout(() => {
-        window.CleverCompanionWidget.sendMessage(action);
+        if (window.CleverCompanionWidget.sendMessage) {
+          window.CleverCompanionWidget.sendMessage(message);
+        }
       }, 500);
-    }
-  }
-
-  function scrollToDemo() {
-    const demoSection = document.getElementById('demo-section');
-    if (demoSection) {
-      demoSection.scrollIntoView({
-        behavior: 'smooth'
-      });
-    }
-  }
-
-  // Add smooth scrolling and animations
-  document.addEventListener('DOMContentLoaded', function() {
-    // Animate elements on scroll
-    const observerOptions = {
-      threshold: 0.1,
-      rootMargin: '0px 0px -50px 0px'
-    };
-
-    const observer = new IntersectionObserver(function(entries) {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.style.opacity = '1';
-          entry.target.style.transform = 'translateY(0)';
-        }
-      });
-    }, observerOptions);
-
-    // Observe all cards
-    document.querySelectorAll('.card-hover').forEach(card => {
-      card.style.opacity = '0';
-      card.style.transform = 'translateY(20px)';
-      card.style.transition = 'all 0.6s ease';
-      observer.observe(card);
-    });
-
-    // Auto-add card-hover class to vehicle cards and other elements
-    const addCardHoverClass = () => {
-      // Target vehicle cards and other card-like elements
-      const selectors = [
-        '[class*="vehicle"]',
-        '[class*="card"]',
-        '[class*="shadow"]',
-        '.bg-white',
-        '.rounded-lg'
-      ];
-
-      selectors.forEach(selector => {
-        document.querySelectorAll(selector).forEach(element => {
-          if (!element.classList.contains('card-hover') &&
-                  !element.classList.contains('no-animate')) {
-            element.classList.add('card-hover');
-            observer.observe(element);
-          }
-        });
-      });
-    };
-
-    // Run initially and watch for new content
-    addCardHoverClass();
-
-    // Watch for dynamically added content (React components)
-    const mutationObserver = new MutationObserver(() => {
-      setTimeout(addCardHoverClass, 100);
-    });
-
-    mutationObserver.observe(document.body, {
-      childList: true,
-      subtree: true
-    });
-  });
-
-  // Enhanced integration when CleverCompanion is ready
-  document.addEventListener('clevercompanion:ready', function() {
-    console.log('CleverCompanion AI Assistant is ready for EZ Autos!');
-
-    // Configure the widget for automotive context
-    if (window.CleverCompanionWidget && window.CleverCompanionWidget.configure) {
-      window.CleverCompanionWidget.configure({
-        context: 'automotive_dealership',
-        business: 'EZ Autos',
-        services: ['vehicle_sales', 'financing', 'test_drives', 'trade_ins'],
-        theme: {
-          primaryColor: '#2563eb',
-          brandName: 'EZ Autos Assistant'
-        }
-      });
-    }
-  });
-
-  // Global helper functions for React components
-  window.ezAutosChat = {
-    start: startChat,
-    quickAction: quickAction,
-
-    // Predefined quick actions for common automotive inquiries
-    findFamilyCar: () => quickAction("I'm looking for a reliable family car"),
-    getFinancing: () => quickAction("What financing options do you have?"),
-    scheduleTestDrive: () => quickAction("I'd like to schedule a test drive"),
-    checkTradeIn: () => quickAction("What's my trade-in value?"),
-    businessHours: () => quickAction("What are your business hours?"),
-    getDirections: () => quickAction("How do I get to your dealership?"),
-
-    // Vehicle-specific inquiries
-    askAboutVehicle: (make, model, year) => {
-      quickAction(`Tell me about the ${year} ${make} ${model}`);
-    },
-
-    // Price and budget inquiries
-    findInBudget: (budget) => {
-      quickAction(`Show me vehicles under $${budget}`);
+    } else {
+      console.log('CleverCompanion Widget not available in testMessage');
     }
   };
+
+  window.quickAction = function(action) {
+    console.log('quickAction called with:', action);
+    if (window.CleverCompanionWidget) {
+      window.CleverCompanionWidget.open();
+      // Don't send a preset message, just open the chat
+    } else {
+      console.log('CleverCompanion Widget not available in quickAction');
+    }
+  };
+
+  // Check widget status when page loads
+  document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM loaded, checking for CleverCompanion widget...');
+
+    // Check immediately
+    if (window.CleverCompanionWidget) {
+      console.log('✅ CleverCompanion Widget available immediately');
+    } else {
+      console.log('⏳ Waiting for CleverCompanion Widget to load...');
+
+      // Check periodically
+      let attempts = 0;
+      const maxAttempts = 50; // 5 seconds
+      const checkInterval = setInterval(() => {
+        attempts++;
+        if (window.CleverCompanionWidget) {
+          console.log('✅ CleverCompanion Widget loaded successfully!');
+          clearInterval(checkInterval);
+        } else if (attempts >= maxAttempts) {
+          console.log('❌ Widget not loaded after timeout. Make sure CleverCompanion service is running on http://localhost:3000');
+          clearInterval(checkInterval);
+        }
+      }, 100);
+    }
+  });
 </script>
 </body>
 </html>

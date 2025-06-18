@@ -1,111 +1,154 @@
-import React, { useEffect, useState } from 'react';
-import { MessageSquare } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { MessageSquare, X } from 'lucide-react';
 
-const ChatBot: React.FC = () => {
-  const [isWidgetReady, setIsWidgetReady] = useState(false);
-  const [isWidgetLoaded, setIsWidgetLoaded] = useState(false);
-
-  useEffect(() => {
-    // Check if widget is already available
-    if (window.CleverCompanionWidget) {
-      setIsWidgetReady(true);
-      setIsWidgetLoaded(true);
-      return;
-    }
-
-    // Listen for widget ready event
-    const handleWidgetReady = () => {
-      console.log('CleverCompanion widget is ready!');
-      setIsWidgetReady(true);
-      setIsWidgetLoaded(true);
-    };
-
-    // Listen for widget load event
-    const handleWidgetLoad = () => {
-      console.log('CleverCompanion widget loaded!');
-      setIsWidgetLoaded(true);
-    };
-
-    window.addEventListener('clevercompanion:ready', handleWidgetReady);
-    window.addEventListener('clevercompanion:loaded', handleWidgetLoad);
-
-    // Check periodically if widget becomes available
-    const checkWidget = setInterval(() => {
-      if (window.CleverCompanionWidget && !isWidgetReady) {
-        setIsWidgetReady(true);
-        setIsWidgetLoaded(true);
-        clearInterval(checkWidget);
-      }
-    }, 1000);
-
-    // Cleanup
-    return () => {
-      window.removeEventListener('clevercompanion:ready', handleWidgetReady);
-      window.removeEventListener('clevercompanion:loaded', handleWidgetLoad);
-      clearInterval(checkWidget);
-    };
-  }, [isWidgetReady]);
-
-  // Fallback chat button if external widget is not available
-  const handleFallbackChat = () => {
-    // If external widget is not available, show a simple message
-    alert('AI Assistant is currently unavailable. Please contact us at (555) 123-4567 or email info@ezautos.com');
-  };
-
-  // If external widget is loaded, it will handle the chat UI
-  // This component serves as a fallback and integration helper
-  if (isWidgetLoaded && window.CleverCompanionWidget) {
-    return null; // External widget handles the UI
-  }
-
-  // Fallback UI if external widget is not available
-  return (
-      <div className="fixed bottom-6 right-6 z-40">
-        <button
-            onClick={isWidgetReady ? window.startChat : handleFallbackChat}
-            className="flex items-center justify-center p-4 rounded-full shadow-lg transition-colors duration-200 bg-blue-600 hover:bg-blue-700 text-white"
-            aria-label="Open chat assistant"
-            title={isWidgetReady ? "Chat with AI Assistant" : "Contact Support"}
-        >
-          <MessageSquare size={24} />
-        </button>
-
-        {!isWidgetLoaded && (
-            <div className="absolute bottom-16 right-0 bg-white rounded-lg shadow-lg p-3 text-sm text-gray-600 max-w-xs">
-              <p>AI Assistant loading...</p>
-            </div>
-        )}
-      </div>
-  );
-};
-
-// Extend Window interface for TypeScript
+// Extend the Window interface to include CleverCompanion
 declare global {
   interface Window {
     CleverCompanionWidget?: {
       open: () => void;
       close: () => void;
-      sendMessage: (message: string) => void;
-      isOpen: () => boolean;
-      configure?: (config: any) => void;
-      getHistory?: () => any[];
-      clearHistory?: () => void;
+      sendMessage?: (message: string) => void;
     };
     startChat?: () => void;
-    quickAction?: (action: string) => void;
-    ezAutosChat?: {
-      start: () => void;
-      quickAction: (action: string) => void;
-      findFamilyCar: () => void;
-      getFinancing: () => void;
-      scheduleTestDrive: () => void;
-      checkTradeIn: () => void;
-      businessHours: () => void;
-      getDirections: () => void;
-      askAboutVehicle: (make: string, model: string, year: number) => void;
-      findInBudget: (budget: number) => void;
-    };
   }
 }
+
+const ChatBot: React.FC = () => {
+  const [isWidgetReady, setIsWidgetReady] = useState(false);
+  const [isChecking, setIsChecking] = useState(true);
+
+  useEffect(() => {
+    // Check if CleverCompanion widget is available
+    const checkWidget = () => {
+      if (window.CleverCompanionWidget) {
+        console.log('✅ CleverCompanion Widget detected and ready!');
+        setIsWidgetReady(true);
+        setIsChecking(false);
+        return true;
+      }
+      return false;
+    };
+
+    // Initial check
+    if (checkWidget()) return;
+
+    // Load the CleverCompanion script if not already loaded
+    const existingScript = document.querySelector('script[src*="clevercompanion-widget.js"]');
+
+    if (!existingScript) {
+      console.log('Loading CleverCompanion widget script...');
+      const script = document.createElement('script');
+      script.src = 'http://localhost:3000/clevercompanion-widget.js';
+      script.async = true;
+
+      script.onload = () => {
+        console.log('CleverCompanion script loaded successfully');
+        // Give it a moment to initialize
+        setTimeout(() => {
+          if (checkWidget()) return;
+
+          // Keep checking for widget availability
+          const interval = setInterval(() => {
+            if (checkWidget()) {
+              clearInterval(interval);
+            }
+          }, 100);
+
+          // Stop checking after 10 seconds
+          setTimeout(() => {
+            clearInterval(interval);
+            if (!window.CleverCompanionWidget) {
+              console.log('❌ CleverCompanion Widget not available after timeout');
+              setIsChecking(false);
+            }
+          }, 10000);
+        }, 500);
+      };
+
+      script.onerror = () => {
+        console.error('❌ Failed to load CleverCompanion script. Make sure the service is running on http://localhost:3000');
+        setIsChecking(false);
+      };
+
+      document.head.appendChild(script);
+    } else {
+      console.log('CleverCompanion script already exists, checking widget...');
+      // Script already exists, just check for widget
+      const interval = setInterval(() => {
+        if (checkWidget()) {
+          clearInterval(interval);
+        }
+      }, 100);
+
+      // Stop checking after 5 seconds if script already exists
+      setTimeout(() => {
+        clearInterval(interval);
+        if (!window.CleverCompanionWidget) {
+          console.log('❌ CleverCompanion Widget not available');
+          setIsChecking(false);
+        }
+      }, 5000);
+    }
+  }, []);
+
+  const handleChatClick = () => {
+    console.log('Chat button clicked');
+    console.log('Widget ready:', isWidgetReady);
+    console.log('CleverCompanionWidget available:', !!window.CleverCompanionWidget);
+
+    if (window.CleverCompanionWidget) {
+      try {
+        console.log('Opening CleverCompanion widget...');
+        window.CleverCompanionWidget.open();
+      } catch (error) {
+        console.error('Error opening CleverCompanion widget:', error);
+        alert('Error opening chat. Please try again.');
+      }
+    } else if (window.startChat) {
+      console.log('Using fallback startChat function...');
+      window.startChat();
+    } else {
+      console.log('No chat methods available');
+      alert('Chat service is not available at the moment. Please make sure the CleverCompanion service is running on http://localhost:3000');
+    }
+  };
+
+  // Don't render if we're still checking and no widget is ready
+  if (isChecking && !isWidgetReady) {
+    return (
+        <div className="fixed bottom-6 right-6 z-40">
+          <div className="flex items-center justify-center p-4 rounded-full bg-gray-400 text-white shadow-lg">
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
+          </div>
+        </div>
+    );
+  }
+
+  return (
+      <div className="fixed bottom-6 right-6 z-40">
+        <button
+            onClick={handleChatClick}
+            disabled={!isWidgetReady}
+            className={`flex items-center justify-center p-4 rounded-full shadow-lg transition-all duration-200 ${
+                isWidgetReady
+                    ? 'bg-blue-600 hover:bg-blue-700 text-white cursor-pointer transform hover:scale-105'
+                    : 'bg-gray-400 text-gray-200 cursor-not-allowed'
+            }`}
+            aria-label="Open chat"
+            title={isWidgetReady ? "Chat with us" : "Chat service loading..."}
+        >
+          <MessageSquare size={24} />
+        </button>
+
+        {/* Debug info in development */}
+        {process.env.NODE_ENV === 'development' && (
+            <div className="absolute bottom-16 right-0 bg-black text-white text-xs p-2 rounded opacity-75 pointer-events-none">
+              Widget: {isWidgetReady ? '✅' : '❌'}<br/>
+              Checking: {isChecking ? '🔄' : '✅'}
+            </div>
+        )}
+      </div>
+  );
+};
 
 export default ChatBot;

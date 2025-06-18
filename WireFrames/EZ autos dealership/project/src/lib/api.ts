@@ -113,18 +113,32 @@ export const updateTestDrive = async (id: string, data: any) => {
   return response.data;
 };
 
-// Chat
+// Chat - Updated for CleverCompanion integration
 export const getChatHistory = async () => {
   const response = await api.get('/chat-history/');
   return response.data;
 };
 
-export const sendChatMessage = async (message: string, sessionId: string) => {
-  const response = await api.post('/chat/', {
-    message,
-    session_id: sessionId
-  });
-  return response.data;
+export const sendChatMessage = async (message: string, sessionId: string, sender: 'user' | 'bot' = 'user') => {
+  try {
+    console.log('📤 Sending chat message to API:', { message, sessionId, sender });
+    const response = await api.post('/chat/', {
+      message,
+      session_id: sessionId,
+      sender
+    });
+    console.log('✅ Chat message API response:', response.data);
+    return response.data;
+  } catch (error: any) {
+    console.error('❌ Chat message API error:', error);
+    console.error('Error response:', error.response?.data);
+    throw error;
+  }
+};
+
+// New function specifically for saving chat messages with sender info
+export const saveChatMessage = async (message: string, sessionId: string, sender: 'user' | 'bot') => {
+  return sendChatMessage(message, sessionId, sender);
 };
 
 // Feedback

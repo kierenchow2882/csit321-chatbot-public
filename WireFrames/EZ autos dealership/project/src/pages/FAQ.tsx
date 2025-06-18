@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronDown, ChevronUp, Search, MessageSquare } from 'lucide-react';
+import { ChevronDown, ChevronUp, Search } from 'lucide-react';
 
 interface FAQItem {
   question: string;
@@ -55,20 +55,22 @@ const FAQ: React.FC = () => {
     );
   };
 
+  const handleChatClick = () => {
+    if (window.CleverCompanionWidget) {
+      window.CleverCompanionWidget.open();
+    } else if (window.startChat) {
+      window.startChat();
+    } else {
+      alert('Chat service is not available at the moment. Please try again later.');
+    }
+  };
+
   const filteredFaqs = faqs.filter(faq => {
     const matchesSearch = faq.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
         faq.answer.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === 'All' || faq.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
-
-  const handleChatWithAI = () => {
-    if (window.ezAutosChat) {
-      window.ezAutosChat.quickAction("I have a question that's not covered in the FAQ. Can you help me?");
-    } else if (window.startChat) {
-      window.startChat();
-    }
-  };
 
   return (
       <div className="pt-20 min-h-screen bg-gray-50">
@@ -136,22 +138,21 @@ const FAQ: React.FC = () => {
             <div className="mt-12 p-6 bg-blue-50 rounded-lg">
               <h2 className="text-xl font-semibold text-gray-800 mb-4">Still have questions?</h2>
               <p className="text-gray-600 mb-4">
-                Can't find what you're looking for? Our AI assistant is here to help with personalized answers, or contact our support team directly.
+                Can't find what you're looking for? Feel free to reach out to our customer support team.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <button
-                    onClick={handleChatWithAI}
-                    className="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-md transition-colors"
-                >
-                  <MessageSquare size={18} />
-                  Chat with AI Assistant
-                </button>
+              <div className="flex gap-4">
                 <a
                     href="/contact"
-                    className="inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-700 font-medium px-6 py-2 rounded-md border border-gray-300 transition-colors"
+                    className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-md transition-colors"
                 >
-                  Contact Support Team
+                  Contact Us
                 </a>
+                <button
+                    onClick={handleChatClick}
+                    className="inline-block bg-white hover:bg-gray-50 text-gray-700 font-medium px-6 py-2 rounded-md border border-gray-300 transition-colors"
+                >
+                  Chat with Us
+                </button>
               </div>
             </div>
           </div>

@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
 import HeroBanner from './components/HeroBanner';
 import FeaturedVehicles from './components/FeaturedVehicles';
-import ChatBot from './components/ChatBot';
+import ExternalChatBot from './components/ChatBot.tsx';
 import Footer from './components/Footer';
 import SearchPage from './pages/SearchPage';
 import VehicleDetails from './pages/VehicleDetails';
@@ -37,7 +37,7 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/admin" element={<AdminDashboard />} />
           </Routes>
-          <ChatBot />
+          <ExternalChatBot />
           <Footer />
         </div>
       </Router>

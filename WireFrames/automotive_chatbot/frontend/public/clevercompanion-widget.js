@@ -30,10 +30,10 @@
     };
 
     // PROBLEM 1 & 2 FIX: Using PNG logo with proper path and styling
-    const CHATBOT_LOGO_URL = './media/images/CleverCompanion-logo.png';
+    const CHATBOT_LOGO_URL = 'http://localhost:3000/media/images/CleverCompanion-logo.png';
 
     // User avatar - Using boy.png as requested
-    const USER_AVATAR = `<img src="./media/images/boy.png" alt="User" style="width: 20px; height: 20px; border-radius: 50%; object-fit: cover;">`;
+    const USER_AVATAR = '<img src="http://localhost:3000/media/images/boy.png" alt="User" style="width: 20px; height: 20px; border-radius: 50%; object-fit: cover;">';
 
     // Menu options
     const MENU_OPTIONS = [

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowRight, Search, MessageSquare } from 'lucide-react';
+import { ArrowRight, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const HeroBanner: React.FC = () => {
@@ -19,11 +19,12 @@ const HeroBanner: React.FC = () => {
     navigate(`/search?category=${encodeURIComponent(category)}`);
   };
 
-  const handleAIAssistant = () => {
-    if (window.ezAutosChat) {
-      window.ezAutosChat.quickAction("I need help finding the right car for me. Can you help me explore your inventory?");
-    } else if (window.startChat) {
-      window.startChat();
+  const handleChatAction = (action: string) => {
+    // Use the global quickAction function to interact with CleverCompanion
+    if (window.quickAction) {
+      window.quickAction(action);
+    } else {
+      console.log('Chat action:', action);
     }
   };
 
@@ -90,11 +91,10 @@ const HeroBanner: React.FC = () => {
                   Luxury
                 </button>
                 <button
-                    onClick={handleAIAssistant}
-                    className="bg-blue-600/80 hover:bg-blue-600 text-white text-sm font-medium py-2 px-4 rounded-full backdrop-blur-sm transition-colors flex items-center gap-2"
+                    onClick={() => handleChatAction('I need help finding a vehicle')}
+                    className="bg-green-500/80 hover:bg-green-600/80 text-white text-sm font-medium py-2 px-4 rounded-full backdrop-blur-sm transition-colors"
                 >
-                  <MessageSquare size={16} />
-                  Ask AI Assistant
+                  💬 Ask Our Expert
                 </button>
               </div>
             </div>
