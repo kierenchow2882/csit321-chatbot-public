@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Heart, Info, DollarSign, ArrowRight, Calendar } from 'lucide-react';
 import { Vehicle } from '../types';
 import { useNavigate } from 'react-router-dom';
+import { createTestDrive, getProfile } from '../lib/api';
 
 interface VehicleCardProps {
   vehicle: Vehicle;
@@ -10,14 +11,27 @@ interface VehicleCardProps {
 const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle }) => {
   const [isFavorited, setIsFavorited] = useState(false);
   const [showTestDriveModal, setShowTestDriveModal] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [user, setUser] = useState<any>(null);
   const [testDriveForm, setTestDriveForm] = useState({
-    customer_name: '',
-    customer_email: '',
-    customer_phone: '',
     booking_date: '',
     notes: ''
   });
   const navigate = useNavigate();
+
+  useEffect(() => {
+    checkUserAuth();
+  }, []);
+
+  const checkUserAuth = async () => {
+    try {
+      const profile = await getProfile();
+      setUser(profile);
+    } catch (error) {
+      // User not authenticated
+      setUser(null);
+    }
+  };
 
   const handleViewDetails = () => {
     navigate(`/vehicle/${vehicle.id}`);
@@ -27,34 +41,79 @@ const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle }) => {
     navigate(`/finance?vehicle=${vehicle.id}`);
   };
 
+  const handleTestDriveClick = () => {
+    if (!user) {
+      // Redirect to login if not authenticated
+      navigate('/login');
+      return;
+    }
+    setShowTestDriveModal(true);
+  };
+
   const handleTestDriveSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (isSubmitting || !user) return;
+
+    setIsSubmitting(true);
+
     try {
-      // Here you would normally call the API to book a test drive
-      console.log('Test drive booking:', {
+      console.log('Submitting test drive booking...');
+
+      const testDriveData = {
         vehicle_id: vehicle.id,
-        ...testDriveForm
-      });
+        customer_name: `${user.user.first_name || ''} ${user.user.last_name || ''}`.trim() || user.user.email,
+        customer_email: user.user.email,
+        customer_phone: user.phone || '',
+        booking_date: testDriveForm.booking_date,
+        notes: testDriveForm.notes
+      };
+
+      console.log('Test drive data:', testDriveData);
+
+      const response = await createTestDrive(testDriveData);
+      console.log('Test drive booking response:', response);
 
       // Show success message
       alert('Test drive booked successfully! We will contact you soon to confirm the details.');
+
+      // Close modal and reset form
       setShowTestDriveModal(false);
       setTestDriveForm({
-        customer_name: '',
-        customer_email: '',
-        customer_phone: '',
         booking_date: '',
         notes: ''
       });
-    } catch (error) {
+
+    } catch (error: any) {
       console.error('Error booking test drive:', error);
-      alert('Failed to book test drive. Please try again.');
+
+      let errorMessage = 'Failed to book test drive. Please try again.';
+
+      if (error.response?.data?.error) {
+        errorMessage = error.response.data.error;
+      } else if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+
+      alert(errorMessage);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const toggleFavorite = () => {
     setIsFavorited(!isFavorited);
     // Here you would normally save to favorites in the backend
+  };
+
+  const getUserDisplayName = () => {
+    if (!user) return '';
+    const firstName = user.user.first_name || '';
+    const lastName = user.user.last_name || '';
+    const fullName = `${firstName} ${lastName}`.trim();
+    return fullName || user.user.email;
   };
 
   return (
@@ -123,7 +182,7 @@ const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle }) => {
                 View Details <ArrowRight size={16} className="ml-1" />
               </button>
               <button
-                  onClick={() => setShowTestDriveModal(true)}
+                  onClick={handleTestDriveClick}
                   className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium py-2 px-3 rounded transition-colors duration-200 flex items-center justify-center"
                   title="Book Test Drive"
               >
@@ -141,7 +200,7 @@ const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle }) => {
         </div>
 
         {/* Test Drive Modal */}
-        {showTestDriveModal && (
+        {showTestDriveModal && user && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
               <div className="bg-white rounded-lg p-6 w-full max-w-md">
                 <h3 className="text-lg font-semibold mb-4">Book Test Drive</h3>
@@ -151,47 +210,64 @@ const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle }) => {
 
                 <form onSubmit={handleTestDriveSubmit}>
                   <div className="space-y-4">
+                    {/* User Information (Read-only) */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Full Name *
+                        Your Name
                       </label>
                       <input
                           type="text"
-                          required
-                          value={testDriveForm.customer_name}
-                          onChange={(e) => setTestDriveForm({...testDriveForm, customer_name: e.target.value})}
-                          className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500"
-                          placeholder="Enter your full name"
+                          value={getUserDisplayName()}
+                          disabled
+                          className="w-full border border-gray-300 rounded-md p-2 bg-gray-50 text-gray-500 cursor-not-allowed"
                       />
+                      <p className="text-xs text-gray-500 mt-1">
+                        Update your name in your <button
+                          type="button"
+                          onClick={() => navigate('/profile')}
+                          className="text-blue-600 hover:underline"
+                      >
+                        profile settings
+                      </button>
+                      </p>
                     </div>
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Email *
+                        Your Email
                       </label>
                       <input
                           type="email"
-                          required
-                          value={testDriveForm.customer_email}
-                          onChange={(e) => setTestDriveForm({...testDriveForm, customer_email: e.target.value})}
-                          className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500"
-                          placeholder="Enter your email"
+                          value={user.user.email}
+                          disabled
+                          className="w-full border border-gray-300 rounded-md p-2 bg-gray-50 text-gray-500 cursor-not-allowed"
                       />
                     </div>
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Phone Number
+                        Your Phone Number
                       </label>
                       <input
                           type="tel"
-                          value={testDriveForm.customer_phone}
-                          onChange={(e) => setTestDriveForm({...testDriveForm, customer_phone: e.target.value})}
-                          className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500"
-                          placeholder="Enter your phone number"
+                          value={user.phone || 'Not provided'}
+                          disabled
+                          className="w-full border border-gray-300 rounded-md p-2 bg-gray-50 text-gray-500 cursor-not-allowed"
                       />
+                      {!user.phone && (
+                          <p className="text-xs text-gray-500 mt-1">
+                            Add your phone number in your <button
+                              type="button"
+                              onClick={() => navigate('/profile')}
+                              className="text-blue-600 hover:underline"
+                          >
+                            profile settings
+                          </button>
+                          </p>
+                      )}
                     </div>
 
+                    {/* Editable Fields */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Preferred Date & Time *
@@ -203,6 +279,7 @@ const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle }) => {
                           onChange={(e) => setTestDriveForm({...testDriveForm, booking_date: e.target.value})}
                           className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500"
                           min={new Date().toISOString().slice(0, 16)}
+                          disabled={isSubmitting}
                       />
                     </div>
 
@@ -216,6 +293,7 @@ const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle }) => {
                           className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500"
                           rows={3}
                           placeholder="Any special requests or questions?"
+                          disabled={isSubmitting}
                       />
                     </div>
                   </div>
@@ -224,15 +302,17 @@ const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle }) => {
                     <button
                         type="button"
                         onClick={() => setShowTestDriveModal(false)}
-                        className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                        className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+                        disabled={isSubmitting}
                     >
                       Cancel
                     </button>
                     <button
                         type="submit"
-                        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled={isSubmitting}
                     >
-                      Book Test Drive
+                      {isSubmitting ? 'Booking...' : 'Book Test Drive'}
                     </button>
                   </div>
                 </form>

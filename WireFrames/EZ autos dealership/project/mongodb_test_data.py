@@ -37,17 +37,17 @@ except Exception as e:
 
 # Import MongoDB functions
 from api.mongodb_models import (
-    create_vehicle, create_test_drive, save_chat_message,
+    create_vehicle, create_test_drive, save_chat_message, 
     save_feedback, create_team_member,
-    vehicles_collection, test_drives_collection,
-    chat_history_collection, feedback_collection,
+    vehicles_collection, test_drives_collection, 
+    chat_history_collection, feedback_collection, 
     team_members_collection
 )
 
 def create_sample_vehicles():
     """Create a comprehensive set of sample vehicles"""
     print("Creating sample vehicles...")
-
+    
     vehicles = [
         {
             "make": "BMW",
@@ -270,7 +270,7 @@ def create_sample_vehicles():
             "features": ["Porsche Communication Management", "Air Suspension", "Sport Chrono Package", "Bose Audio", "Panoramic Roof"]
         }
     ]
-
+    
     created_count = 0
     for vehicle_data in vehicles:
         try:
@@ -278,45 +278,45 @@ def create_sample_vehicles():
             if vehicles_collection is not None and vehicles_collection.find_one({"vin": vehicle_data["vin"]}):
                 print(f"Vehicle {vehicle_data['make']} {vehicle_data['model']} already exists, skipping...")
                 continue
-
+                
             result = create_vehicle(vehicle_data)
             print(f"✓ Created: {vehicle_data['year']} {vehicle_data['make']} {vehicle_data['model']}")
             created_count += 1
         except Exception as e:
             print(f"✗ Error creating {vehicle_data['make']} {vehicle_data['model']}: {str(e)}")
-
+    
     print(f"Created {created_count} new vehicles")
     return created_count
 
 def create_sample_test_drives():
     """Create sample test drive bookings"""
     print("\nCreating sample test drives...")
-
+    
     if test_drives_collection is None or vehicles_collection is None:
         print("Collections not available, skipping test drives")
         return 0
-
+    
     # Get some vehicle IDs
     vehicles = list(vehicles_collection.find().limit(8))
     if not vehicles:
         print("No vehicles found, cannot create test drives")
         return 0
-
+    
     customer_names = [
         "John Smith", "Sarah Johnson", "Michael Brown", "Emily Davis",
         "David Wilson", "Lisa Anderson", "Robert Taylor", "Jennifer Martinez",
         "Christopher Lee", "Amanda White", "Matthew Garcia", "Jessica Rodriguez"
     ]
-
+    
     statuses = ["pending", "approved", "completed", "cancelled"]
-
+    
     created_count = 0
     for i in range(20):
         try:
             vehicle = random.choice(vehicles)
             customer_name = random.choice(customer_names)
             booking_date = datetime.now() + timedelta(days=random.randint(-10, 30))
-
+            
             test_drive_data = {
                 "user_id": str(random.randint(1, 10)),
                 "vehicle_id": str(vehicle["_id"]),
@@ -327,24 +327,24 @@ def create_sample_test_drives():
                 "status": random.choice(statuses),
                 "notes": f"Interested in test driving the {vehicle['make']} {vehicle['model']}. Looking for a family vehicle with good fuel economy."
             }
-
+            
             result = create_test_drive(test_drive_data)
             print(f"✓ Created test drive: {customer_name} - {vehicle['make']} {vehicle['model']}")
             created_count += 1
         except Exception as e:
             print(f"✗ Error creating test drive {i+1}: {str(e)}")
-
+    
     print(f"Created {created_count} test drive bookings")
     return created_count
 
 def create_sample_chat_history():
     """Create sample chat conversations"""
     print("\nCreating sample chat history...")
-
+    
     if chat_history_collection is None:
         print("Chat history collection not available, skipping")
         return 0
-
+    
     conversations = [
         [
             ("Hello! I'm looking for a reliable family car under $50,000", "user"),
@@ -385,12 +385,12 @@ def create_sample_chat_history():
             ("No problem! We're open both Saturday and Sunday. Saturday we're open 10AM-6PM and Sunday 11AM-5PM. Our full sales team is available on weekends to help you. Would you like to schedule an appointment or just drop by?", "bot")
         ]
     ]
-
+    
     created_count = 0
     for conv_index, conversation in enumerate(conversations):
         session_id = f"session_{conv_index + 1}_{random.randint(1000, 9999)}"
         user_id = str(random.randint(1, 10))
-
+        
         for message_text, sender in conversation:
             try:
                 message_data = {
@@ -399,29 +399,29 @@ def create_sample_chat_history():
                     "message": message_text,
                     "sender": sender
                 }
-
+                
                 result = save_chat_message(message_data)
                 created_count += 1
             except Exception as e:
                 print(f"✗ Error creating chat message: {str(e)}")
-
+    
     print(f"✓ Created {created_count} chat messages across {len(conversations)} conversations")
     return created_count
 
 def create_sample_feedback():
     """Create sample customer feedback"""
     print("\nCreating sample feedback...")
-
+    
     if feedback_collection is None or vehicles_collection is None:
         print("Collections not available, skipping feedback")
         return 0
-
+    
     # Get some vehicle IDs
     vehicles = list(vehicles_collection.find().limit(6))
     if not vehicles:
         print("No vehicles found, cannot create feedback")
         return 0
-
+    
     feedback_data = [
         {
             "rating": 5,
@@ -484,12 +484,12 @@ def create_sample_feedback():
             "category": "Service"
         }
     ]
-
+    
     created_count = 0
     for i, feedback in enumerate(feedback_data):
         try:
             vehicle = random.choice(vehicles) if vehicles else None
-
+            
             feedback_entry = {
                 "user_id": str(random.randint(1, 10)),
                 "rating": feedback["rating"],
@@ -497,27 +497,27 @@ def create_sample_feedback():
                 "category": feedback["category"],
                 "status": "active"
             }
-
+            
             if vehicle:
                 feedback_entry["vehicle_id"] = str(vehicle["_id"])
-
+            
             result = save_feedback(feedback_entry)
             print(f"✓ Created feedback: {feedback['rating']} stars - {feedback['category']}")
             created_count += 1
         except Exception as e:
             print(f"✗ Error creating feedback {i+1}: {str(e)}")
-
+    
     print(f"Created {created_count} feedback entries")
     return created_count
 
 def create_sample_team_members():
     """Create sample team members"""
     print("\nCreating sample team members...")
-
+    
     if team_members_collection is None:
         print("Team members collection not available, skipping")
         return 0
-
+    
     team_data = [
         {
             "name": "Michael Rodriguez",
@@ -580,7 +580,7 @@ def create_sample_team_members():
             "bio": "Rachel manages our online presence and digital marketing campaigns to help customers discover our services."
         }
     ]
-
+    
     created_count = 0
     for member_data in team_data:
         try:
@@ -588,13 +588,13 @@ def create_sample_team_members():
             if team_members_collection.find_one({"email": member_data["email"]}):
                 print(f"Team member {member_data['name']} already exists, skipping...")
                 continue
-
+                
             result = create_team_member(member_data)
             print(f"✓ Created team member: {member_data['name']} - {member_data['role']}")
             created_count += 1
         except Exception as e:
             print(f"✗ Error creating team member {member_data['name']}: {str(e)}")
-
+    
     print(f"Created {created_count} team members")
     return created_count
 
@@ -602,23 +602,23 @@ def main():
     """Main function to populate all MongoDB collections"""
     print("🚗 EZ Autos MongoDB Test Data Population")
     print("=" * 50)
-
+    
     try:
         # Check MongoDB connection
         if vehicles_collection is None:
             print("❌ MongoDB connection not available. Please check your connection settings.")
             return
-
+        
         print("✅ MongoDB connection successful")
         print("\nStarting data population...\n")
-
+        
         # Create sample data
         vehicles_created = create_sample_vehicles()
         test_drives_created = create_sample_test_drives()
         chat_messages_created = create_sample_chat_history()
         feedback_created = create_sample_feedback()
         team_members_created = create_sample_team_members()
-
+        
         # Summary
         print("\n" + "=" * 50)
         print("📊 POPULATION SUMMARY")
@@ -628,10 +628,10 @@ def main():
         print(f"✅ Chat messages created: {chat_messages_created}")
         print(f"✅ Feedback entries created: {feedback_created}")
         print(f"✅ Team members created: {team_members_created}")
-
+        
         total_created = vehicles_created + test_drives_created + chat_messages_created + feedback_created + team_members_created
         print(f"\n🎉 Total records created: {total_created}")
-
+        
         if total_created > 0:
             print("\n🔧 NEXT STEPS:")
             print("1. Start your Django server: python manage.py runserver")
@@ -641,7 +641,7 @@ def main():
             print("5. Test the vehicle search and filtering")
             print("6. Try the chatbot functionality")
             print("7. View analytics and reports")
-
+        
     except Exception as e:
         print(f"❌ Error during population: {str(e)}")
         import traceback

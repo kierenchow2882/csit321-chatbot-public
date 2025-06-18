@@ -104,7 +104,7 @@ def create_vehicle(vehicle_data):
         for field in required_fields:
             if field not in vehicle_data:
                 raise ValueError(f"Missing required field: {field}")
-
+        
         # Set defaults
         vehicle_data.setdefault('fuel_type', 'Gasoline')
         vehicle_data.setdefault('featured', False)
@@ -113,7 +113,7 @@ def create_vehicle(vehicle_data):
         vehicle_data.setdefault('image_url', 'https://images.pexels.com/photos/1231643/pexels-photo-1231643.jpeg')
         vehicle_data['created_at'] = datetime.utcnow()
         vehicle_data['updated_at'] = datetime.utcnow()
-
+        
         return vehicles_collection.insert_one(vehicle_data)
     except Exception as e:
         raise Exception(f"Error creating vehicle: {str(e)}")
@@ -123,7 +123,7 @@ def get_vehicles(filters=None, limit=None, skip=0, sort_by=None):
         raise Exception("MongoDB connection not available")
     try:
         query = filters or {}
-
+        
         # Handle price range filters
         if 'min_price' in query or 'max_price' in query:
             price_filter = {}
@@ -133,11 +133,11 @@ def get_vehicles(filters=None, limit=None, skip=0, sort_by=None):
                 price_filter['$lte'] = int(query.pop('max_price'))
             if price_filter:
                 query['price'] = price_filter
-
+        
         # Handle mileage filter
         if 'max_mileage' in query:
             query['mileage'] = {'$lte': int(query.pop('max_mileage'))}
-
+        
         # Handle text search for make/model
         if 'search' in query:
             search_term = query.pop('search')
@@ -146,9 +146,9 @@ def get_vehicles(filters=None, limit=None, skip=0, sort_by=None):
                 {'model': {'$regex': search_term, '$options': 'i'}},
                 {'description': {'$regex': search_term, '$options': 'i'}}
             ]
-
+        
         cursor = vehicles_collection.find(query).skip(skip)
-
+        
         # Apply sorting
         if sort_by:
             if sort_by == 'price_asc':
@@ -163,10 +163,10 @@ def get_vehicles(filters=None, limit=None, skip=0, sort_by=None):
                 cursor = cursor.sort([('featured', DESCENDING), ('created_at', DESCENDING)])
         else:
             cursor = cursor.sort('created_at', DESCENDING)
-
+        
         if limit:
             cursor = cursor.limit(limit)
-
+            
         return list(cursor)
     except Exception as e:
         raise Exception(f"Error fetching vehicles: {str(e)}")
@@ -209,12 +209,12 @@ def create_test_drive(test_drive_data):
         for field in required_fields:
             if field not in test_drive_data:
                 raise ValueError(f"Missing required field: {field}")
-
+        
         test_drive_data.setdefault('status', 'pending')
         test_drive_data.setdefault('notes', '')
         test_drive_data['created_at'] = datetime.utcnow()
         test_drive_data['updated_at'] = datetime.utcnow()
-
+        
         return test_drives_collection.insert_one(test_drive_data)
     except Exception as e:
         raise Exception(f"Error creating test drive: {str(e)}")
@@ -238,7 +238,7 @@ def update_test_drive_status(test_drive_id, status, notes=None):
         }
         if notes:
             update_data["admin_notes"] = notes
-
+            
         return test_drives_collection.update_one(
             {"_id": ObjectId(test_drive_id)},
             {"$set": update_data}
@@ -256,7 +256,7 @@ def save_chat_message(message_data):
         for field in required_fields:
             if field not in message_data:
                 raise ValueError(f"Missing required field: {field}")
-
+        
         message_data['created_at'] = datetime.utcnow()
         return chat_history_collection.insert_one(message_data)
     except Exception as e:
@@ -281,7 +281,7 @@ def save_feedback(feedback_data):
         for field in required_fields:
             if field not in feedback_data:
                 raise ValueError(f"Missing required field: {field}")
-
+        
         feedback_data.setdefault('status', 'active')
         feedback_data['created_at'] = datetime.utcnow()
         return feedback_collection.insert_one(feedback_data)
@@ -307,13 +307,13 @@ def create_team_member(member_data):
         for field in required_fields:
             if field not in member_data:
                 raise ValueError(f"Missing required field: {field}")
-
+        
         member_data.setdefault('status', 'active')
         member_data.setdefault('phone', '')
         member_data.setdefault('hire_date', datetime.utcnow().isoformat())
         member_data['created_at'] = datetime.utcnow()
         member_data['updated_at'] = datetime.utcnow()
-
+        
         return team_members_collection.insert_one(member_data)
     except Exception as e:
         raise Exception(f"Error creating team member: {str(e)}")
@@ -355,7 +355,7 @@ def create_financing_application(application_data):
         application_data.setdefault('status', 'pending')
         application_data['created_at'] = datetime.utcnow()
         application_data['updated_at'] = datetime.utcnow()
-
+        
         return financing_applications_collection.insert_one(application_data)
     except Exception as e:
         raise Exception(f"Error creating financing application: {str(e)}")
@@ -378,7 +378,7 @@ def add_vehicle_image(vehicle_id, image_data):
         image_data.setdefault('is_primary', False)
         image_data.setdefault('alt_text', '')
         image_data['created_at'] = datetime.utcnow()
-
+        
         return vehicle_images_collection.insert_one(image_data)
     except Exception as e:
         raise Exception(f"Error adding vehicle image: {str(e)}")
@@ -530,7 +530,7 @@ def initialize_sample_data():
                     "features": ["Lexus Safety System+", "Mark Levinson Audio", "Heated/Ventilated Seats", "Head-Up Display", "Wireless Charging"]
                 }
             ]
-
+            
             for vehicle in sample_vehicles:
                 create_vehicle(vehicle)
             print("Sample vehicles added to database")
@@ -569,7 +569,7 @@ def initialize_sample_data():
                     "bio": "Mike helps customers find the best financing options for their vehicle purchases."
                 }
             ]
-
+            
             for member in sample_members:
                 create_team_member(member)
             print("Sample team members added to database")

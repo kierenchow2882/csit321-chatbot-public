@@ -12,16 +12,16 @@ django.setup()
 from django.contrib.auth.models import User
 from api.models import Profile, KnowledgeBase, ChatbotSettings, VehicleInquiry, NewsletterSubscription
 from api.mongodb_models import (
-    create_vehicle, create_test_drive, save_chat_message,
+    create_vehicle, create_test_drive, save_chat_message, 
     save_feedback, create_team_member,
-    vehicles_collection, test_drives_collection,
+    vehicles_collection, test_drives_collection, 
     chat_history_collection, feedback_collection, team_members_collection
 )
 
 def populate_django_data():
     """Populate Django database with sample data"""
     print("Populating Django database...")
-
+    
     # Create additional users
     users_data = [
         {'email': 'customer1@example.com', 'password': 'password123', 'role': 'user'},
@@ -29,7 +29,7 @@ def populate_django_data():
         {'email': 'sales@ezautos.com', 'password': 'password123', 'role': 'sales'},
         {'email': 'manager@ezautos.com', 'password': 'password123', 'role': 'manager'},
     ]
-
+    
     for user_data in users_data:
         if not User.objects.filter(username=user_data['email']).exists():
             user = User.objects.create_user(
@@ -39,7 +39,7 @@ def populate_django_data():
             )
             Profile.objects.create(user=user, role=user_data['role'])
             print(f"Created user: {user_data['email']}")
-
+    
     # Create knowledge base articles
     kb_articles = [
         {
@@ -78,7 +78,7 @@ def populate_django_data():
             'status': 'active'
         }
     ]
-
+    
     admin_user = User.objects.filter(email='admin@example.com').first()
     for article_data in kb_articles:
         if not KnowledgeBase.objects.filter(title=article_data['title']).exists():
@@ -87,7 +87,7 @@ def populate_django_data():
                 created_by=admin_user
             )
             print(f"Created KB article: {article_data['title']}")
-
+    
     # Create chatbot settings
     chatbot_settings = [
         {
@@ -117,7 +117,7 @@ def populate_django_data():
             'is_active': True
         }
     ]
-
+    
     for setting_data in chatbot_settings:
         if not ChatbotSettings.objects.filter(setting_key=setting_data['setting_key']).exists():
             ChatbotSettings.objects.create(
@@ -125,7 +125,7 @@ def populate_django_data():
                 updated_by=admin_user
             )
             print(f"Created chatbot setting: {setting_data['setting_key']}")
-
+    
     # Create vehicle inquiries
     inquiry_types = ['general', 'test_drive', 'financing', 'trade_in']
     for i in range(10):
@@ -139,7 +139,7 @@ def populate_django_data():
             status='pending'
         )
     print("Created 10 vehicle inquiries")
-
+    
     # Create newsletter subscriptions
     for i in range(25):
         email = f"subscriber{i+1}@example.com"
@@ -154,12 +154,12 @@ def populate_django_data():
 def populate_mongodb_data():
     """Populate MongoDB with sample data"""
     print("Populating MongoDB database...")
-
+    
     # Check if collections are available - FIXED: Use 'is None' instead of boolean check
     if vehicles_collection is None:
         print("MongoDB vehicles collection not available, skipping vehicle data")
         return
-
+    
     # Additional vehicles (beyond the ones created in mongodb_models.py)
     additional_vehicles = [
         {
@@ -263,7 +263,7 @@ def populate_mongodb_data():
             "features": ["ProPILOT Assist", "NissanConnect", "Zero Gravity Seats", "Intelligent Key"]
         }
     ]
-
+    
     # Add vehicles if they don't exist
     for vehicle_data in additional_vehicles:
         try:
@@ -273,17 +273,17 @@ def populate_mongodb_data():
                 print(f"Created vehicle: {vehicle_data['year']} {vehicle_data['make']} {vehicle_data['model']}")
         except Exception as e:
             print(f"Error creating vehicle {vehicle_data['make']} {vehicle_data['model']}: {str(e)}")
-
+    
     # Create test drive bookings
     if test_drives_collection is not None:
         try:
             # Get some vehicle IDs for test drives
             sample_vehicles = list(vehicles_collection.find().limit(5))
-
+            
             for i in range(15):
                 vehicle = random.choice(sample_vehicles)
                 booking_date = datetime.now() + timedelta(days=random.randint(1, 30))
-
+                
                 test_drive_data = {
                     "user_id": str(random.randint(1, 5)),
                     "vehicle_id": str(vehicle["_id"]),
@@ -294,17 +294,17 @@ def populate_mongodb_data():
                     "status": random.choice(["pending", "approved", "completed", "cancelled"]),
                     "notes": f"Test drive request for {vehicle['make']} {vehicle['model']}"
                 }
-
+                
                 result = create_test_drive(test_drive_data)
                 print(f"Created test drive booking {i+1}")
         except Exception as e:
             print(f"Error creating test drives: {str(e)}")
-
+    
     # Create chat history
     if chat_history_collection is not None:
         try:
             chat_sessions = [f"session_{i}" for i in range(1, 11)]
-
+            
             sample_conversations = [
                 ("Hello, I'm looking for a reliable family car", "Hello! I'd be happy to help you find a reliable family car. What size family do you have and what's your budget range?"),
                 ("What financing options do you have?", "We offer various financing options including traditional auto loans with rates starting at 2.9% APR, lease agreements, and special promotional rates. Would you like to speak with our finance team?"),
@@ -312,11 +312,11 @@ def populate_mongodb_data():
                 ("What are your business hours?", "We're open Monday-Friday 9AM-8PM, Saturday 10AM-6PM, and Sunday 11AM-5PM. Is there a specific time you'd like to visit?"),
                 ("Do you accept trade-ins?", "Yes, we accept trade-ins and offer competitive valuations. You can bring your vehicle for a free appraisal. What vehicle are you looking to trade in?")
             ]
-
+            
             for i in range(25):
                 session_id = random.choice(chat_sessions)
                 user_msg, bot_msg = random.choice(sample_conversations)
-
+                
                 # Save user message
                 save_chat_message({
                     "user_id": str(random.randint(1, 5)),
@@ -324,7 +324,7 @@ def populate_mongodb_data():
                     "message": user_msg,
                     "sender": "user"
                 })
-
+                
                 # Save bot response
                 save_chat_message({
                     "user_id": str(random.randint(1, 5)),
@@ -332,17 +332,17 @@ def populate_mongodb_data():
                     "message": bot_msg,
                     "sender": "bot"
                 })
-
+            
             print("Created 50 chat messages (25 conversations)")
         except Exception as e:
             print(f"Error creating chat history: {str(e)}")
-
+    
     # Create feedback
     if feedback_collection is not None:
         try:
             sample_vehicles = list(vehicles_collection.find().limit(5))
             feedback_categories = ["Service", "Product", "Website", "Support"]
-
+            
             sample_comments = [
                 "Excellent service! The staff was very helpful and knowledgeable.",
                 "Great selection of vehicles and competitive pricing.",
@@ -353,10 +353,10 @@ def populate_mongodb_data():
                 "Financing process was smooth and transparent.",
                 "Outstanding customer service from start to finish."
             ]
-
+            
             for i in range(20):
                 vehicle = random.choice(sample_vehicles) if sample_vehicles else None
-
+                
                 feedback_data = {
                     "user_id": str(random.randint(1, 5)),
                     "rating": random.randint(3, 5),
@@ -364,15 +364,15 @@ def populate_mongodb_data():
                     "category": random.choice(feedback_categories),
                     "status": "active"
                 }
-
+                
                 if vehicle:
                     feedback_data["vehicle_id"] = str(vehicle["_id"])
-
+                
                 result = save_feedback(feedback_data)
                 print(f"Created feedback entry {i+1}")
         except Exception as e:
             print(f"Error creating feedback: {str(e)}")
-
+    
     # Create additional team members
     if team_members_collection is not None:
         try:
@@ -408,7 +408,7 @@ def populate_mongodb_data():
                     "bio": "Lisa manages our marketing campaigns and social media presence to help customers discover our services."
                 }
             ]
-
+            
             for member_data in additional_team:
                 try:
                     existing = team_members_collection.find_one({"email": member_data["email"]})
@@ -424,22 +424,22 @@ def main():
     try:
         print("Starting database population...")
         print("=" * 50)
-
+        
         # Populate Django database
         populate_django_data()
         print("\n" + "=" * 50)
-
+        
         # Populate MongoDB database
         populate_mongodb_data()
         print("\n" + "=" * 50)
-
+        
         print("Database population completed successfully!")
         print("\nTest credentials:")
         print("Admin: admin@example.com / admin")
         print("Customer: customer1@example.com / password123")
         print("Sales: sales@ezautos.com / password123")
         print("Manager: manager@ezautos.com / password123")
-
+        
     except Exception as e:
         print(f"Error during population: {str(e)}")
         import traceback

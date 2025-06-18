@@ -12,7 +12,7 @@ from .mongodb_models import (
     save_chat_message, get_chat_history,
     save_feedback, get_feedback,
     create_team_member, get_team_members, update_team_member, delete_team_member,
-    vehicles_collection, test_drives_collection, chat_history_collection,
+    vehicles_collection, test_drives_collection, chat_history_collection, 
     feedback_collection, team_members_collection
 )
 from bson import ObjectId
@@ -27,33 +27,33 @@ def register_user(request):
     try:
         email = request.data.get('email')
         password = request.data.get('password')
-
+        
         if not email or not password:
             return Response({
                 'error': 'Email and password are required'
             }, status=status.HTTP_400_BAD_REQUEST)
-
+        
         if User.objects.filter(username=email).exists():
             return Response({
                 'error': 'Email already registered'
             }, status=status.HTTP_400_BAD_REQUEST)
-
+        
         user = User.objects.create_user(
             username=email,
             email=email,
             password=password
         )
-
+        
         Profile.objects.create(user=user, role='user')
-
+        
         login(request, user)
-
+        
         return Response({
             'message': 'User registered successfully',
             'email': user.email,
             'role': 'user'
         }, status=status.HTTP_201_CREATED)
-
+        
     except Exception as e:
         print(f"Registration error: {str(e)}")
         return Response({
@@ -66,14 +66,14 @@ def login_user(request):
     try:
         email = request.data.get('email')
         password = request.data.get('password')
-
+        
         if not email or not password:
             return Response({
                 'error': 'Email and password are required'
             }, status=status.HTTP_400_BAD_REQUEST)
-
+        
         user = authenticate(username=email, password=password)
-
+        
         if user is not None:
             login(request, user)
             try:
@@ -94,7 +94,7 @@ def login_user(request):
             return Response({
                 'error': 'Invalid credentials'
             }, status=status.HTTP_401_UNAUTHORIZED)
-
+            
     except Exception as e:
         print(f"Login error: {str(e)}")
         return Response({
@@ -106,40 +106,104 @@ def logout_user(request):
     logout(request)
     return Response({'message': 'Logged out successfully'})
 
-@api_view(['GET'])
+@api_view(['GET', 'PUT'])
 def get_profile(request):
-    print(f"Profile request - User authenticated: {request.user.is_authenticated}")
-    print(f"Profile request - User: {request.user}")
+    if request.method == 'GET':
+        print(f"Profile request - User authenticated: {request.user.is_authenticated}")
+        print(f"Profile request - User: {request.user}")
 
-    if not request.user.is_authenticated:
-        return Response({
-            'error': 'Not authenticated'
-        }, status=status.HTTP_401_UNAUTHORIZED)
+        if not request.user.is_authenticated:
+            return Response({
+                'error': 'Not authenticated'
+            }, status=status.HTTP_401_UNAUTHORIZED)
 
-    try:
-        profile = Profile.objects.get(user=request.user)
-        return Response({
-            'user': {
-                'email': request.user.email,
-                'id': request.user.id
-            },
-            'role': profile.role
-        })
-    except Profile.DoesNotExist:
-        # Create profile if it doesn't exist
-        profile = Profile.objects.create(user=request.user, role='user')
-        return Response({
-            'user': {
-                'email': request.user.email,
-                'id': request.user.id
-            },
-            'role': profile.role
-        })
-    except Exception as e:
-        print(f"Profile error: {str(e)}")
-        return Response({
-            'error': 'An error occurred while fetching profile'
-        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        try:
+            profile = Profile.objects.get(user=request.user)
+            return Response({
+                'user': {
+                    'email': request.user.email,
+                    'id': request.user.id,
+                    'first_name': request.user.first_name,
+                    'last_name': request.user.last_name
+                },
+                'role': profile.role,
+                'phone': profile.phone,
+                'address': profile.address,
+                'date_of_birth': profile.date_of_birth.isoformat() if profile.date_of_birth else None
+            })
+        except Profile.DoesNotExist:
+            # Create profile if it doesn't exist
+            profile = Profile.objects.create(user=request.user, role='user')
+            return Response({
+                'user': {
+                    'email': request.user.email,
+                    'id': request.user.id,
+                    'first_name': request.user.first_name,
+                    'last_name': request.user.last_name
+                },
+                'role': profile.role,
+                'phone': profile.phone,
+                'address': profile.address,
+                'date_of_birth': profile.date_of_birth.isoformat() if profile.date_of_birth else None
+            })
+        except Exception as e:
+            print(f"Profile error: {str(e)}")
+            return Response({
+                'error': 'An error occurred while fetching profile'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    elif request.method == 'PUT':
+        if not request.user.is_authenticated:
+            return Response({
+                'error': 'Not authenticated'
+            }, status=status.HTTP_401_UNAUTHORIZED)
+
+        try:
+            profile = Profile.objects.get(user=request.user)
+            user = request.user
+
+            # Update User model fields
+            user.first_name = request.data.get('first_name', user.first_name)
+            user.last_name = request.data.get('last_name', user.last_name)
+            user.save()
+
+            # Update Profile model fields
+            profile.phone = request.data.get('phone', profile.phone)
+            profile.address = request.data.get('address', profile.address)
+
+            # Handle date_of_birth
+            date_of_birth = request.data.get('date_of_birth')
+            if date_of_birth:
+                from datetime import datetime
+                try:
+                    profile.date_of_birth = datetime.strptime(date_of_birth, '%Y-%m-%d').date()
+                except ValueError:
+                    pass  # Keep existing value if invalid date format
+
+            profile.save()
+
+            return Response({
+                'user': {
+                    'email': user.email,
+                    'id': user.id,
+                    'first_name': user.first_name,
+                    'last_name': user.last_name
+                },
+                'role': profile.role,
+                'phone': profile.phone,
+                'address': profile.address,
+                'date_of_birth': profile.date_of_birth.isoformat() if profile.date_of_birth else None
+            })
+
+        except Profile.DoesNotExist:
+            return Response({
+                'error': 'Profile not found'
+            }, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            print(f"Profile update error: {str(e)}")
+            return Response({
+                'error': 'An error occurred while updating profile'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class IsAdminUser(permissions.BasePermission):
     def has_permission(self, request, view):
@@ -179,14 +243,14 @@ def analytics_overview(request):
         # Get time range from query params (default to 30 days)
         days = int(request.GET.get('days', 30))
         start_date = datetime.now() - timedelta(days=days)
-
+        
         # Django database stats
         total_users = User.objects.count()
         new_users_count = User.objects.filter(date_joined__gte=start_date).count()
         total_inquiries = VehicleInquiry.objects.count()
         pending_inquiries = VehicleInquiry.objects.filter(status='pending').count()
         newsletter_subscribers = NewsletterSubscription.objects.filter(is_active=True).count()
-
+        
         # User activity over time (last 7 days)
         user_activity = []
         for i in range(7):
@@ -199,10 +263,10 @@ def analytics_overview(request):
                 'visits': signups * 8  # Estimate visits based on signups
             })
         user_activity.reverse()
-
+        
         # MongoDB stats
         mongodb_stats = {}
-
+        
         if vehicles_collection is not None:
             total_vehicles = vehicles_collection.count_documents({})
             featured_vehicles = vehicles_collection.count_documents({"featured": True})
@@ -212,7 +276,7 @@ def analytics_overview(request):
                 'featured_vehicles': featured_vehicles,
                 'available_vehicles': available_vehicles
             })
-
+        
         if test_drives_collection is not None:
             total_test_drives = test_drives_collection.count_documents({})
             pending_test_drives = test_drives_collection.count_documents({"status": "pending"})
@@ -224,12 +288,12 @@ def analytics_overview(request):
                 'approved_test_drives': approved_test_drives,
                 'completed_test_drives': completed_test_drives
             })
-
+        
         if chat_history_collection is not None:
             total_chat_messages = chat_history_collection.count_documents({})
             user_messages = chat_history_collection.count_documents({"sender": "user"})
             bot_messages = chat_history_collection.count_documents({"sender": "bot"})
-
+            
             # Chat interactions by category (simplified)
             chat_interactions = [
                 {"name": "General Inquiries", "value": user_messages // 2},
@@ -237,22 +301,22 @@ def analytics_overview(request):
                 {"name": "Financing Questions", "value": user_messages // 5},
                 {"name": "Support", "value": user_messages // 8}
             ]
-
+            
             mongodb_stats.update({
                 'total_chat_messages': total_chat_messages,
                 'user_messages': user_messages,
                 'bot_messages': bot_messages,
                 'chat_interactions': chat_interactions
             })
-
+        
         if feedback_collection is not None:
             total_feedback = feedback_collection.count_documents({})
-
+            
             # Average rating calculation
             feedback_cursor = feedback_collection.find({}, {"rating": 1})
             ratings = [doc.get('rating', 0) for doc in feedback_cursor]
             average_rating = sum(ratings) / len(ratings) if ratings else 0
-
+            
             # Rating distribution
             rating_distribution = []
             for rating in range(1, 6):
@@ -261,13 +325,13 @@ def analytics_overview(request):
                     "rating": rating,
                     "count": count
                 })
-
+            
             mongodb_stats.update({
                 'total_feedback': total_feedback,
                 'average_rating': round(average_rating, 2),
                 'rating_distribution': rating_distribution
             })
-
+        
         if team_members_collection is not None:
             total_team_members = team_members_collection.count_documents({})
             active_team_members = team_members_collection.count_documents({"status": "active"})
@@ -275,10 +339,10 @@ def analytics_overview(request):
                 'total_team_members': total_team_members,
                 'active_team_members': active_team_members
             })
-
+        
         # Calculate estimated revenue (simplified calculation)
         estimated_revenue = completed_test_drives * 45000 if 'completed_test_drives' in mongodb_stats else 0
-
+        
         return Response({
             'overview_stats': {
                 'total_users': total_users,
@@ -293,7 +357,7 @@ def analytics_overview(request):
             'mongodb_stats': mongodb_stats,
             'time_range': f"Last {days} days"
         })
-
+        
     except Exception as e:
         print(f"Analytics error: {str(e)}")
         return Response({
@@ -314,7 +378,7 @@ def vehicles_view(request):
             max_price = request.GET.get('max_price')
             fuel_type = request.GET.get('fuel_type')
             featured = request.GET.get('featured')
-
+            
             # Build filter query
             filters = {}
             if make:
@@ -334,30 +398,30 @@ def vehicles_view(request):
                 filters['fuel_type'] = fuel_type
             if featured:
                 filters['featured'] = featured.lower() == 'true'
-
+            
             vehicles = get_vehicles(filters)
-
+            
             # Convert ObjectId to string for JSON serialization
             for vehicle in vehicles:
                 vehicle['id'] = str(vehicle['_id'])
                 del vehicle['_id']
-
+                
             return Response(vehicles)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
+    
     elif request.method == 'POST':
         # Only admins can create vehicles
         if not request.user.is_authenticated:
             return Response({'error': 'Authentication required'}, status=status.HTTP_401_UNAUTHORIZED)
-
+        
         try:
             profile = Profile.objects.get(user=request.user)
             if profile.role != 'admin':
                 return Response({'error': 'Admin access required'}, status=status.HTTP_403_FORBIDDEN)
         except Profile.DoesNotExist:
             return Response({'error': 'Admin access required'}, status=status.HTTP_403_FORBIDDEN)
-
+        
         try:
             result = create_vehicle(request.data)
             return Response({'id': str(result.inserted_id)}, status=status.HTTP_201_CREATED)
@@ -372,25 +436,25 @@ def vehicle_detail_view(request, vehicle_id):
             vehicle = get_vehicle_by_id(vehicle_id)
             if not vehicle:
                 return Response({'error': 'Vehicle not found'}, status=status.HTTP_404_NOT_FOUND)
-
+            
             vehicle['id'] = str(vehicle['_id'])
             del vehicle['_id']
             return Response(vehicle)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
+    
     elif request.method in ['PUT', 'DELETE']:
         # Only admins can update/delete vehicles
         if not request.user.is_authenticated:
             return Response({'error': 'Authentication required'}, status=status.HTTP_401_UNAUTHORIZED)
-
+        
         try:
             profile = Profile.objects.get(user=request.user)
             if profile.role != 'admin':
                 return Response({'error': 'Admin access required'}, status=status.HTTP_403_FORBIDDEN)
         except Profile.DoesNotExist:
             return Response({'error': 'Admin access required'}, status=status.HTTP_403_FORBIDDEN)
-
+        
         if request.method == 'PUT':
             try:
                 result = update_vehicle(vehicle_id, request.data)
@@ -399,7 +463,7 @@ def vehicle_detail_view(request, vehicle_id):
                 return Response({'message': 'Vehicle updated successfully'})
             except Exception as e:
                 return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
+        
         elif request.method == 'DELETE':
             try:
                 result = delete_vehicle(vehicle_id)
@@ -420,7 +484,7 @@ def test_drive_view(request):
                 test_drives = get_test_drives()
             else:
                 test_drives = get_test_drives({'user_id': str(request.user.id)})
-
+            
             # Convert ObjectId to string for JSON serialization
             for drive in test_drives:
                 drive['id'] = str(drive['_id'])
@@ -428,7 +492,7 @@ def test_drive_view(request):
             return Response(test_drives)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
+    
     elif request.method == 'POST':
         try:
             data = request.data.copy()
@@ -445,11 +509,11 @@ def update_test_drive_view(request, test_drive_id):
         new_status = request.data.get('status')
         if not new_status:
             return Response({'error': 'Status is required'}, status=status.HTTP_400_BAD_REQUEST)
-
+        
         result = update_test_drive_status(test_drive_id, new_status)
         if result.matched_count == 0:
             return Response({'error': 'Test drive not found'}, status=status.HTTP_404_NOT_FOUND)
-
+        
         return Response({'message': 'Test drive updated successfully'})
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -464,7 +528,7 @@ def chat_history_view(request):
                 chat_history = get_chat_history()
             else:
                 chat_history = get_chat_history({'user_id': str(request.user.id)})
-
+            
             # Convert ObjectId to string for JSON serialization
             for message in chat_history:
                 message['id'] = str(message['_id'])
@@ -472,7 +536,7 @@ def chat_history_view(request):
             return Response(chat_history)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
+    
     elif request.method == 'POST':
         try:
             data = request.data.copy()
@@ -493,7 +557,7 @@ def feedback_view(request):
                 feedback = get_feedback()
             else:
                 feedback = get_feedback({'user_id': str(request.user.id)})
-
+            
             # Convert ObjectId to string for JSON serialization
             for item in feedback:
                 item['id'] = str(item['_id'])
@@ -501,7 +565,7 @@ def feedback_view(request):
             return Response(feedback)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
+    
     elif request.method == 'POST':
         try:
             data = request.data.copy()
@@ -526,7 +590,7 @@ def team_members_view(request):
             return Response(team_members)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
+    
     elif request.method == 'POST':
         try:
             result = create_team_member(request.data)
@@ -545,7 +609,7 @@ def team_member_detail_view(request, member_id):
             return Response({'message': 'Team member updated successfully'})
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
+    
     elif request.method == 'DELETE':
         try:
             result = delete_team_member(member_id)
@@ -562,7 +626,7 @@ def chat_bot_view(request):
     try:
         message = request.data.get('message', '')
         session_id = request.data.get('session_id', '')
-
+        
         # Simple chatbot responses - you can integrate with AI services later
         responses = {
             'hello': 'Hello! How can I help you find your perfect vehicle today?',
@@ -573,16 +637,16 @@ def chat_bot_view(request):
             'location': 'We are located at 123 Auto Boulevard, Car City. Would you like directions?',
             'default': 'Thank you for your question! Our team will get back to you shortly. Is there anything else I can help you with?'
         }
-
+        
         # Simple keyword matching
         message_lower = message.lower()
         response = responses['default']
-
+        
         for keyword, reply in responses.items():
             if keyword in message_lower:
                 response = reply
                 break
-
+        
         # Save the conversation
         if request.user.is_authenticated:
             save_chat_message({
@@ -591,14 +655,14 @@ def chat_bot_view(request):
                 'message': message,
                 'sender': 'user'
             })
-
+            
             save_chat_message({
                 'user_id': str(request.user.id),
                 'session_id': session_id,
                 'message': response,
                 'sender': 'bot'
             })
-
+        
         return Response({'response': response})
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

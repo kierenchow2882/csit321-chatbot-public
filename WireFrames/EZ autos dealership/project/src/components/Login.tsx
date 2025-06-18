@@ -43,30 +43,27 @@ const Login: React.FC = () => {
       setDebugInfo(`Login successful: ${JSON.stringify(data)}`);
 
       if (data.email) {
+        // Store authentication state immediately
         localStorage.setItem('isAuthenticated', 'true');
         localStorage.setItem('userRole', data.role);
         localStorage.setItem('userEmail', data.email);
 
-        // Wait a moment then verify authentication
-        setTimeout(async () => {
-          try {
-            const profile = await getProfile();
-            console.log('Profile after login:', profile);
-            setDebugInfo(prev => prev + ` | Profile: ${JSON.stringify(profile)}`);
+        console.log('Stored auth data:', {
+          role: data.role,
+          email: data.email
+        });
 
-            if (profile.role === 'admin') {
-              console.log('Redirecting to admin dashboard');
-              navigate('/admin');
-            } else {
-              console.log('Redirecting to home');
-              navigate('/');
-            }
-          } catch (profileError) {
-            console.error('Profile check failed:', profileError);
-            setError('Authentication verification failed');
-            setDebugInfo(prev => prev + ` | Profile error: ${profileError}`);
+        // Add a small delay to ensure the API session is properly set
+        setTimeout(() => {
+          // Force a page reload to update all components with new auth state
+          if (data.role === 'admin') {
+            console.log('Redirecting admin to dashboard');
+            window.location.href = '/admin';
+          } else {
+            console.log('Redirecting user to home');
+            window.location.href = '/';
           }
-        }, 500);
+        }, 100);
       }
     } catch (err: any) {
       console.error('Login error:', err);

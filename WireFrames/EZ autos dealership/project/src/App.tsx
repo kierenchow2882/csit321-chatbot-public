@@ -10,6 +10,7 @@ import VehicleDetails from './pages/VehicleDetails';
 import FinancialPlanner from './pages/FinancialPlanner';
 import FAQ from './pages/FAQ';
 import Contact from './pages/Contact';
+import Profile from './pages/Profile';
 import Login from './components/Login';
 import Register from './components/Register';
 import AdminDashboard from './components/AdminDashboard';
@@ -31,6 +32,7 @@ function App() {
             <Route path="/finance" element={<FinancialPlanner />} />
             <Route path="/faq" element={<FAQ />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/profile" element={<Profile />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/admin" element={<AdminDashboard />} />

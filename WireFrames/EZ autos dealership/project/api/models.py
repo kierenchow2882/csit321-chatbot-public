@@ -8,7 +8,7 @@ class Profile(models.Model):
         ('manager', 'Manager'),
         ('sales', 'Sales Representative'),
     ]
-
+    
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     role = models.CharField(max_length=50, choices=ROLE_CHOICES, default='user')
     phone = models.CharField(max_length=20, blank=True, null=True)
@@ -37,7 +37,7 @@ class KnowledgeBase(models.Model):
         ('inactive', 'Inactive'),
         ('draft', 'Draft'),
     ]
-
+    
     title = models.CharField(max_length=200)
     content = models.TextField()
     category = models.CharField(max_length=100)
@@ -63,7 +63,7 @@ class VehicleInquiry(models.Model):
         ('financing', 'Financing Information'),
         ('trade_in', 'Trade-in Inquiry'),
     ]
-
+    
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     vehicle_id = models.CharField(max_length=50)  # MongoDB ObjectId as string
     inquiry_type = models.CharField(max_length=50, choices=INQUIRY_TYPE_CHOICES)
