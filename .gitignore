@@ -1,5 +1,12 @@
 .venv/
 
+# IDE and Editor Configurations
+# JetBrains IDEs (IntelliJ, PyCharm, WebStorm, etc.)
+.idea/
+
+# Visual Studio Code
+.vscode/
+
 # Cursor IDE
 .cursor/
 .cursor-settings/
