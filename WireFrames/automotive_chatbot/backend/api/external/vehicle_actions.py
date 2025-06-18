@@ -198,28 +198,38 @@ class ActionBookTestDrive(Action):
         
         # HARDCODED PROTOTYPE DEMO - Extract booking details from user message
         if "honda civic" in user_text.lower() and "ivan" in user_text.lower() and "sunday" in user_text.lower():
-            # This is the prototype demo case from image 5
-            response = """✅ **Test Drive Booking Confirmed** 🚗
+            # This is the prototype demo case - UPDATED WITH ACTUAL DATE
+            from datetime import datetime, timedelta
+            
+            # Calculate next Sunday
+            today = datetime.now()
+            days_ahead = 6 - today.weekday()  # 6 = Sunday
+            if days_ahead <= 0:  # Target day already happened this week
+                days_ahead += 7
+            next_sunday = today + timedelta(days_ahead)
+            formatted_date = next_sunday.strftime("%d %B %Y")  # e.g., "23 June 2025"
+            
+            response = f"""✅ **Test Drive Booking Confirmed** 🚗
 
 📋 **Booking Details:**
 • **Customer:** Ivan
 • **Vehicle:** Honda Civic
-• **Date:** This Sunday
+• **Date:** {formatted_date} (Sunday)
 • **Time:** 10:00 AM  
 • **Contact:** 92474141
 
 📍 **Location:** CleverCompanion Showroom
 350 Orchard Road, Shaw House #05-02
 
-📞 **Confirmation:**
-We'll call you at 92474141 to confirm the exact timing.
+📱 **Confirmation:**
+We'll send you the confirmation through WhatsApp at 92474141.
 
 ✨ **What to bring:**
 • Valid Driving License
 • NRIC/Passport
 • Comfortable shoes for driving
 
-🎯 **See you on Sunday at 10:00 AM, Ivan!**"""
+🎯 **See you on {formatted_date} at 10:00 AM, Ivan!**"""
         else:
             response = """📅 **Test Drive Booking** 🚗
 
@@ -249,105 +259,7 @@ We'll call you at 92474141 to confirm the exact timing.
         dispatcher.utter_message(text=response)
         return []
 
-class ActionGetMaintenanceInfo(Action):
-    def name(self) -> Text:
-        return "action_get_maintenance_info"
-
-    def run(self, dispatcher: CollectingDispatcher,
-            tracker: Tracker,
-            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
-        
-        user_text = tracker.latest_message.get("text", "").lower()
-        
-        # Check for tire-related queries
-        if any(keyword in user_text for keyword in ['tire', 'tyre', 'flat', 'change']):
-            response = """🔧 **Complete Tire Changing Guide** 🛞
-
-**Step-by-Step Process:**
-
-**1. Safety First** 🚨
-• Park on level ground away from traffic
-• Turn on hazard lights and apply parking brake
-• Place wheel chocks behind opposite wheels
-
-**2. Preparation** 🛠️
-• Remove spare tire, jack, and lug wrench from boot
-• Loosen lug nuts (don't remove completely yet)
-• Locate proper jack point under vehicle
-
-**3. Lifting Vehicle** ⬆️
-• Position jack securely under lift point
-• Raise vehicle until tire is 6 inches off ground
-• **Never put body under lifted vehicle**
-
-**4. Removing Flat Tire** 🔧
-• Fully remove loosened lug nuts (keep them safe)
-• Pull tire straight toward you to remove
-• Set flat tire aside safely
-
-**5. Installing Spare** 🔄
-• Align spare tire with wheel bolts
-• Replace lug nuts and hand-tighten first
-• Tighten in star/cross pattern with wrench
-
-**6. Final Steps** ✅
-• Lower vehicle until tire touches ground
-• Fully tighten nuts in star pattern
-• Lower completely and remove jack
-• Check spare tire pressure
-• Store flat tire and tools in boot
-
-**💡 Safety Tips:**
-• Spare tires are temporary - Max 80 km/h speed
-• Get permanent replacement ASAP
-• If on highway, call roadside assistance (+65 6748 9911)
-• Keep emergency kit: reflective triangle, torch, gloves
-
-**🚗 Singapore Specific:**
-• Emergency services: 995 (Police), 1777 (24hr breakdown)
-• Most service centers open 24/7 on major highways"""
-        
-        elif any(keyword in user_text for keyword in ['loan', 'calculate', 'financing', 'payment']):
-            # Redirect to proper loan calculator
-            response = """💰 **Car Loan Calculator** 🏦
-
-I'll help you calculate your car loan! Please provide:
-
-🚗 **Car Price:** (e.g., "80000")
-💵 **Down Payment:** (e.g., "20000" or "25%")
-📅 **Loan Tenure:** (e.g., "5 years")
-💸 **Interest Rate:** (optional - I'll use current rates)
-
-**Example:** "Calculate loan for 80000 car with 20000 down payment for 5 years"
-
-📊 **Current Singapore Car Loan Rates:**
-🏦 **DBS/POSB:** 2.88% - 3.88% p.a.
-🏦 **OCBC:** 2.85% - 3.85% p.a.
-🏦 **UOB:** 2.78% - 3.78% p.a.
-
-💡 **Ready to calculate?** Just tell me your car price and down payment!"""
-        
-        else:
-            response = """🔧 **Singapore Vehicle Maintenance Guide** 🇸🇬
-
-🛠️ **Available Guides:**
-• 🛞 **Tires:** Complete changing guide, pressure checks
-• 🛢️ **Engine:** Oil changes, air filter, spark plugs
-• 🛑 **Brakes:** Pad inspection, fluid checks
-• 🔋 **Electrical:** Battery maintenance, lighting
-• 💧 **Fluids:** Coolant, transmission, power steering
-• 🌪️ **Filters:** Cabin and engine air filters
-
-💡 **Ask specifically about any task!**
-Examples:
-• "How to change tire?"
-• "Oil change steps"
-• "Battery maintenance"
-
-🚗 All guides tailored for Singapore's climate!"""
-        
-        dispatcher.utter_message(text=response)
-        return []
+# MOVED ActionGetMaintenanceInfo TO maintenance_actions.py - KEEPING THIS PLACEHOLDER FOR REFERENCE
 
 class ActionRecommendEconomicCars(Action):
     def name(self) -> Text:
@@ -606,8 +518,10 @@ class ActionPersonaBasedRecommendations(Action):
         
         user_text = tracker.latest_message.get("text", "").lower()
         
-        # PERSONA 1: Young Professional (Budget-conscious, first car)
-        if "young professional" in user_text or "first car" in user_text or "budget conscious" in user_text:
+        # PERSONA 1: Young Professional (Budget-conscious, first car) - ENHANCED REALISTIC TRIGGERS
+        if ("young professional" in user_text or "first car" in user_text or "budget conscious" in user_text or
+            "fresh graduate" in user_text or "just started working" in user_text or "entry level" in user_text or
+            "affordable reliable" in user_text or "good fuel economy" in user_text or "low maintenance" in user_text):
             response = """👔 **Young Professional Vehicle Recommendations** 💼
 
 **🎯 Perfect matches for your lifestyle:**
@@ -633,8 +547,10 @@ class ActionPersonaBasedRecommendations(Action):
 💡 **Your Profile:** Budget-conscious, reliable transport, low running costs
 📊 **Estimated Monthly Costs:** $800-1,200 (loan + insurance + maintenance)"""
 
-        # PERSONA 2: Family-oriented (Safety, space, practical)
-        elif "family oriented" in user_text or "family car" in user_text or "kids" in user_text or "children" in user_text:
+        # PERSONA 2: Family-oriented (Safety, space, practical) - ENHANCED REALISTIC TRIGGERS  
+        elif ("family oriented" in user_text or "family car" in user_text or "kids" in user_text or "children" in user_text or
+              "safety features" in user_text or "7 seater" in user_text or "spacious" in user_text or "suv" in user_text or
+              "mpv" in user_text or "child safety" in user_text or "school runs" in user_text or "weekend trips" in user_text):
             response = """👨‍👩‍👧‍👦 **Family-Oriented Vehicle Recommendations** 🚗
 
 **🎯 Perfect matches for your family needs:**
@@ -660,8 +576,10 @@ class ActionPersonaBasedRecommendations(Action):
 💡 **Your Profile:** Safety-first, space for family, practical features
 📊 **Estimated Monthly Costs:** $1,200-1,600 (loan + insurance + maintenance)"""
 
-        # PERSONA 3: Luxury enthusiast (Performance, premium features, status)
-        elif "luxury enthusiast" in user_text or "premium" in user_text or "luxury" in user_text or "performance" in user_text:
+        # PERSONA 3: Luxury enthusiast (Performance, premium features, status) - ENHANCED REALISTIC TRIGGERS
+        elif ("luxury enthusiast" in user_text or "premium" in user_text or "luxury" in user_text or "performance" in user_text or
+              "bmw" in user_text or "mercedes" in user_text or "audi" in user_text or "executive" in user_text or
+              "status symbol" in user_text or "prestige" in user_text or "comfort features" in user_text or "high end" in user_text):
             response = """🏆 **Luxury Enthusiast Vehicle Recommendations** ✨
 
 **🎯 Perfect matches for your refined taste:**
@@ -693,9 +611,11 @@ class ActionPersonaBasedRecommendations(Action):
 
 **Tell me about your lifestyle for personalized recommendations:**
 
-**👔 Type:** "young professional first car"
-**👨‍👩‍👧‍👦 Type:** "family oriented with kids"  
-**🏆 Type:** "luxury enthusiast premium performance"
+**👔 Try saying:** "I'm a fresh graduate just started working, need something affordable and reliable with good fuel economy"
+
+**👨‍👩‍👧‍👦 Try saying:** "I have kids and need a spacious car with safety features for school runs and weekend trips"
+
+**🏆 Try saying:** "I want a luxury car with premium comfort features as an executive status symbol"
 
 I'll provide 3 tailored vehicle recommendations with detailed specifications, pricing, and why they're perfect for your needs!
 

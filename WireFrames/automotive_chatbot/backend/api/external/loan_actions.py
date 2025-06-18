@@ -33,12 +33,21 @@ class ActionCalculateLoan(Action):
             # Extract latest user message
             latest_message = tracker.latest_message.get('text', '').lower()
             
-            # Extract numbers from the message - FIXED REGEX PATTERN
+            # Extract numbers from the message - COMPLETELY REWRITTEN FOR STABILITY
             import re
-            # Remove commas first, then find numbers
-            clean_message = latest_message.replace(',', '')
-            numbers = re.findall(r'\d+(?:\.\d+)?', clean_message)
-            numbers = [float(num) for num in numbers if num.replace('.', '').isdigit()]
+            try:
+                # Clean the message and extract numbers more safely
+                clean_message = latest_message.replace(',', '').replace('$', '')
+                # Find all number patterns including decimals
+                number_patterns = re.findall(r'\b\d+(?:\.\d+)?\b', clean_message)
+                numbers = []
+                for pattern in number_patterns:
+                    try:
+                        numbers.append(float(pattern))
+                    except ValueError:
+                        continue
+            except Exception:
+                numbers = []
             
             # Default values
             car_price = 0

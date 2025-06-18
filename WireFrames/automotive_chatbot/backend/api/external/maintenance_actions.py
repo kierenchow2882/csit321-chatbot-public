@@ -306,4 +306,86 @@ class ActionFilterMaintenance(Action):
 • Reduced allergens"""
 
         dispatcher.utter_message(text=response)
+        return []
+
+class ActionGetMaintenanceInfo(Action):
+    """MOVED FROM vehicle_actions.py - Main maintenance info action"""
+    
+    def name(self) -> Text:
+        return "action_get_maintenance_info"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        
+        user_text = tracker.latest_message.get("text", "").lower()
+        
+        # Check for tire-related queries
+        if any(keyword in user_text for keyword in ['tire', 'tyre', 'flat', 'change']):
+            response = """🔧 **Complete Tire Changing Guide** 🛞
+
+**Step-by-Step Process:**
+
+**1. Safety First** 🚨
+• Park on level ground away from traffic
+• Turn on hazard lights and apply parking brake
+• Place wheel chocks behind opposite wheels
+
+**2. Preparation** 🛠️
+• Remove spare tire, jack, and lug wrench from boot
+• Loosen lug nuts (don't remove completely yet)
+• Locate proper jack point under vehicle
+
+**3. Lifting Vehicle** ⬆️
+• Position jack securely under lift point
+• Raise vehicle until tire is 6 inches off ground
+• **Never put body under lifted vehicle**
+
+**4. Removing Flat Tire** 🔧
+• Fully remove loosened lug nuts (keep them safe)
+• Pull tire straight toward you to remove
+• Set flat tire aside safely
+
+**5. Installing Spare** 🔄
+• Align spare tire with wheel bolts
+• Replace lug nuts and hand-tighten first
+• Tighten in star/cross pattern with wrench
+
+**6. Final Steps** ✅
+• Lower vehicle until tire touches ground
+• Fully tighten nuts in star pattern
+• Lower completely and remove jack
+• Check spare tire pressure
+• Store flat tire and tools in boot
+
+**💡 Safety Tips:**
+• Spare tires are temporary - Max 80 km/h speed
+• Get permanent replacement ASAP
+• If on highway, call roadside assistance (+65 6748 9911)
+• Keep emergency kit: reflective triangle, torch, gloves
+
+**🚗 Singapore Specific:**
+• Emergency services: 995 (Police), 1777 (24hr breakdown)
+• Most service centers open 24/7 on major highways"""
+        
+        else:
+            response = """🔧 **Singapore Vehicle Maintenance Guide**
+
+🛠️ **Available Guides:**
+• 🛞 **Tires:** Complete changing guide, pressure checks
+• 🛢️ **Engine:** Oil changes, air filter, spark plugs
+• 🛑 **Brakes:** Pad inspection, fluid checks
+• 🔋 **Electrical:** Battery maintenance, lighting
+• 💧 **Fluids:** Coolant, transmission, power steering
+• 🌪️ **Filters:** Cabin and engine air filters
+
+💡 **Ask specifically about any task!**
+Examples:
+• "How to change tire?"
+• "Oil change steps"
+• "Battery maintenance"
+
+🚗 All guides tailored for Singapore's climate!"""
+        
+        dispatcher.utter_message(text=response)
         return [] 

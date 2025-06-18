@@ -17,7 +17,7 @@ from .contact_actions import (
 
 # Import Vehicle-related actions
 from .vehicle_actions import (
-    ActionGetVehicleInfo, ActionBookTestDrive, ActionGetMaintenanceInfo, ActionRecommendEconomicCars, ActionRecommendFamilyCars, ActionSearchVehicles, ActionPersonaBasedRecommendations
+    ActionGetVehicleInfo, ActionBookTestDrive, ActionRecommendEconomicCars, ActionRecommendFamilyCars, ActionSearchVehicles, ActionPersonaBasedRecommendations
 )
 
 # Import Fuel-related actions
@@ -26,7 +26,7 @@ from .fuel_actions import ActionFuelPrices, ActionCheapestFuel
 # Import Maintenance-related actions
 from .maintenance_actions import (
     ActionMaintenanceGuide, ActionTireMaintenance, ActionEngineMaintenance, 
-    ActionBrakeMaintenance, ActionElectricalMaintenance, ActionFluidMaintenance, ActionFilterMaintenance
+    ActionBrakeMaintenance, ActionElectricalMaintenance, ActionFluidMaintenance, ActionFilterMaintenance, ActionGetMaintenanceInfo
 )
 
 # Import Test Drive Booking actions
@@ -61,7 +61,6 @@ __all__ = [
     # Vehicle Actions
     'ActionGetVehicleInfo',
     'ActionBookTestDrive',
-    'ActionGetMaintenanceInfo',
     'ActionRecommendEconomicCars',
     'ActionRecommendFamilyCars',
     'ActionSearchVehicles',
@@ -73,6 +72,7 @@ __all__ = [
     
     # Maintenance Actions
     'ActionMaintenanceGuide',
+    'ActionGetMaintenanceInfo',
     'ActionTireMaintenance',
     'ActionEngineMaintenance',
     'ActionBrakeMaintenance',

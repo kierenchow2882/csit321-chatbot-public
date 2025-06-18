@@ -297,11 +297,12 @@
             font-weight: 500;
         }
 
+        /* PROBLEM 6 FIX: Make user timestamp more visible */
         .cc-message.cc-user .cc-timestamp {
             text-align: right;
-            color: #6b7280;
+            color: #E5E7EB;
             font-weight: 600;
-            opacity: 1;
+            opacity: 0.9;
         }
 
         /* Input area - PROBLEM 4 FIX: Add proper form field IDs and names */
@@ -1100,7 +1101,16 @@
         `;
 
         messagesContainer.insertAdjacentHTML('beforeend', messageHTML);
-        scrollToBottom();
+        
+        // PROBLEM 5 FIX: Auto-scroll to show latest bot response at the top of visible area
+        if (sender === 'bot') {
+            // Small delay to ensure content is rendered before scrolling
+            setTimeout(() => {
+                scrollToLatestBotMessage();
+            }, 100);
+        } else {
+            scrollToBottom();
+        }
     }
 
     function formatMessage(text) {
@@ -1293,6 +1303,23 @@
             const lastMessage = messages[messages.length - 1];
             if (lastMessage && lastMessage.classList.contains('cc-user')) {
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+        }
+    }
+
+    // PROBLEM 5 FIX: New function to scroll to latest bot message top
+    function scrollToLatestBotMessage() {
+        const messagesContainer = document.getElementById(CONFIG.MESSAGES_ID);
+        if (messagesContainer) {
+            const botMessages = messagesContainer.querySelectorAll('.cc-message.cc-bot');
+            const latestBotMessage = botMessages[botMessages.length - 1];
+            if (latestBotMessage) {
+                const containerTop = messagesContainer.scrollTop;
+                const messageTop = latestBotMessage.offsetTop;
+                const containerHeight = messagesContainer.clientHeight;
+                
+                // Scroll to show the latest bot message at the top of visible area
+                messagesContainer.scrollTop = messageTop - 20; // 20px padding from top
             }
         }
     }
