@@ -104,12 +104,58 @@ CleverCompanion is an advanced automotive chatbot platform specifically designed
 - 🔧 **Maintenance Guide** - Singapore-specific maintenance recommendations
 - 📞 **Contact Support** - Multiple contact channels and support options
 
+## ⏰ RASA Installation Timeout - NORMAL BEHAVIOR
+
+**🚨 YES, RASA timeouts are completely normal!** Here's what you need to know:
+
+### Why RASA Takes So Long to Install:
+- **80+ dependencies** including TensorFlow, PyTorch, Transformers, Spacy
+- **Heavy compilation** of C extensions (especially on Windows)
+- **Large downloads** - typically 1-2GB of packages  
+- **Machine Learning models** and natural language processing libraries
+
+### ⏱️ Typical Installation Times:
+- **Fast systems/connection**: 3-5 minutes
+- **Average systems**: 5-10 minutes  
+- **Slower systems**: 10-15 minutes
+- **Very slow connections**: 15+ minutes
+
+### 🚀 Enhanced Setup Options:
+
+#### Option 1: Enhanced Setup (Recommended)
+```bash
+python setup.py
+```
+- ✅ **10-minute timeout** for RASA (vs old 2-minute timeout)
+- ✅ **Live progress bars** and spinning animations  
+- ✅ **Real-time installation output** for RASA with timestamps
+- ✅ **Time estimates** for each package category
+- ✅ **Smart timeout handling** - different timeouts per package type
+
+#### Option 2: RASA-Only Installation (For Persistent Timeouts)
+```bash
+python setup_rasa_only.py
+```
+- ✅ **15-minute maximum timeout**
+- ✅ **Live installation output** with detailed timestamps
+- ✅ **Verbose mode** to see exactly what's happening
+- ✅ **Automatic testing** after successful installation
+
+### 🔍 If RASA Still Times Out:
+1. **Check internet speed** - RASA downloads are large
+2. **Free disk space** - Need ~2GB for RASA + dependencies  
+3. **Windows users**: Install Visual Studio Build Tools
+4. **Try**: `pip install --upgrade setuptools wheel` first
+5. **Alternative**: Use conda instead: `conda install rasa`
+
 ## 🚀 Quick Start
 
 ### Prerequisites
 - Node.js 16+ (for frontend)
 - Python 3.9.13 (for RASA compatibility)
 - Git
+- **Good internet connection** (for RASA installation)
+- **2GB+ free disk space**
 
 ### Installation & Setup
 
@@ -119,10 +165,11 @@ git clone [repository-url]
 cd automotive_chatbot
 ```
 
-2. **Install All Dependencies**
+2. **Install All Dependencies** (Enhanced with Progress Tracking)
 ```bash
-python setup.py install
+python setup.py
 ```
+*Expected time: 10-15 minutes for first install*
 
 3. **Start All Services**
 ```bash

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-🤖 RASA 3.6.4 Automotive Chatbot Setup - ONE BY ONE INSTALLATION
-Installs each dependency individually with success/failure tracking
+🤖 RASA 3.6.4 Automotive Chatbot Setup - ENHANCED WITH PROGRESS TRACKING
+Installs each dependency individually with real-time progress and proper timeouts
 """
 
 import subprocess
@@ -9,6 +9,8 @@ import sys
 import os
 from pathlib import Path
 import platform
+import time
+import threading
 
 def print_colored(message, color='white'):
     """Print colored messages"""
@@ -25,33 +27,91 @@ def print_colored(message, color='white'):
     reset_code = colors['reset']
     print(f"{color_code}{message}{reset_code}")
 
-def run_command(command, description, timeout=120):
-    """Run a command with timeout and return success status"""
+def animate_progress(stop_event, package_name):
+    """Show animated progress while installation is running"""
+    animation = "|/-\\"
+    idx = 0
+    while not stop_event.is_set():
+        print(f"\r🔄 Installing {package_name}... {animation[idx % len(animation)]}", end='', flush=True)
+        idx += 1
+        time.sleep(0.3)
+
+def run_command_with_progress(command, description, timeout=300, show_output=False):
+    """Run a command with animated progress and return success status"""
     try:
         print_colored(f"🔧 {description}...", 'cyan')
-        result = subprocess.run(
-            command,
-            shell=True,
-            capture_output=True,
-            text=True,
-            timeout=timeout
-        )
         
-        if result.returncode == 0:
+        if show_output:
+            # For RASA and other large packages, show live output
+            print_colored("📺 Live installation output (this may take several minutes):", 'blue')
+            print_colored("=" * 60, 'blue')
+            
+            process = subprocess.Popen(
+                command,
+                shell=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+                bufsize=1,
+                universal_newlines=True
+            )
+            
+            start_time = time.time()
+            while True:
+                output = process.stdout.readline()
+                if output == '' and process.poll() is not None:
+                    break
+                if output:
+                    print(output.strip())
+                
+                # Check timeout
+                if time.time() - start_time > timeout:
+                    process.terminate()
+                    print_colored(f"⏰ {description} - TIMEOUT after {timeout} seconds", 'yellow')
+                    return False
+            
+            return_code = process.poll()
+            print_colored("=" * 60, 'blue')
+            
+        else:
+            # For smaller packages, show animated progress
+            stop_event = threading.Event()
+            progress_thread = threading.Thread(target=animate_progress, args=(stop_event, description))
+            progress_thread.start()
+            
+            try:
+                result = subprocess.run(
+                    command,
+                    shell=True,
+                    capture_output=True,
+                    text=True,
+                    timeout=timeout
+                )
+                return_code = result.returncode
+                
+            finally:
+                stop_event.set()
+                progress_thread.join()
+                print()  # New line after progress animation
+        
+        if return_code == 0:
             print_colored(f"✅ {description} - SUCCESS", 'green')
             return True
         else:
-            print_colored(f"❌ {description} - FAILED", 'red')
-            if result.stderr:
-                print_colored(f"   Error: {result.stderr[:200]}...", 'red')
+            print_colored(f"❌ {description} - FAILED (Exit code: {return_code})", 'red')
             return False
             
     except subprocess.TimeoutExpired:
-        print_colored(f"⏰ {description} - TIMEOUT", 'yellow')
+        print_colored(f"⏰ {description} - TIMEOUT after {timeout} seconds", 'yellow')
+        print_colored(f"💡 Tip: RASA installation can take 5-10 minutes on slower systems", 'cyan')
         return False
     except Exception as e:
         print_colored(f"❌ {description} - ERROR: {str(e)}", 'red')
         return False
+
+def run_command(command, description, timeout=120):
+    """Legacy run_command for backward compatibility"""
+    return run_command_with_progress(command, description, timeout, False)
 
 def read_requirements():
     """Read and parse requirements.txt"""
@@ -71,19 +131,41 @@ def read_requirements():
     
     return packages
 
-def install_package_individually(package):
-    """Install a single package"""
+def install_package_individually(package, timeout=300, show_progress=False):
+    """Install a single package with configurable timeout and progress"""
     python_exe = ".venv\\Scripts\\python.exe" if os.name == 'nt' else ".venv/bin/python"
-    command = f"{python_exe} -m pip install \"{package}\" --timeout 180"
-    return run_command(command, f"Installing {package}")
+    command = f"{python_exe} -m pip install \"{package}\" --timeout 300 --no-cache-dir"
+    
+    if show_progress:
+        return run_command_with_progress(command, f"Installing {package}", timeout, True)
+    else:
+        return run_command_with_progress(command, f"Installing {package}", timeout, False)
+
+def estimate_time(package):
+    """Estimate installation time for different packages"""
+    heavy_packages = ['rasa', 'tensorflow', 'torch', 'transformers', 'spacy']
+    medium_packages = ['scipy', 'pandas', 'numpy', 'faiss-cpu']
+    
+    package_lower = package.lower()
+    
+    if any(heavy in package_lower for heavy in heavy_packages):
+        return "⏱️ 5-10 minutes", 600  # 10 minutes timeout
+    elif any(medium in package_lower for medium in medium_packages):
+        return "⏱️ 1-3 minutes", 300   # 5 minutes timeout
+    else:
+        return "⏱️ 30-60 seconds", 120  # 2 minutes timeout
 
 def main():
     print_colored("============================================================", 'cyan')
-    print_colored("🤖 RASA 3.6.4 Automotive Chatbot Setup - ONE BY ONE", 'cyan')
+    print_colored("🤖 RASA 3.6.4 Automotive Chatbot Setup - ENHANCED VERSION", 'cyan')
     print_colored("============================================================", 'cyan')
     
     # Check Python version
     python_version = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
+    print_colored(f"🐍 Python {python_version}", 'blue')
+    print_colored("============================================================", 'cyan')
+    print_colored(f"🐍 Python {python_version}", 'blue')
+    print_colored("============================================================", 'cyan')
     print_colored(f"🐍 Python {python_version}", 'blue')
     
     if sys.version_info < (3, 9):
@@ -103,12 +185,28 @@ def main():
     if not run_command(".venv\\Scripts\\python.exe -m pip install --upgrade pip", "Upgrading pip"):
         print_colored("⚠️ Pip upgrade failed, continuing anyway...", 'yellow')
     
-    # Install RASA core first
+    # Install RASA core first with proper timeout and progress
     print_colored("📦 Step 1: Installing RASA core...", 'blue')
-    rasa_success = install_package_individually("rasa==3.6.4")
+    print_colored("⚠️ IMPORTANT: RASA installation typically takes 5-10 minutes!", 'yellow')
+    print_colored("📥 Downloading and compiling 80+ dependencies including TensorFlow...", 'cyan')
+    
+    time_estimate, timeout_val = estimate_time("rasa==3.6.4")
+    print_colored(f"🕐 Estimated time: {time_estimate}", 'blue')
+    
+    rasa_success = install_package_individually("rasa==3.6.4", timeout_val, True)
+    
     if rasa_success:
-        rasa_sdk_success = install_package_individually("rasa-sdk==3.6.1")
+        print_colored("🎉 RASA core installed successfully!", 'green')
+        time_estimate, timeout_val = estimate_time("rasa-sdk==3.6.1")
+        print_colored(f"🕐 Installing RASA SDK - Estimated time: {time_estimate}", 'blue')
+        rasa_sdk_success = install_package_individually("rasa-sdk==3.6.1", timeout_val, False)
     else:
+        print_colored("💔 RASA core installation failed", 'red')
+        print_colored("🔍 Common causes:", 'yellow')
+        print_colored("   • Slow internet connection", 'yellow')
+        print_colored("   • Insufficient disk space", 'yellow')
+        print_colored("   • Missing Visual Studio Build Tools (Windows)", 'yellow')
+        print_colored("   • Conflicting dependencies", 'yellow')
         rasa_sdk_success = False
     
     # Read requirements and install one by one
@@ -133,11 +231,16 @@ def main():
     else:
         failed_list.append("rasa-sdk==3.6.1")
     
-    # Install each package individually
+    # Install each package individually with time estimates
     for i, package in enumerate(packages, 1):
+        time_estimate, timeout_val = estimate_time(package)
         print_colored(f"📦 [{i}/{len(packages)}] Processing: {package}", 'blue')
+        print_colored(f"🕐 {time_estimate}", 'cyan')
         
-        if install_package_individually(package):
+        # Show live output for heavy packages
+        show_live = any(heavy in package.lower() for heavy in ['tensorflow', 'torch', 'transformers', 'scipy'])
+        
+        if install_package_individually(package, timeout_val, show_live):
             success_list.append(package)
         else:
             failed_list.append(package)
@@ -217,11 +320,26 @@ def main():
     print_colored("============================================================", 'cyan')
     if len(failed_list) == 0:
         print_colored("🎉 ALL PACKAGES INSTALLED SUCCESSFULLY!", 'green')
+        print_colored("🚀 Your RASA automotive chatbot is ready to go!", 'green')
     elif len(success_list) > len(failed_list):
         print_colored("🎯 MOSTLY SUCCESSFUL - Core functionality available!", 'yellow')
+        if "rasa==3.6.4" in success_list:
+            print_colored("✅ RASA core is working - You can proceed with development!", 'green')
     else:
         print_colored("⚠️ MANY FAILURES - Check dependency conflicts", 'red')
+        if "rasa==3.6.4" not in success_list:
+            print_colored("❌ RASA installation failed - This is critical for the project", 'red')
     print_colored("============================================================", 'cyan')
+    
+    # Additional tips based on results
+    if "rasa==3.6.4" not in success_list:
+        print()
+        print_colored("🆘 RASA INSTALLATION TROUBLESHOOTING TIPS:", 'yellow')
+        print_colored("1. Check internet connection speed", 'cyan')
+        print_colored("2. Free up disk space (RASA needs ~2GB)", 'cyan')
+        print_colored("3. On Windows: Install Visual Studio Build Tools", 'cyan')
+        print_colored("4. Try running: pip install --upgrade setuptools wheel", 'cyan')
+        print_colored("5. Consider using conda instead: conda install rasa", 'cyan')
     
     print_colored("🚀 Setup complete! Check the summary above for details.", 'cyan')
 
