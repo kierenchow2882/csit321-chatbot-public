@@ -1,16 +1,149 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>EZ Autos - Find Your Perfect Drive</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EZ Autos - Find Your Perfect Drive</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<div id="root"></div>
+<script type="module" src="/src/main.tsx"></script>
+
+<!-- External CleverCompanion Widget Integration -->
+<script src="clevercompanion-widget.js"></script>
+
+<script>
+  // Page functionality for CleverCompanion integration
+  function startChat() {
+    if (window.CleverCompanionWidget) {
+      window.CleverCompanionWidget.open();
+    }
+  }
+
+  function quickAction(action) {
+    if (window.CleverCompanionWidget) {
+      window.CleverCompanionWidget.open();
+      setTimeout(() => {
+        window.CleverCompanionWidget.sendMessage(action);
+      }, 500);
+    }
+  }
+
+  function scrollToDemo() {
+    const demoSection = document.getElementById('demo-section');
+    if (demoSection) {
+      demoSection.scrollIntoView({
+        behavior: 'smooth'
+      });
+    }
+  }
+
+  // Add smooth scrolling and animations
+  document.addEventListener('DOMContentLoaded', function() {
+    // Animate elements on scroll
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver(function(entries) {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+        }
+      });
+    }, observerOptions);
+
+    // Observe all cards
+    document.querySelectorAll('.card-hover').forEach(card => {
+      card.style.opacity = '0';
+      card.style.transform = 'translateY(20px)';
+      card.style.transition = 'all 0.6s ease';
+      observer.observe(card);
+    });
+
+    // Auto-add card-hover class to vehicle cards and other elements
+    const addCardHoverClass = () => {
+      // Target vehicle cards and other card-like elements
+      const selectors = [
+        '[class*="vehicle"]',
+        '[class*="card"]',
+        '[class*="shadow"]',
+        '.bg-white',
+        '.rounded-lg'
+      ];
+
+      selectors.forEach(selector => {
+        document.querySelectorAll(selector).forEach(element => {
+          if (!element.classList.contains('card-hover') &&
+                  !element.classList.contains('no-animate')) {
+            element.classList.add('card-hover');
+            observer.observe(element);
+          }
+        });
+      });
+    };
+
+    // Run initially and watch for new content
+    addCardHoverClass();
+
+    // Watch for dynamically added content (React components)
+    const mutationObserver = new MutationObserver(() => {
+      setTimeout(addCardHoverClass, 100);
+    });
+
+    mutationObserver.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+  });
+
+  // Enhanced integration when CleverCompanion is ready
+  document.addEventListener('clevercompanion:ready', function() {
+    console.log('CleverCompanion AI Assistant is ready for EZ Autos!');
+
+    // Configure the widget for automotive context
+    if (window.CleverCompanionWidget && window.CleverCompanionWidget.configure) {
+      window.CleverCompanionWidget.configure({
+        context: 'automotive_dealership',
+        business: 'EZ Autos',
+        services: ['vehicle_sales', 'financing', 'test_drives', 'trade_ins'],
+        theme: {
+          primaryColor: '#2563eb',
+          brandName: 'EZ Autos Assistant'
+        }
+      });
+    }
+  });
+
+  // Global helper functions for React components
+  window.ezAutosChat = {
+    start: startChat,
+    quickAction: quickAction,
+
+    // Predefined quick actions for common automotive inquiries
+    findFamilyCar: () => quickAction("I'm looking for a reliable family car"),
+    getFinancing: () => quickAction("What financing options do you have?"),
+    scheduleTestDrive: () => quickAction("I'd like to schedule a test drive"),
+    checkTradeIn: () => quickAction("What's my trade-in value?"),
+    businessHours: () => quickAction("What are your business hours?"),
+    getDirections: () => quickAction("How do I get to your dealership?"),
+
+    // Vehicle-specific inquiries
+    askAboutVehicle: (make, model, year) => {
+      quickAction(`Tell me about the ${year} ${make} ${model}`);
+    },
+
+    // Price and budget inquiries
+    findInBudget: (budget) => {
+      quickAction(`Show me vehicles under $${budget}`);
+    }
+  };
+</script>
+</body>
 </html>
