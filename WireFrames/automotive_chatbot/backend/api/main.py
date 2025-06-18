@@ -66,47 +66,48 @@ async def health_check():
     }
 
 # Import and include routers
-try:
-    from api.boundaries import chatbots, users, analytics, widget_api, admin
-    from api.boundaries import vehicle_boundary, coe_boundary, rag_boundary, admin_dashboard, loan_boundary
+# try:
+    # Boundaries import removed - not implemented yet
+# from api.boundaries import chatbots, users, analytics, widget_api, admin
+# from api.boundaries import vehicle_boundary, coe_boundary, rag_boundary, admin_dashboard, loan_boundary
     
     # BCE Compliant boundary routes (NEW)
-    app.include_router(vehicle_boundary.router)
-    app.include_router(coe_boundary.router)
-    app.include_router(rag_boundary.router)
-    app.include_router(admin_dashboard.router)
-    app.include_router(loan_boundary.router)
+    # app.include_router(vehicle_boundary.router)
+    # app.include_router(coe_boundary.router)
+    # app.include_router(rag_boundary.router)
+    # app.include_router(admin_dashboard.router)
+    # app.include_router(loan_boundary.router)
     
     # Main chatbot routes
-    app.include_router(chatbots.router, prefix="/api/chatbots", tags=["chatbots"])
-    app.include_router(users.router, prefix="/api/users", tags=["users"])  
-    app.include_router(analytics.router, prefix="/api/analytics", tags=["analytics"])
+#     app.include_router(chatbots.router, prefix="/api/chatbots", tags=["chatbots"])
+#     app.include_router(users.router, prefix="/api/users", tags=["users"])  
+#     app.include_router(analytics.router, prefix="/api/analytics", tags=["analytics"])
     
-    # Widget API routes
-    app.include_router(widget_api.router, prefix="/api", tags=["widget"])
+#     # Widget API routes
+#     app.include_router(widget_api.router, prefix="/api", tags=["widget"])
     
-    # Admin routes for managing chatbot configuration
-    app.include_router(admin.router, prefix="/api/admin", tags=["admin"])
+#     # Admin routes for managing chatbot configuration
+#     app.include_router(admin.router, prefix="/api/admin", tags=["admin"])
     
-except ImportError as e:
-    print(f"Warning: Could not import some routes: {e}")
+# except ImportError as e:
+#     print(f"Warning: Could not import some routes: {e}")
     # Create minimal boundary routes for RASA actions
-    from fastapi import APIRouter
-    
-    # Essential boundaries for RASA actions
-    vehicle_router = APIRouter(prefix="/api/vehicles", tags=["vehicles"])
-    coe_router = APIRouter(prefix="/api/coe", tags=["coe"])
-    
-    @vehicle_router.get("/")
-    async def get_vehicles_fallback():
-        return {"success": True, "vehicles": [], "message": "Vehicle service initializing"}
-    
-    @coe_router.get("/prices")
-    async def get_coe_prices_fallback():
-        return {"success": True, "data": {"category_a": {"current": 95000}}, "message": "COE service initializing"}
-    
-    app.include_router(vehicle_router)
-    app.include_router(coe_router)
+from fastapi import APIRouter
+
+# Essential boundaries for RASA actions
+vehicle_router = APIRouter(prefix="/api/vehicles", tags=["vehicles"])
+coe_router = APIRouter(prefix="/api/coe", tags=["coe"])
+
+@vehicle_router.get("/")
+async def get_vehicles_fallback():
+    return {"success": True, "vehicles": [], "message": "Vehicle service initializing"}
+
+@coe_router.get("/prices")
+async def get_coe_prices_fallback():
+    return {"success": True, "data": {"category_a": {"current": 95000}}, "message": "COE service initializing"}
+
+app.include_router(vehicle_router)
+app.include_router(coe_router)
 
 if __name__ == "__main__":
     import uvicorn

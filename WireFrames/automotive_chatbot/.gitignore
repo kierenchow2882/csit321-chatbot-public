@@ -146,3 +146,9 @@ Icon?
 # MongoDB data directories
 data/db/ 
 /.venv/
+
+
+.cursor/
+.cursor-settings/
+cursor.db
+.cursor-session

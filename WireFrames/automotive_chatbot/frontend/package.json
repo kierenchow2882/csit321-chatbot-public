@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@heroicons/react": "^2.1.1",
+    "@stagewise-plugins/react": "^0.4.8",
+    "@stagewise/toolbar-next": "^0.4.8",
     "axios": "^1.6.7",
     "next": "^15.3.3",
     "react": "^19.1.0",

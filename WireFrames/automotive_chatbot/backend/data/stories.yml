@@ -46,6 +46,22 @@ stories:
   - intent: ask_contact
   - action: action_contact_us
 
+# PROBLEM 5 FIX: Specific contact stories
+- story: ask email only
+  steps:
+  - intent: ask_email_only
+  - action: action_email_only
+
+- story: ask phone only
+  steps:
+  - intent: ask_phone_only
+  - action: action_phone_only
+
+- story: ask whatsapp only
+  steps:
+  - intent: ask_whatsapp_only
+  - action: action_whatsapp_only
+
 - story: book test drive
   steps:
   - intent: book_test_drive
@@ -160,6 +176,26 @@ stories:
   - intent: ask_coe_category
   - action: action_explain_coe_categories
 
+- story: coe category a inquiry
+  steps:
+  - intent: ask_coe_category_a
+  - action: action_coe_category_a
+
+- story: coe category b inquiry
+  steps:
+  - intent: ask_coe_category_b
+  - action: action_coe_category_b
+
+- story: coe category c inquiry
+  steps:
+  - intent: ask_coe_category_c
+  - action: action_coe_category_c
+
+- story: coe category e inquiry
+  steps:
+  - intent: ask_coe_category_e
+  - action: action_coe_category_e
+
 - story: coe bidding process
   steps:
   - intent: ask_coe_bidding_process
@@ -168,7 +204,13 @@ stories:
 - story: loan financing inquiry
   steps:
   - intent: ask_loan_financing
-  - action: action_get_loan_info
+  - action: action_calculate_loan
+
+# PROBLEM 9 FIX: Loan calculator story
+- story: calculate loan
+  steps:
+  - intent: calculate_loan
+  - action: action_calculate_loan
 
 - story: insurance inquiry
   steps:
@@ -209,7 +251,7 @@ stories:
   - intent: ask_coe_prices
   - action: action_coe_prices
   - intent: ask_loan_financing
-  - action: action_get_loan_info
+  - action: action_calculate_loan
   - intent: ask_insurance
   - action: action_get_insurance_info
   - intent: book_test_drive
@@ -224,7 +266,19 @@ stories:
   - intent: ask_coe_category
   - action: action_explain_coe_categories
   - intent: ask_loan_financing
-  - action: action_get_loan_info
+  - action: action_calculate_loan
+
+- story: loan calculator flow
+  steps:
+  - intent: calculate_loan
+  - action: action_calculate_loan
+
+- story: loan financing to calculator
+  steps:
+  - intent: ask_loan_financing
+  - action: action_calculate_loan
+  - intent: calculate_loan
+  - action: action_calculate_loan
 
 - story: budget planning flow
   steps:
@@ -332,11 +386,51 @@ stories:
 - story: business hours inquiry
   steps:
   - intent: ask_business_hours
-  - action: action_provide_business_hours
+  - action: action_operating_hours
 
 - story: schedule visit confirmation
   steps:
   - intent: ask_business_hours
-  - action: action_provide_business_hours
+  - action: action_operating_hours
   - intent: confirm_schedule_visit
   - action: action_contact_us
+
+- story: search vehicles general
+  steps:
+  - intent: search_vehicles
+  - action: action_search_vehicles
+
+- story: search budget cars
+  steps:
+  - intent: search_budget_cars
+  - action: action_search_vehicles
+
+- story: search family cars  
+  steps:
+  - intent: search_family_cars
+  - action: action_search_vehicles
+
+- story: search luxury cars
+  steps:
+  - intent: search_luxury_cars
+  - action: action_search_vehicles
+
+- story: search eco cars
+  steps:
+  - intent: search_eco_cars
+  - action: action_search_vehicles
+
+- story: persona based recommendations
+  steps:
+  - intent: ask_persona_recommendations
+  - action: action_persona_based_recommendations
+
+- story: coe predictions confirmation
+  steps:
+  - intent: ask_coe_predictions_confirm
+  - action: action_coe_predictions_confirm
+
+- story: capability confirmation
+  steps:
+  - intent: ask_capability_confirm
+  - action: action_capability_confirm

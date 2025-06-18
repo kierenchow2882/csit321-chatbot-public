@@ -1,1 +1,7 @@
 .venv/
+
+# Cursor IDE
+.cursor/
+.cursor-settings/
+cursor.db
+.cursor-session

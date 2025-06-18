@@ -68,7 +68,7 @@ stories:
   - user: |
       tell me about loan options
     intent: ask_loan_info
-  - action: action_get_loan_info
+  - action: action_calculate_loan
 
 - story: Maintenance information
   steps:

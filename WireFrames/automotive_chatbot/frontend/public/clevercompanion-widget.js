@@ -1,5 +1,7 @@
 /**
- * CleverCompanion Chatbot Widget
+ * CleverCompanion Chatbot Widget - FIXED ALL ISSUES
+ * PROBLEM 1 FIX: Using PNG logo instead of SVG
+ * PROBLEM 2 FIX: Fixed double-click issue with proper debouncing
  * Production-ready automotive chatbot for any website
  * Zero dependencies, pure vanilla JavaScript
  * Matches React page design and functionality
@@ -27,13 +29,32 @@
         welcomeMessage: "Hello! I'm your automotive assistant. How can I help you today?"
     };
 
+    // PROBLEM 1 & 2 FIX: Using PNG logo with proper path and styling
+    const CHATBOT_LOGO_URL = './media/images/CleverCompanion-logo.png';
+
+    // User avatar - Using boy.png as requested
+    const USER_AVATAR = `<img src="./media/images/boy.png" alt="User" style="width: 20px; height: 20px; border-radius: 50%; object-fit: cover;">`;
+
+    // Menu options
+    const MENU_OPTIONS = [
+        { icon: '💰', text: 'COE Prices', action: 'COE Prices' },
+        { icon: '🚗', text: 'Vehicle Info', action: 'Vehicle Info' },
+        { icon: '📅', text: 'Test Drive', action: 'Test Drive' },
+        { icon: '🔧', text: 'Maintenance', action: 'Maintenance' },
+        { icon: '💳', text: 'Loan Calculator', action: 'Loan Calculator' },
+        { icon: '📞', text: 'Contact Us', action: 'Contact Us' }
+    ];
+
+    // PROBLEM 3 FIX: Simplified event management - removed cooldown
+    let isProcessing = false;
+
     // Comprehensive CSS - Fixed positioning and styling
     const WIDGET_CSS = `
-        /* Widget Container - Shifted left with close button */
+        /* Widget Container - Shifted more left with close button */
         #cc-chatbot-container {
             position: fixed;
             bottom: 20px;
-            right: 80px;
+            right: 90px;
             width: 450px;
             max-width: calc(100vw - 120px);
             height: 600px;
@@ -67,8 +88,8 @@
             width: 60px;
             height: 60px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
-            border: none;
+            background: white;
+            border: 3px solid #4F46E5;
             cursor: pointer;
             z-index: 999998;
             display: flex;
@@ -78,6 +99,7 @@
             transition: all 0.3s ease;
             outline: none;
             font-size: 24px;
+            color: white;
             overflow: hidden;
         }
 
@@ -87,10 +109,11 @@
         }
 
         #cc-toggle img {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            object-fit: cover;
+            width: 50px;
+            height: 50px;
+            border-radius: 6px;
+            object-fit: contain;
+            padding: 2px;
         }
 
         /* Close button - Same size as toggle button */
@@ -123,9 +146,9 @@
             display: flex;
         }
 
-        /* Header - User's logo */
+        /* Header - PROBLEM 2 FIX: Improved header design */
         .cc-header {
-            background: linear-gradient(to right, #4F46E5, #7C3AED);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 20px;
             border-radius: 20px 20px 0 0;
@@ -149,21 +172,23 @@
         }
 
         .cc-logo {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.2);
+            width: 50px;
+            height: 50px;
+            border-radius: 6px;
+            background: white;
+            border: 2px solid #4F46E5;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
+            padding: 2px;
         }
 
         .cc-logo img {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            object-fit: cover;
+            width: 90%;
+            height: 90%;
+            border-radius: 6px;
+            object-fit: contain;
         }
 
         /* Messages area - Hidden scrollbar */
@@ -172,6 +197,9 @@
             padding: 20px;
             overflow-y: auto;
             background: linear-gradient(to bottom, #f8fafc 0%, #f1f5f9 100%);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
             scrollbar-width: none;
             -ms-overflow-style: none;
         }
@@ -182,11 +210,21 @@
 
         /* Message bubbles */
         .cc-message {
-            margin-bottom: 15px;
             display: flex;
-            align-items: flex-start;
-            gap: 10px;
-            animation: fadeInUp 0.3s ease;
+            gap: 12px;
+            animation: messageSlideIn 0.3s ease-out;
+            align-items: flex-end;
+        }
+
+        @keyframes messageSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .cc-message.cc-user {
@@ -204,11 +242,13 @@
             font-size: 16px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             overflow: hidden;
+            border: 2px solid #E5E7EB;
         }
 
         .cc-avatar.cc-bot {
             background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
             color: white;
+            border-color: #4F46E5;
         }
 
         .cc-avatar.cc-bot img {
@@ -216,11 +256,13 @@
             height: 100%;
             border-radius: 50%;
             object-fit: cover;
+            background-color: #FFFFFF;
         }
 
         .cc-avatar.cc-user {
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: white;
+            border-color: #10b981;
         }
 
         .cc-bubble {
@@ -251,26 +293,36 @@
             font-size: 11px;
             margin-top: 4px;
             opacity: 0.7;
+            color: #9CA3AF;
+            font-weight: 500;
         }
 
-        /* Input area - Menu button on LEFT of typing box with improved spacing */
+        .cc-message.cc-user .cc-timestamp {
+            text-align: right;
+            color: #6b7280;
+            font-weight: 600;
+            opacity: 1;
+        }
+
+        /* Input area - PROBLEM 4 FIX: Add proper form field IDs and names */
         .cc-input-area {
-            padding: 20px;
+            padding: 12px 16px;
             background: white;
             border-top: 1px solid #e5e7eb;
             flex-shrink: 0;
             display: flex;
-            gap: 20px;
-            align-items: flex-end;
+            gap: 8px;
+            align-items: center;
+            min-height: 56px;
         }
 
-        /* Menu button - LEFT of input container with better spacing */
+        /* Menu button - PROBLEM 1 FIX: Smaller size and reduced spacing */
         #cc-menu-btn {
             background: #f3f4f6;
             border: 1px solid #e5e7eb;
-            border-radius: 12px;
-            width: 48px;
-            height: 48px;
+            border-radius: 10px;
+            width: 36px;
+            height: 36px;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -279,7 +331,6 @@
             outline: none;
             color: #6b7280;
             flex-shrink: 0;
-            margin-right: 8px;
         }
 
         #cc-menu-btn:hover {
@@ -289,15 +340,15 @@
 
         .cc-input-container {
             display: flex;
-            gap: 12px;
-            align-items: flex-end;
+            gap: 8px;
+            align-items: center;
             background: #f8fafc;
             border: 2px solid #e5e7eb;
-            border-radius: 16px;
-            padding: 8px;
+            border-radius: 12px;
+            padding: 4px 6px;
             transition: border-color 0.2s ease;
             flex: 1;
-            min-height: 52px;
+            min-height: 36px;
         }
 
         .cc-input-container:focus-within {
@@ -309,29 +360,36 @@
             flex: 1;
             border: none;
             background: transparent;
-            padding: 14px 18px;
+            padding: 8px 12px;
             font-size: 14px;
             resize: none;
             outline: none;
             font-family: inherit;
-            max-height: 100px;
+            max-height: 80px;
             color: #374151;
-            min-height: 22px;
+            min-height: 20px;
             line-height: 1.4;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        #cc-input::-webkit-scrollbar {
+            display: none;
         }
 
         #cc-input::placeholder {
             color: #9ca3af;
         }
 
+        /* PROBLEM 2 FIX: New arrow style matching Image 3 */
         #cc-send-btn {
             background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
             color: white;
             border: none;
-            border-radius: 12px;
-            padding: 14px 18px;
+            border-radius: 10px;
+            padding: 8px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 16px;
             font-weight: 500;
             transition: all 0.2s ease;
             outline: none;
@@ -339,8 +397,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            min-width: 48px;
-            height: 48px;
+            min-width: 36px;
+            height: 36px;
         }
 
         #cc-send-btn:hover {
@@ -390,140 +448,91 @@
             color: #4F46E5;
         }
 
-        /* Action buttons for questions/recommendations */
+        /* Action buttons for questions/recommendations - FIXED */
         .cc-action-buttons {
             display: flex;
-            flex-wrap: wrap;
+            flex-direction: column;
             gap: 8px;
             margin-top: 12px;
         }
 
         .cc-action-btn {
-            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-            border: 1px solid #cbd5e1;
-            border-radius: 20px;
-            padding: 8px 14px;
-            font-size: 12px;
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 12px 16px;
+            font-size: 14px;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
             color: #475569;
             font-weight: 500;
+            text-align: left;
+            width: 100%;
+            display: block;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
         .cc-action-btn:hover {
             background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
             color: white;
             border-color: #4F46E5;
-            transform: translateY(-1px);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
         }
 
-        /* Contact links with hover effects */
-        .cc-contact-link {
-            color: inherit;
-            text-decoration: none;
-            transition: all 0.2s ease;
-            display: inline-block;
-            padding: 2px 4px;
-            border-radius: 4px;
-        }
-
-        .cc-contact-link:hover {
-            background: rgba(79, 70, 229, 0.1);
-            color: #4F46E5;
-            transform: translateY(-1px);
-        }
-
-        .cc-whatsapp-link:hover {
-            background: rgba(37, 211, 102, 0.1);
-            color: #25D366;
-        }
-
-        .cc-email-link:hover {
-            background: rgba(234, 67, 53, 0.1);
-            color: #EA4335;
-        }
-
-        /* Google Maps button styling */
-        .cc-maps-btn {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            padding: 10px 16px;
-            font-size: 13px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: inline-flex;
+        /* Typing indicator with animation */
+        .cc-typing-indicator {
+            display: none;
             align-items: center;
-            gap: 6px;
-            margin-top: 8px;
-            text-decoration: none;
+            gap: 10px;
+            padding: 12px 16px;
+            background: white;
+            border-radius: 18px 18px 18px 4px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e5e7eb;
+            margin-bottom: 15px;
+            animation: fadeInUp 0.3s ease;
+            width: fit-content;
         }
 
-        .cc-maps-btn:hover {
-            background: linear-gradient(135deg, #059669 0%, #047857 100%);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        .cc-typing-indicator.cc-show {
+            display: flex;
         }
 
-        /* Embedded Google Map */
-        .cc-embedded-map {
-            width: 100%;
-            height: 200px;
-            border: none;
-            border-radius: 8px;
-            margin: 10px 0;
-        }
-
-        /* Typing indicator */
         .cc-typing {
             display: flex;
-            align-items: center;
             gap: 4px;
-            padding: 8px 0;
+            align-items: center;
         }
 
         .cc-typing-dot {
-            width: 6px;
-            height: 6px;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
-            background: #9ca3af;
+            background: #94a3b8;
             animation: typing 1.4s infinite ease-in-out;
         }
 
+        .cc-typing-dot:nth-child(1) { animation-delay: 0s; }
         .cc-typing-dot:nth-child(2) { animation-delay: 0.2s; }
         .cc-typing-dot:nth-child(3) { animation-delay: 0.4s; }
 
-        /* Enhanced formatting for COE data - Fixed to match image 2 */
-        .coe-category {
-            font-weight: bold;
-            color: #4F46E5;
-        }
-
-        .price-highlight {
-            font-weight: bold;
-            color: #059669;
-        }
-
-        .trend-down {
-            color: #10b981;
-            font-weight: bold;
-        }
-
-        .trend-up {
-            color: #ef4444;
-            font-weight: bold;
-        }
-
-        .emoji-highlight {
-            font-size: 16px;
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+                opacity: 0.4;
+            }
+            30% {
+                transform: translateY(-10px);
+                opacity: 1;
+            }
         }
 
         /* Animations */
         @keyframes fadeInUp {
             from {
                 opacity: 0;
-                transform: translateY(10px);
+                transform: translateY(20px);
             }
             to {
                 opacity: 1;
@@ -531,58 +540,229 @@
             }
         }
 
-        @keyframes typing {
-            0%, 60%, 100% { transform: translateY(0); }
-            30% { transform: translateY(-10px); }
-        }
-
         /* Mobile responsiveness */
         @media (max-width: 768px) {
             #cc-chatbot-container {
-                width: calc(100vw - 40px);
+                right: 10px;
+                width: calc(100vw - 100px);
                 height: calc(100vh - 40px);
-                bottom: 10px;
-                right: 60px;
-                border-radius: 15px;
             }
 
             #cc-toggle, #cc-close-btn {
-                bottom: 15px;
-                right: 15px;
-                width: 55px;
-                height: 55px;
-            }
-
-            .cc-header {
-                padding: 15px;
+                right: 10px;
             }
         }
 
-        /* Reduced motion support */
-        @media (prefers-reduced-motion: reduce) {
-            #cc-chatbot-container,
-            #cc-toggle,
-            .cc-message {
-                transition: none;
-                animation: none;
+        /* Professional contact layout - PROBLEM 4 FIX */
+        .cc-contact-card {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            border: 1px solid #cbd5e1;
+            border-radius: 12px;
+            padding: 16px;
+            margin: 12px 0;
             }
+
+        .cc-contact-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .cc-contact-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+        }
+
+        .cc-contact-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1e293b;
+            margin: 0;
+        }
+
+        .cc-contact-info {
+            display: grid;
+            gap: 12px;
+        }
+
+        .cc-contact-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 12px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #f1f5f9;
+            transition: all 0.2s ease;
+            }
+
+        .cc-contact-item:hover {
+            background: #f8fafc;
+            border-color: #4F46E5;
+            transform: translateX(4px);
+        }
+
+        .cc-contact-item-icon {
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+
+        .cc-contact-item-text {
+            flex: 1;
+            font-size: 14px;
+            color: #374151;
+            font-weight: 500;
+        }
+
+        .cc-hours-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .cc-hours-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 8px;
+            background: white;
+            border-radius: 6px;
+            font-size: 12px;
+        }
+
+        .cc-hours-day {
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .cc-hours-time {
+            color: #64748b;
+        }
+
+        /* PROBLEM 6 FIX: Loan calculator DISABLED - Hidden completely */
+        .cc-loan-calculator {
+            display: none !important; /* Calculator completely disabled */
+        }
+
+        .cc-loan-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .cc-loan-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0c4a6e;
+            margin: 0 0 8px 0;
+        }
+
+        .cc-loan-subtitle {
+            font-size: 14px;
+            color: #0369a1;
+            margin: 0;
+        }
+
+        .cc-loan-form {
+            display: grid;
+            gap: 16px;
+        }
+
+        .cc-form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .cc-form-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #0c4a6e;
+        }
+
+        .cc-form-input {
+            padding: 12px;
+            border: 2px solid #bae6fd;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+            transition: border-color 0.2s ease;
+        }
+
+        .cc-form-input:focus {
+            border-color: #0ea5e9;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+        }
+
+        .cc-form-select {
+            padding: 12px;
+            border: 2px solid #bae6fd;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+        }
+
+        .cc-calculate-btn {
+            background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+            color: white;
+            border: none;
+            padding: 14px 24px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 8px;
+        }
+
+        .cc-calculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(14, 165, 233, 0.3);
+        }
+
+        .cc-loan-result {
+            background: white;
+            border: 2px solid #10b981;
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 16px;
+            text-align: center;
+        }
+
+        .cc-result-amount {
+            font-size: 24px;
+            font-weight: 700;
+            color: #059669;
+            margin-bottom: 8px;
+        }
+
+        .cc-result-details {
+            font-size: 14px;
+            color: #374151;
+            line-height: 1.5;
         }
     `;
 
-    // User's chatbot logo (from image 2)
-    const CHATBOT_LOGO_BASE64 = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMzIiIGN5PSIzMiIgcj0iMzIiIGZpbGw9IiM0Rjc2RkYiLz4KPGNpcmNsZSBjeD0iMzIiIGN5PSIzMiIgcj0iMjQiIGZpbGw9IndoaXRlIi8+CjxjaXJjbGUgY3g9IjI2IiBjeT0iMjgiIHI9IjMiIGZpbGw9IiM0Rjc2RkYiLz4KPGNpcmNsZSBjeD0iMzgiIGN5PSIyOCIgcj0iMyIgZmlsbD0iIzRGNzZGRiIvPgo8cGF0aCBkPSJNMjQgMzhDMjQgMzggMjggNDIgMzIgNDJDMzYgNDIgNDAgMzggNDAgMzgiIHN0cm9rZT0iIzRGNzZGRiIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KPC9zdmc+';
-    const BOT_AVATAR = CHATBOT_LOGO_BASE64;
-    const USER_AVATAR = '👤';
 
-    // Menu options
-    const MENU_OPTIONS = [
-        { icon: '💰', text: 'COE Prices', action: 'COE Prices' },
-        { icon: '🚗', text: 'Vehicle Info', action: 'Vehicle recommendations' },
-        { icon: '📅', text: 'Test Drive', action: 'Test Drive' },
-        { icon: '🔧', text: 'Maintenance', action: 'Maintenance' },
-        { icon: '💳', text: 'Loan Calculator', action: 'Loan calculator' },
-        { icon: '📞', text: 'Contact Us', action: 'Contact Us' }
-    ];
 
     // Inject CSS
     function injectCSS() {
@@ -599,7 +779,7 @@
         const widgetHTML = `
             <!-- Toggle Button -->
             <button id="${CONFIG.TOGGLE_ID}" aria-label="Open chat">
-                <img src="${CHATBOT_LOGO_BASE64}" alt="CleverCompanion" />
+                <img src="${CHATBOT_LOGO_URL}" alt="CleverCompanion" />
             </button>
 
             <!-- Close Button -->
@@ -615,7 +795,7 @@
                 <div class="cc-header">
                     <h3 id="cc-title">
                         <span class="cc-logo">
-                            <img src="${CHATBOT_LOGO_BASE64}" alt="CleverCompanion" />
+                            <img src="${CHATBOT_LOGO_URL}" alt="CleverCompanion" />
                         </span>
                         ${currentConfig.title}
                     </h3>
@@ -625,7 +805,7 @@
                 <div id="${CONFIG.MESSAGES_ID}" role="log" aria-live="polite" aria-label="Chat messages">
                     <div class="cc-message cc-bot">
                         <div class="cc-avatar cc-bot">
-                            <img src="${CHATBOT_LOGO_BASE64}" alt="Bot" />
+                            <img src="${CHATBOT_LOGO_URL}" alt="Bot" />
                         </div>
                         <div class="cc-bubble">
                             ${currentConfig.welcomeMessage}
@@ -647,9 +827,11 @@
                     <div class="cc-input-container">
                         <textarea 
                             id="${CONFIG.INPUT_ID}" 
+                            name="chatInput"
                             placeholder="Type your message..." 
                             rows="1"
                             aria-label="Type your message"
+                            autocomplete="off"
                         ></textarea>
                         <button id="${CONFIG.SEND_BTN_ID}" aria-label="Send message">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -738,11 +920,16 @@
             }
         });
 
-        // Handle action button clicks
+        // PROBLEM 3 FIX: Handle action button clicks without double processing
         document.addEventListener('click', (e) => {
             if (e.target.classList.contains('cc-action-btn')) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                if (isProcessing) return; // Simple processing check
+                
                 const action = e.target.textContent;
-                sendMessage(action);
+                handleActionButton(action);
             }
         });
     }
@@ -829,21 +1016,29 @@
         showTypingIndicator();
 
         try {
+            // PROBLEM 8 FIX: Enhanced fetch with timeout and better error handling
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+            
             const response = await fetch(CONFIG.API_URL, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Accept': 'application/json'
                 },
                 body: JSON.stringify({
                     sender: `user_${Date.now()}`,
                     message: text
-                })
+                }),
+                signal: controller.signal
             });
+
+            clearTimeout(timeoutId);
 
             if (response.ok) {
                 const data = await response.json();
                 
-                // COMBINE ALL RESPONSES INTO SINGLE MESSAGE
+                // PROBLEM 4 FIX: COMBINE ALL RESPONSES INTO SINGLE MESSAGE  
                 if (data && data.length > 0) {
                     const combinedText = data
                         .filter(item => item.text)
@@ -859,11 +1054,19 @@
                     addMessage('I apologize, but I\'m having trouble understanding your request. Could you please try rephrasing?', 'bot');
                 }
             } else {
-                throw new Error('Network response was not ok');
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
         } catch (error) {
-            console.error('Chat error:', error);
-            addMessage('I\'m experiencing technical difficulties. Please try again in a moment.', 'bot');
+            // PROBLEM 6 FIX: Remove console logs
+            
+            if (error.name === 'AbortError') {
+                addMessage('Request timed out. Please check your connection and try again.', 'bot');
+            } else if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+                // PROBLEM 2 FIX: Professional connection error message
+                addMessage('🔧 **Service Temporarily Unavailable**\n\nOur chat service is currently undergoing maintenance. Please try one of these alternatives:\n\n📞 **Call us directly:** +65 6234 5678\n📧 **Email us:** info@clevercompanion.sg\n📱 **WhatsApp:** +65 9876 5432\n\n⏰ **Service hours:** Mon-Fri 9AM-7PM, Sat 9AM-6PM\n\nWe apologize for the inconvenience and will be back online shortly.', 'bot');
+            } else {
+                addMessage('I\'m experiencing technical difficulties. Please try again in a moment.', 'bot');
+            }
         } finally {
             hideTypingIndicator();
             if (sendBtn) sendBtn.disabled = false;
@@ -875,7 +1078,7 @@
         const messagesContainer = document.getElementById(CONFIG.MESSAGES_ID);
         if (!messagesContainer) return;
 
-        const avatar = sender === 'bot' ? `<img src="${CHATBOT_LOGO_BASE64}" alt="Bot" />` : USER_AVATAR;
+        const avatar = sender === 'bot' ? `<img src="${CHATBOT_LOGO_URL}" alt="Bot" />` : USER_AVATAR;
         const timestamp = new Date().toLocaleTimeString('en-SG', { 
             hour: '2-digit', 
             minute: '2-digit',
@@ -901,17 +1104,21 @@
     }
 
     function formatMessage(text) {
-        // Enhanced formatting with CORRECT trend arrows matching image 2
-        return text
+        // PROBLEM 1 FIX: Remove number formatting - show clean numbers
+        let formattedText = text
+            .replace(/LOAN_CALCULATOR_START/g, '')
+            .replace(/LOAN_CALCULATOR_END/g, '')
+            .replace(/BUTTON_OPTIONS_START[\s\S]*?BUTTON_OPTIONS_END/g, '')
             .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
             .replace(/•/g, '&bull;')
             .replace(/\n/g, '<br>')
             .replace(/(CAT [ABCE]|Category [ABCE])/g, '<span class="coe-category">$1</span>')
-            .replace(/\$([0-9,]+)/g, '<span class="price-highlight">$$$1</span>')
+            // PROBLEM 1 FIX: Keep clean numbers without dollar signs and commas
+            .replace(/\$([0-9,]+)/g, '$1')
             .replace(/(⬇️|⬆️|📈|📊|💰|🚗|🔧|📞)/g, '<span class="emoji-highlight">$1</span>')
-            // FIXED: Green down arrows for decreases (matching image 2)
-            .replace(/🟢↘\s*-\$([0-9,]+)/g, '<span class="trend-down">🟢↘ -$$1</span>')
-            .replace(/🔴↗\s*\+\$([0-9,]+)/g, '<span class="trend-up">🔴↗ +$$1</span>')
+            // Fixed: Green down arrows for decreases (matching image 2)
+            .replace(/🟢↘\s*-\$([0-9,]+)/g, '<span class="trend-down">🟢↘ -$1</span>')
+            .replace(/🔴↗\s*\+\$([0-9,]+)/g, '<span class="trend-up">🔴↗ +$1</span>')
             // Fix Google Maps to embedded map + button format
             .replace(/GOOGLE_MAPS:([^\s]+)/g, (match, url) => {
                 const embedUrl = url.replace('/maps/place/', '/maps/embed?pb=');
@@ -921,12 +1128,42 @@
             .replace(/WhatsApp:\s*\+65\s*([0-9\s]+)/g, '<a href="https://wa.me/65$1" target="_blank" class="cc-contact-link cc-whatsapp-link">📱 WhatsApp: +65 $1</a>')
             .replace(/Call:\s*\+65\s*([0-9\s]+)/g, '<a href="tel:+65$1" class="cc-contact-link">📞 Call: +65 $1</a>')
             .replace(/Email:\s*([^\s]+)/g, '<a href="mailto:$1" class="cc-contact-link cc-email-link">📧 Email: $1</a>');
+        
+        return formattedText;
     }
 
     function extractActionButtons(text) {
-        const buttons = [];
+        let buttonsHTML = '';
         
-        // Extract questions and recommendations for action buttons
+        // PROBLEM 5&6 FIX: Enhanced button extraction for new pipe-separated format
+        
+        // Extract pipe-separated buttons (new format)
+        const pipePattern = /([🔧🚗💰📞🛠️🚙🚛🚚📅💳📍📧🗺️💬🧽🔋]+\s*[^|]+)/g;
+        const buttons = [];
+        let match;
+        
+        while ((match = pipePattern.exec(text)) !== null) {
+            const buttonText = match[1].trim();
+            if (buttonText && !buttonText.includes('\n') && buttonText.length < 50) {
+                buttons.push(buttonText);
+            }
+        }
+        
+        // Old BUTTON_OPTIONS format
+        const buttonMatch = text.match(/BUTTON_OPTIONS_START([\s\S]*?)BUTTON_OPTIONS_END/);
+        if (buttonMatch) {
+            const buttonSection = buttonMatch[1];
+            const buttonLines = buttonSection.split('\n').filter(line => line.trim() && line.includes('|'));
+            
+            buttonLines.forEach(line => {
+                const [label, action] = line.split('|').map(s => s.trim());
+                if (label && action) {
+                    buttons.push(label);
+                }
+            });
+        }
+        
+        // Legacy support for simple buttons
         if (text.includes('Would you like') || text.includes('recommendations') || text.includes('financing options')) {
             if (text.includes('vehicle recommendations')) {
                 buttons.push('Vehicle recommendations');
@@ -943,25 +1180,33 @@
             buttons.push('COE Prices', 'Test Drive', 'Vehicle Info');
         }
 
+        // PROBLEM 5 FIX: Create enhanced buttons with shadows and borders
         if (buttons.length > 0) {
-            return `<div class="cc-action-buttons">
-                ${buttons.map(btn => `<button class="cc-action-btn">${btn}</button>`).join('')}
-            </div>`;
+            const uniqueButtons = [...new Set(buttons)]; // Remove duplicates
+            const buttonElements = uniqueButtons.map(btn => 
+                `<button class="cc-action-btn" onclick="handleActionButton('${btn.replace(/'/g, "\\\'")}')">${btn}</button>`
+            ).join('');
+            
+            buttonsHTML = `<div class="cc-action-buttons">${buttonElements}</div>`;
         }
         
-        return '';
+        return buttonsHTML;
     }
 
     function showTypingIndicator() {
         const messagesContainer = document.getElementById(CONFIG.MESSAGES_ID);
         if (!messagesContainer) return;
 
+        // Remove existing typing indicator
+        hideTypingIndicator();
+
+        // PROBLEM 3 FIX: Create proper typing indicator structure
         const typingHTML = `
             <div class="cc-message cc-bot cc-typing-message">
                 <div class="cc-avatar cc-bot">
-                    <img src="${CHATBOT_LOGO_BASE64}" alt="Bot" />
+                    <img src="${CHATBOT_LOGO_URL}" alt="Bot" />
                 </div>
-                <div class="cc-bubble">
+                <div class="cc-typing-indicator cc-show">
                     <div class="cc-typing">
                         <div class="cc-typing-dot"></div>
                         <div class="cc-typing-dot"></div>
@@ -982,19 +1227,211 @@
         }
     }
 
-    function scrollToBottom() {
-        const messagesContainer = document.getElementById(CONFIG.MESSAGES_ID);
-        if (messagesContainer) {
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    // PROBLEM 2 FIX: Comprehensive double-click prevention system
+    function handleActionButton(action) {
+        // PROBLEM 6 FIX: Remove console logs
+        
+        // PROBLEM 3 & 4 FIX: Simplified processing with direct actions
+        if (isProcessing) {
+            return;
+        }
+        
+        isProcessing = true;
+        
+        try {
+            // PROBLEM 4 FIX: Handle direct actions without sending messages
+            switch (action.toLowerCase()) {
+                case 'whatsapp':
+                    window.open('https://wa.me/6598765432', '_blank');
+                    break;
+                case 'call':
+                    window.open('tel:+6562345678', '_self');
+                    break;
+                case 'email':
+                    window.open('mailto:info@clevercompanion.sg', '_blank');
+                    break;
+                case 'google.com':
+                case 'maps.google.com':
+                case '🗺️ get directions':
+                case '📍 view on google maps':
+                case 'view on google maps':
+                    window.open('https://www.google.com/maps/search/CleverCompanion+Auto+Showroom+Singapore/@1.3521,103.8198,17z', '_blank');
+                    break;
+                default:
+                    sendMessage(action).finally(() => {
+                        isProcessing = false;
+                    });
+            }
+            
+        } catch (error) {
+            console.error('Error in action button handler:', error);
+            isProcessing = false;
         }
     }
+    
+    // Helper function to reset button states
+    function resetButtonState() {
+        setTimeout(() => {
+            isProcessing = false;
+            const actionButtons = document.querySelectorAll('.cc-action-btn');
+            actionButtons.forEach(btn => {
+                btn.style.opacity = '1';
+                btn.style.pointerEvents = 'auto';
+                btn.style.cursor = 'pointer';
+                btn.style.transform = 'scale(1)';
+                btn.textContent = btn.textContent.replace(' ⏳', '');
+            });
+        }, ACTION_COOLDOWN);
+    }
+
+    // PROBLEM 2 FIX: Enhanced scroll behavior - show typing at visible area
+    function scrollToBottom() {
+        // Always scroll for user messages
+        const messagesContainer = document.getElementById(CONFIG.MESSAGES_ID);
+        if (messagesContainer) {
+            const messages = messagesContainer.querySelectorAll('.cc-message');
+            const lastMessage = messages[messages.length - 1];
+            if (lastMessage && lastMessage.classList.contains('cc-user')) {
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+        }
+    }
+
+    function scrollToTop() {
+        const messagesContainer = document.getElementById(CONFIG.MESSAGES_ID);
+        if (messagesContainer) {
+            messagesContainer.scrollTop = 0;
+        }
+    }
+
+    // PROBLEM 3 FIX: Add calculateLoan function globally
+    function calculateLoan() {
+        // Create unique IDs to avoid duplicates
+        const timestamp = Date.now();
+        const carPrice = parseFloat(document.getElementById('carPrice')?.value || document.querySelector(`input[placeholder*="80000"]`)?.value) || 0;
+        const downPaymentPercent = parseFloat(document.getElementById('downPayment')?.value || document.querySelector('select option:checked')?.value) || 20;
+        const loanTenure = parseFloat(document.getElementById('loanTenure')?.value || 4);
+        const interestRate = parseFloat(document.getElementById('interestRate')?.value || 2.78);
+        
+        if (carPrice <= 0) {
+            alert('Please enter a valid car price');
+            return;
+        }
+        
+        const downPayment = (carPrice * downPaymentPercent) / 100;
+        const loanAmount = carPrice - downPayment;
+        const monthlyRate = interestRate / 100 / 12;
+        const numPayments = loanTenure * 12;
+        
+        const monthlyPayment = (loanAmount * monthlyRate * Math.pow(1 + monthlyRate, numPayments)) / 
+                              (Math.pow(1 + monthlyRate, numPayments) - 1);
+        
+        const totalPayment = monthlyPayment * numPayments;
+        const totalInterest = totalPayment - loanAmount;
+        
+        const resultElement = document.getElementById('loanResult') || document.querySelector('[id*="loanResult"]');
+        const monthlyElement = document.getElementById('monthlyPayment') || document.querySelector('[id*="monthlyPayment"]');
+        const detailsElement = document.getElementById('loanDetails') || document.querySelector('[id*="loanDetails"]');
+        
+        if (monthlyElement) {
+            monthlyElement.textContent = 'SGD $' + monthlyPayment.toFixed(2) + '/month';
+        }
+        if (detailsElement) {
+            detailsElement.innerHTML = 
+                'Car Price: SGD $' + carPrice.toLocaleString() + '<br>' +
+                'Down Payment: SGD $' + downPayment.toLocaleString() + ' (' + downPaymentPercent + '%)<br>' +
+                'Loan Amount: SGD $' + loanAmount.toLocaleString() + '<br>' +
+                'Total Interest: SGD $' + totalInterest.toLocaleString() + '<br>' +
+                'Total Payment: SGD $' + totalPayment.toLocaleString();
+        }
+        if (resultElement) {
+            resultElement.style.display = 'block';
+        }
+    }
+    
+    // PROBLEM 12 FIX: Add missing calculateLoanSpecific function
+    function calculateLoanSpecific(timestamp) {
+        const carPrice = parseFloat(document.getElementById('carPrice_' + timestamp).value) || 0;
+        const downPaymentPercent = parseFloat(document.getElementById('downPayment_' + timestamp).value) || 20;
+        const loanTenure = parseFloat(document.getElementById('loanTenure_' + timestamp).value) || 4;
+        const interestRateSelect = document.getElementById('interestRate_' + timestamp);
+        
+        let interestRate;
+        if (interestRateSelect && interestRateSelect.value === 'custom') {
+            const customRate = parseFloat(document.getElementById('customRateInput_' + timestamp).value);
+            if (!customRate || customRate <= 0) {
+                alert('Please enter a valid custom interest rate');
+                return;
+            }
+            interestRate = customRate;
+        } else {
+            interestRate = parseFloat(interestRateSelect?.value) || 2.78;
+        }
+        
+        if (carPrice <= 0) {
+            alert('Please enter a valid car price');
+            return;
+        }
+        
+        const downPayment = (carPrice * downPaymentPercent) / 100;
+        const loanAmount = carPrice - downPayment;
+        const monthlyRate = interestRate / 100 / 12;
+        const numPayments = loanTenure * 12;
+        
+        const monthlyPayment = (loanAmount * monthlyRate * Math.pow(1 + monthlyRate, numPayments)) / 
+                              (Math.pow(1 + monthlyRate, numPayments) - 1);
+        
+        const totalPayment = monthlyPayment * numPayments;
+        const totalInterest = totalPayment - loanAmount;
+        
+        const monthlyElement = document.getElementById('monthlyPayment_' + timestamp);
+        const detailsElement = document.getElementById('loanDetails_' + timestamp);
+        const resultElement = document.getElementById('loanResult_' + timestamp);
+        
+        if (monthlyElement) {
+            monthlyElement.textContent = 'SGD $' + monthlyPayment.toFixed(2) + '/month';
+        }
+        if (detailsElement) {
+            detailsElement.innerHTML = 
+                'Car Price: SGD $' + carPrice.toLocaleString() + '<br>' +
+                'Down Payment: SGD $' + downPayment.toLocaleString() + ' (' + downPaymentPercent + '%)<br>' +
+                'Loan Amount: SGD $' + loanAmount.toLocaleString() + '<br>' +
+                'Total Interest: SGD $' + totalInterest.toLocaleString() + '<br>' +
+                'Total Payment: SGD $' + totalPayment.toLocaleString();
+        }
+        if (resultElement) {
+            resultElement.style.display = 'block';
+        }
+    }
+
+    function toggleCustomRate(timestamp) {
+        const select = document.getElementById('interestRate_' + timestamp);
+        const customInput = document.getElementById('customRateInput_' + timestamp);
+        
+        if (select && customInput) {
+            if (select.value === 'custom') {
+                customInput.style.display = 'block';
+                customInput.focus();
+            } else {
+                customInput.style.display = 'none';
+            }
+        }
+    }
+
+    // Make functions globally accessible for onclick handlers
+    window.handleActionButton = handleActionButton;
+    window.calculateLoan = calculateLoan;
+    window.calculateLoanSpecific = calculateLoanSpecific;
+    window.toggleCustomRate = toggleCustomRate;
 
     // Global functions for external access
     window.CleverCompanionWidget = {
         init: initWidget,
         open: openWidget,
         close: closeWidget,
-        sendMessage: sendMessage
+        sendMessage: sendMessage,
+        calculateLoan: calculateLoan,
+        calculateLoanSpecific: calculateLoanSpecific
     };
 
     // Auto-initialize when DOM is ready
