@@ -33,7 +33,8 @@ Here's our email for your convenience:
 📧 **Email:**
 info@clevercompanion.sg
 
-<button onclick="window.open('mailto:info@clevercompanion.sg', '_blank')" style="background: #FF6B35; color: white; border: none; padding: 12px 24px; border-radius: 25px; cursor: pointer; font-size: 14px; margin: 10px 0; display: inline-block; transition: all 0.3s ease; box-shadow: 0 2px 4px rgba(255, 107, 53, 0.3);" onmouseover="this.style.background='#E5522A'; this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 8px rgba(255, 107, 53, 0.4)';" onmouseout="this.style.background='#FF6B35'; this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 4px rgba(255, 107, 53, 0.3)';">📧 Email me now</button>"""
+<button onclick="window.open('mailto:info@clevercompanion.sg', '_blank')" style="background: #FF6B35; color: white; border: none; padding: 12px 24px; border-radius: 25px; cursor: pointer; font-size: 14px; margin: 10px 0; display: inline-block;">📧 Email me now</button>"""
+# <button onclick="window.open('mailto:info@clevercompanion.sg', '_blank')" style="background: #FF6B35; color: white; border: none; padding: 12px 24px; border-radius: 25px; cursor: pointer; font-size: 14px; margin: 10px 0; display: inline-block; transition: all 0.3s ease; box-shadow: 0 2px 4px rgba(255, 107, 53, 0.3);" onmouseover="this.style.background='#E5522A'; this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 8px rgba(255, 107, 53, 0.4)';" onmouseout="this.style.background='#FF6B35'; this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 4px rgba(255, 107, 53, 0.3)';">📧 Email me now</button>"""
         
         dispatcher.utter_message(text=response)
         return []
@@ -266,4 +267,6 @@ class ActionProvideBusinessHours(Action):
 **🏛️ Public Holidays:** CLOSED"""
           
         dispatcher.utter_message(text=response)
-        return [] 
+        return []
+
+# Note: Feedback actions have been moved to feedback_actions.py 

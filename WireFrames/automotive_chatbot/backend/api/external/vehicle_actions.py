@@ -71,7 +71,7 @@ Please try again later or contact us directly for vehicle information.
 **🔋 Features:**
 • {vehicle_info.get('Features', 'Standard automotive features')}
 
-💡 **Interested?** Ask me to "book test drive for {brand} {model}" or get financing options!"""
+💡 **Interested?** Ask me to "book test drive for {brand} {model}" or about pricing!"""
             else:
                 # Show available models for the brand
                 models = self.get_brand_models(df, brand)

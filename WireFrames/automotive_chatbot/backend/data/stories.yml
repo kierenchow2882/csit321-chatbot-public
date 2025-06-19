@@ -284,12 +284,11 @@ stories:
   steps:
   - intent: budget_planning
   - action: action_budget_calculator
-  - intent: ask_coe_prices
-  - action: action_coe_prices
-  - intent: ask_road_tax
-  - action: action_get_road_tax_info
-  - intent: ask_insurance
-  - action: action_get_insurance_info
+
+- story: calculate montly installment
+  steps:
+  - intent: calculate_loan
+  - action: action_budget_calculator
 
 - story: second hand car inquiry
   steps:
@@ -434,3 +433,33 @@ stories:
   steps:
   - intent: ask_capability_confirm
   - action: action_capability_confirm
+
+- story: calculate loan
+  steps:
+  - intent: calculate_loan
+  - action: action_calculate_loan
+
+- story: ask feedback
+  steps:
+  - intent: ask_feedback
+  - action: action_feedback_request
+
+- story: give feedback
+  steps:
+  - intent: give_feedback
+  - action: action_process_feedback
+
+- story: ask car reviews
+  steps:
+  - intent: ask_car_reviews
+  - action: action_get_car_reviews
+
+- story: provide loan calculation details
+  steps:
+  - intent: provide_loan_details
+  - action: action_loan_calculation_result
+
+- story: request specific car reviews
+  steps:
+  - intent: request_specific_car_reviews
+  - action: action_show_car_reviews

@@ -30,21 +30,19 @@
     };
 
     // PROBLEM 1 & 2 FIX: Using PNG logo with proper path and styling
-    const CHATBOT_LOGO_URL = 'http://localhost:3000/media/images/CleverCompanion-logo.png';
+    const CHATBOT_LOGO_URL = './media/images/CleverCompanion-logo.png';
 
     // User avatar - Using boy.png as requested
-    const USER_AVATAR = `<img src="http://localhost:3000/media/images/boy.png" alt="User" style="width: 20px; height: 20px; border-radius: 50%; object-fit: cover;">`;
+    const USER_AVATAR = `<img src="./media/images/boy.png" alt="User" style="width: 20px; height: 20px; border-radius: 50%; object-fit: cover;">`;
 
     // Menu options
     const MENU_OPTIONS = [
-        { icon: '💰', text: 'Latest COE Prices', action: 'LatestCOE Prices' },
-        { icon: '🚗', text: 'Search Vehicle', action: 'Search Vehicle' },
-        { icon: '📅', text: 'Test Drive Booking', action: 'Test Drive Booking' },
-        { icon: '🔧', text: 'Maintenance Tips', action: 'Maintenance Tips' },
+        { icon: '💰', text: 'COE Prices', action: 'COE Prices' },
+        { icon: '🚗', text: 'Vehicle Info', action: 'Vehicle Info' },
+        { icon: '📅', text: 'Test Drive', action: 'Test Drive' },
+        { icon: '🔧', text: 'Maintenance', action: 'Maintenance' },
         { icon: '💳', text: 'Loan Calculator', action: 'Loan Calculator' },
-        { icon: '📞', text: 'Contact Us', action: 'Contact Us' },
-        { icon: '📝', text: 'Feedback', action: 'Feedback' },
-        { icon: '⭐', text: 'Car Reviews & Ratings', action: 'Car Reviews & Ratings' }
+        { icon: '📞', text: 'Contact Us', action: 'Contact Us' }
     ];
 
     // PROBLEM 3 FIX: Simplified event management - removed cooldown
@@ -359,7 +357,7 @@
             box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
         }
 
-        .cc-input-container #cc-input {
+        #cc-input {
             flex: 1;
             border: none;
             background: transparent;
@@ -368,21 +366,19 @@
             resize: none;
             outline: none;
             font-family: inherit;
-            height: 20px; /* Fixed height - no expanding */
-            max-height: 20px;
+            max-height: 80px;
             color: #374151;
             min-height: 20px;
             line-height: 1.4;
             scrollbar-width: none;
             -ms-overflow-style: none;
-            overflow: hidden; /* Force single line only */
         }
 
-        .cc-input-container #cc-input::-webkit-scrollbar {
+        #cc-input::-webkit-scrollbar {
             display: none;
         }
 
-        .cc-input-container #cc-input::placeholder {
+        #cc-input::placeholder {
             color: #9ca3af;
         }
 
@@ -889,8 +885,7 @@
 
         if (input) {
             input.addEventListener('keypress', handleKeyPress);
-            // PROBLEM 1 FIX: Remove autoResize completely - keep fixed height always
-            // input.addEventListener('input', autoResize);
+            input.addEventListener('input', autoResize);
         }
 
         if (sendBtn) {
@@ -898,7 +893,6 @@
                 const message = input.value.trim();
                 if (message) {
                     sendMessage(message);
-                    resetTextareaSize(); // PROBLEM 2 FIX: Reset size after sending via button click
                 }
             });
         }
@@ -993,7 +987,6 @@
                 const message = input.value.trim();
                 if (message) {
                     sendMessage(message);
-                    resetTextareaSize(); // PROBLEM 2 FIX: Reset size after sending via Enter key
                 }
             }
         }
@@ -1007,15 +1000,6 @@
         }
     }
 
-    // PROBLEM 2 FIX: Reset textarea to original size after sending message
-    function resetTextareaSize() {
-        const input = document.getElementById(CONFIG.INPUT_ID);
-        if (input) {
-            input.style.height = 'auto';
-            input.style.height = '40px'; // Reset to original single-line size
-        }
-    }
-
     async function sendMessage(text) {
         const input = document.getElementById(CONFIG.INPUT_ID);
         const sendBtn = document.getElementById(CONFIG.SEND_BTN_ID);
@@ -1025,11 +1009,8 @@
         // Add user message
         addMessage(text, 'user');
         
-        // Clear input, reset size, and disable send button
-        if (input) {
-            input.value = '';
-            resetTextareaSize(); // PROBLEM 2 FIX: Reset to original size immediately
-        }
+        // Clear input and disable send button
+        if (input) input.value = '';
         if (sendBtn) sendBtn.disabled = true;
         
         // Show typing indicator
@@ -1090,7 +1071,7 @@
         } finally {
             hideTypingIndicator();
             if (sendBtn) sendBtn.disabled = false;
-            resetTextareaSize(); // PROBLEM 2 FIX: Ensure textarea stays at original size
+            autoResize();
         }
     }
 
@@ -1126,7 +1107,7 @@
             // Small delay to ensure content is rendered before scrolling
             setTimeout(() => {
                 scrollToLatestBotMessage();
-            });
+            }, 100);
         } else {
             scrollToBottom();
         }
@@ -1154,11 +1135,11 @@
                 return `<iframe src="${embedUrl}" class="cc-embedded-map" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe><a href="${url}" target="_blank" class="cc-maps-btn">📍 View on Google Maps</a>`;
             })
             // Format contact information with hover effects
-            // .replace(/WhatsApp:\s*\+65\s*([0-9\s]+)/g, '<a href="https://wa.me/65$1" target="_blank" class="cc-contact-link cc-whatsapp-link">📱 WhatsApp: +65 $1</a>')
-            // .replace(/Call:\s*\+65\s*([0-9\s]+)/g, '<a href="tel:+65$1" class="cc-contact-link">📞 Call: +65 $1</a>')
-            // .replace(/Email:\s*([^\s]+)/g, '<a href="mailto:$1" class="cc-contact-link cc-email-link">📧 Email: $1</a>')
+            .replace(/WhatsApp:\s*\+65\s*([0-9\s]+)/g, '<a href="https://wa.me/65$1" target="_blank" class="cc-contact-link cc-whatsapp-link">📱 WhatsApp: +65 $1</a>')
+            .replace(/Call:\s*\+65\s*([0-9\s]+)/g, '<a href="tel:+65$1" class="cc-contact-link">📞 Call: +65 $1</a>')
+            .replace(/Email:\s*([^\s]+)/g, '<a href="mailto:$1" class="cc-contact-link cc-email-link">📧 Email: $1</a>')
             // PROBLEM 1 FIX: Handle button tags properly and prevent malformed HTML
-            // .replace(/<button([^>]*?)>\s*([^<]*?)\s*$/g, '<button$1>$2</button>'); // Close unclosed button tags
+            .replace(/<button([^>]*?)>\s*([^<]*?)\s*$/g, '<button$1>$2</button>'); // Close unclosed button tags
         
         return formattedText;
     }
@@ -1199,8 +1180,7 @@
             if (text.includes('vehicle recommendations')) {
                 buttons.push('Vehicle recommendations');
             }
-            // PROBLEM 2 FIX: Remove automatic "Financing options" button for car reviews
-            if (text.includes('financing options') && !text.includes('Car Reviews') && !text.includes('Reviews & Ratings')) {
+            if (text.includes('financing options')) {
                 buttons.push('Financing options');
             }
             if (text.includes('loan calculator')) {
@@ -1333,7 +1313,7 @@
     function scrollToLatestBotMessage() {
         const messagesContainer = document.getElementById(CONFIG.MESSAGES_ID);
         if (messagesContainer) {
-            const botMessages = messagesContainer.querySelectorAll('.cc-message');
+            const botMessages = messagesContainer.querySelectorAll('.cc-message.cc-bot');
             const latestBotMessage = botMessages[botMessages.length - 1];
             if (latestBotMessage) {
                 const messageRect = latestBotMessage.getBoundingClientRect();

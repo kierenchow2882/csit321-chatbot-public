@@ -20,7 +20,7 @@ class ActionMaintenanceGuide(Action):
             tracker: Tracker,
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
         
-        response = """🔧 **Singapore Vehicle Maintenance Guide** 🇸🇬
+        response = """🔧 **Singapore Vehicle Maintenance Guide**
 
 🔧 **Available Guides:**
 

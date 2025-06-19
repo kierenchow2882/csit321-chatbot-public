@@ -61,6 +61,13 @@ intents:
   - search_luxury_cars
   - search_eco_cars
   - ask_persona_recommendations
+  # PROBLEM 6 & 7: New intents for feedback and reviews
+  - ask_feedback
+  - give_feedback
+  - ask_car_reviews
+  # PROBLEM FIX: Additional new intents for loan and car reviews
+  - provide_loan_details
+  - request_specific_car_reviews
 
 entities:
   - car_brand
@@ -123,6 +130,7 @@ actions:
   - action_coe_category_c
   - action_coe_category_e
   - action_calculate_loan
+  - action_budget_calculator
   - action_email_only
   - action_phone_only
   - action_whatsapp_only
@@ -153,7 +161,6 @@ actions:
   - action_get_ev_info
   - action_get_depreciation_info
   - action_first_time_buyer_guide
-  - action_budget_calculator
   - action_get_second_hand_info
   - action_compare_vehicles
   - action_get_maintenance_costs
@@ -173,6 +180,13 @@ actions:
   - utter_features
   - utter_out_of_scope
   - utter_default
+  # PROBLEM 4: New actions for feedback and reviews  
+  - action_feedback_request
+  - action_process_feedback
+  - action_get_car_reviews
+  # PROBLEM FIX: Additional new actions
+  - action_loan_calculation_result
+  - action_show_car_reviews
 
 session_config:
   session_expiration_time: 60

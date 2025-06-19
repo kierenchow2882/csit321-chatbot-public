@@ -520,6 +520,47 @@ nlu:
     - monthly installment calculator
     - loan computation
     - compute loan payment
+    - budget calculator for 180000 car
+
+- intent: provide_loan_details
+  examples: |
+    - calculate loan for 180000 car with 36000 down payment for 7 years
+    - loan for 200000 with 40000 down payment 4 years
+    - calculate 180000 car 20000 down 6 years
+    - loan calculator 250000 50000 5 years 2.5 rate
+    - 180k car 20% down payment 7 years loan
+    - car price 180000 down payment 36000 loan tenure 7 years
+    - 180000 car loan 20% down 7 years 3.33% interest
+    - can u calculate the monthly installment for a car price 180000 with 20%downpayment for 7 years loan with a 3.33% interest rate
+    - can u calculate the montly installment for a car price 180000 with 20%downpayment for 7 years loan with a 3.33% interest rate
+    - calculate monthly installment for car price 180000 with 20% down payment for 7 years
+    - monthly installment for 180000 car 20% down 7 years 3.33%
+
+- intent: request_specific_car_reviews
+  examples: |
+    - show me honda civic reviews
+    - bmw 320i ratings and reviews
+    - what do people say about toyota camry
+    - honda civic reviews
+    - toyota camry reviews
+    - reviews for honda civic
+    - bmw 320i reviews
+    - mercedes c200 reviews
+    - honda vezel reviews
+    - mazda cx5 reviews
+    - show reviews for toyota camry
+    - i want to see honda civic reviews
+    - tell me about bmw 320i reviews
+    - show me mazda cx5 ratings
+    - mazda cx5 ratings and reviews
+    - can i get some reviews of honda civic
+    - car reviews for mercedes c200
+    - honda vezel customer reviews
+    - what do people say about mazda cx5
+    - ratings for honda civic
+    - customer feedback on toyota camry
+    - reviews of bmw cars
+    - mercedes reviews
 
 - intent: ask_insurance
   examples: |
@@ -634,6 +675,8 @@ nlu:
     - budget calculator
     - all inclusive cost
     - what's the total cost
+    - budget calculation for car loan
+    - comprehensive budget planning
 
 - intent: ask_second_hand_cars
   examples: |
@@ -892,6 +935,11 @@ nlu:
     - coe trend
     - coe outlook
     - future coe costs
+    - can u predict the coe price for next few months
+    - what are the future coe prices
+    - coe price prediction for next month
+    - estimate coe prices next month
+    - coe forecast for coming months
 
 - intent: ask_capability_confirm  
   examples: |
@@ -1034,3 +1082,64 @@ nlu:
     - premium comfort features essential
     - prestige brand for executive
     - luxury enthusiast performance oriented
+
+# PROBLEM 6: Feedback intent training data (FIXED - added simple "Feedback" word)
+- intent: ask_feedback
+  examples: |
+    - feedback
+    - Feedback
+    - can i feedback on someone
+    - i want to give feedback
+    - feedback about staff
+    - i have feedback
+    - feedback about sales
+    - want to feedback
+    - feedback on service
+    - can i give feedback
+    - feedback form
+    - customer feedback
+    - staff feedback
+    - sales feedback
+    - service feedback
+
+- intent: give_feedback
+  examples: |  
+    - john from sales was very helpful
+    - the service advisor was rude
+    - sarah provided excellent service
+    - poor customer service experience
+    - amazing experience with the staff
+    - the manager was unprofessional
+    - great service from the team
+    - disappointed with the service
+    - outstanding customer support
+    - terrible experience today
+    - highly recommend this place
+    - will not recommend to others
+    - id like to give feedback for Alan from sales team - he was helpful, cool and a nice guy. Really appreciate his help
+    - i want to give feedback for john from sales - he was amazing and very professional
+    - feedback for sarah from customer service - she was really helpful and patient
+    - id like to provide feedback about the sales consultant - he was excellent
+    - want to give feedback for the manager - great service and very knowledgeable
+    - feedback about alan from sales - really appreciate his assistance and professionalism
+    - i have feedback for the sales team member - he was helpful and friendly
+    - would like to give feedback for the staff member - excellent customer service
+
+# PROBLEM 7: Car reviews intent training data (FIXED - removed duplicates and conflicts)
+- intent: ask_car_reviews
+  examples: |
+    - Car Reviews & Ratings
+    - car reviews and ratings
+    - car ratings and reviews
+    - show me car reviews
+    - customer reviews
+    - vehicle reviews
+    - owner reviews
+    - user ratings
+    - car feedback
+    - review of cars
+    - ratings and reviews
+    - i want to see reviews
+    - do you have reviews
+    - can you show reviews
+    - reviews available

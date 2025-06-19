@@ -7,7 +7,10 @@ All actions are now split into separate files for better scalability and maintai
 from .coe_actions import ActionCOEPrices, ActionExplainCOERenewal, ActionExplainCOECategories, ActionCOECategoryA, ActionCOECategoryB, ActionCOECategoryC, ActionCOECategoryE
 
 # Import Loan-related actions  
-from .loan_actions import ActionCalculateLoan
+from .loan_actions import ActionCalculateLoan, ActionLoanOptions, ActionBudgetCalculator, ActionLoanCalculationResult
+
+# Import Feedback-related actions
+from .feedback_actions import ActionFeedbackRequest, ActionProcessFeedback, ActionGetCarReviews, ActionShowCarReviews
 
 # Import Contact-related actions
 from .contact_actions import (
@@ -47,8 +50,16 @@ __all__ = [
     'ActionCOECategoryE',
     
     # Loan Actions
-    'ActionCalculateLoan', 
-    # 'ActionGetLoanInfo',
+    'ActionCalculateLoan',
+    'ActionLoanOptions',
+    'ActionBudgetCalculator',
+    'ActionLoanCalculationResult',
+    
+    # Feedback Actions
+    'ActionFeedbackRequest',
+    'ActionProcessFeedback',
+    'ActionGetCarReviews',
+    'ActionShowCarReviews',
     
     # Contact Actions
     'ActionEmailOnly',

@@ -4,43 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1e3437a4-e86f-40eb-ab95-6bee1c908d5a" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/WireFrames/automotive_chatbot/backend/api/controllers/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/WireFrames/automotive_chatbot/backend/api/controllers/chat_controller.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/WireFrames/automotive_chatbot/backend/api/entities/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/WireFrames/automotive_chatbot/backend/api/entities/vehicle_entity.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/WireFrames/automotive_chatbot/backend/api/services/loan_calculator_service.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/WireFrames/automotive_chatbot/backend/data/maintenance_schedules.xlsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/WireFrames/automotive_chatbot/backend/data/vehicle_inventory.xlsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/WireFrames/automotive_chatbot/frontend/public/BCE_ANALYSIS.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/WireFrames/automotive_chatbot/frontend/public/EMBED_FIXES.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/WireFrames/automotive_chatbot/frontend/public/FRONTEND_BACKEND_BCE.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/WireFrames/automotive_chatbot/frontend/public/WIDGET_EMBEDDING_GUIDE.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/WireFrames/automotive_chatbot/frontend/public/embed-example.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/WireFrames/automotive_chatbot/frontend/public/embed.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/WireFrames/automotive_chatbot/frontend/public/test-embed.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/embed-example.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/enable_longpath.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/CSIT321-FYP-Chatbot-for-Customer-Support.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/CSIT321-FYP-Chatbot-for-Customer-Support.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WireFrames/automotive_chatbot/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/WireFrames/automotive_chatbot/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WireFrames/automotive_chatbot/backend/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/WireFrames/automotive_chatbot/backend/actions/actions.py" beforeDir="false" afterPath="$PROJECT_DIR$/WireFrames/automotive_chatbot/backend/actions/actions.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WireFrames/automotive_chatbot/backend/afiai.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/WireFrames/automotive_chatbot/backend/api/routes/widget_api.py" beforeDir="false" afterPath="$PROJECT_DIR$/WireFrames/automotive_chatbot/backend/api/routes/widget_api.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WireFrames/automotive_chatbot/backend/api/services/rag_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/WireFrames/automotive_chatbot/backend/api/services/rag_service.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WireFrames/automotive_chatbot/backend/data/nlu.yml" beforeDir="false" afterPath="$PROJECT_DIR$/WireFrames/automotive_chatbot/backend/data/nlu.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WireFrames/automotive_chatbot/backend/data/stories.yml" beforeDir="false" afterPath="$PROJECT_DIR$/WireFrames/automotive_chatbot/backend/data/stories.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WireFrames/automotive_chatbot/backend/domain.yml" beforeDir="false" afterPath="$PROJECT_DIR$/WireFrames/automotive_chatbot/backend/domain.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WireFrames/automotive_chatbot/backend/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/WireFrames/automotive_chatbot/backend/requirements.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WireFrames/automotive_chatbot/fix_installation.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/WireFrames/automotive_chatbot/frontend/public/chat.html" beforeDir="false" afterPath="$PROJECT_DIR$/WireFrames/automotive_chatbot/frontend/public/chat.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WireFrames/automotive_chatbot/frontend/src/app/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/WireFrames/automotive_chatbot/frontend/src/app/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WireFrames/automotive_chatbot/mongodb_setup.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/WireFrames/automotive_chatbot/rasa-commands.ps1" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/WireFrames/automotive_chatbot/setup.py" beforeDir="false" afterPath="$PROJECT_DIR$/WireFrames/automotive_chatbot/setup.py" afterDir="false" />
-    </list>
+    <list default="true" id="1e3437a4-e86f-40eb-ab95-6bee1c908d5a" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
