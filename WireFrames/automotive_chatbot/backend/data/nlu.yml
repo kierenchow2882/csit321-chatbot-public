@@ -989,3 +989,48 @@ nlu:
     - recommend cars for my lifestyle
     - personalized recommendations
     - cars that match my profile
+    # PROBLEM 7 & 8 FIX: Add realistic trigger phrases for 3 personas
+    # Young Professional triggers
+    - im a young freshgraduate just started working, can u some recommend me some affordable entry level vehicle?
+    - fresh graduate just started working need something affordable and reliable
+    - just started working entry level position need affordable car
+    - entry level job need reliable car with good fuel economy
+    - affordable reliable car for fresh graduate
+    - good fuel economy car for young professional
+    - low maintenance car for entry level job
+    - budget conscious need reliable first car
+    - young professional need affordable transport
+    - fresh graduate need entry level vehicle
+    - just started career need budget friendly car
+    - affordable car with good fuel economy
+    - reliable entry level vehicle
+    - low maintenance affordable car
+    # Family-oriented triggers  
+    - i have family with kids need spacious car with safety features
+    - family with children need safe spacious vehicle
+    - need 7 seater car for family trips
+    - spacious suv for family with kids
+    - mpv for school runs and weekend trips
+    - child safety features important for family car
+    - family oriented need safe reliable vehicle
+    - safety features for family with children
+    - weekend trips with family need spacious car
+    - school runs need family friendly vehicle
+    - family car with child safety features
+    - spacious car for family outings
+    - 7 seater for large family
+    - suv for family adventures
+    # Luxury enthusiast triggers
+    - executive status symbol need premium luxury car
+    - bmw mercedes audi for business executive
+    - prestige luxury car with comfort features
+    - high end premium vehicle for status
+    - luxury enthusiast want performance and comfort
+    - executive car with premium features
+    - status symbol luxury vehicle
+    - comfort features and prestige important
+    - high end bmw or mercedes
+    - luxury car for business professional
+    - premium comfort features essential
+    - prestige brand for executive
+    - luxury enthusiast performance oriented
