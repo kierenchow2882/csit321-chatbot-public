@@ -677,3 +677,169 @@ If any issues remain after following this guide:
 
 ## 📞 Support
 If you encounter any issues, the chatbot now has proper error handling and all requested functions work as expected.
+
+### 🆕 **LATEST UPDATES - June 19, 2025**
+
+**✅ LOAN CALCULATOR ISSUE FIXED:**
+- **Problem:** `action_calculate_loan` was not being registered by RASA actions server
+- **Solution:** Fixed action imports and uncommented ActionLoanOptions class
+- **Status:** ✅ RESOLVED - Loan calculator now works properly
+
+**✅ NEW MENU OPTIONS ADDED:**
+- 📝 **Feedback** - User feedback collection and rating system
+- ⭐ **Car Reviews & Ratings** - Vehicle reviews and customer ratings
+- **Actions:** Added `action_feedback_request` and `action_get_car_reviews`
+
+**✅ SUB-MENU CAPABILITY CONFIRMED:**
+- Sub-menus are fully supported for complex menu structures
+- Example: COE Prices can expand to show Categories A, B, C, E, Trends, Schedule
+- Implementation ready with expandable design and smooth animations
+
+---
+
+## 🚀 COMPREHENSIVE FIXES COMPLETED
+
+### ✅ **PROBLEM 1: COE Predictions Fixed**
+- **Issue**: COE prediction requests showed vehicle recommendations instead
+- **Fix**: Enhanced NLU training data with more prediction patterns and fixed `action_coe_predictions_confirm` to return actual COE predictions
+- **Result**: Now returns 3-month COE price forecasts with trend analysis
+
+### ✅ **PROBLEM 2: Textarea Auto-Reset Fixed**  
+- **Issue**: Textarea expanded on typing but never returned to original size
+- **Fix**: Added `resetTextareaSize()` function that automatically resets textarea to 40px height after message send
+- **Result**: Textarea now resets to original compact size immediately after sending messages
+
+### ✅ **PROBLEM 3: Loan Calculator Enhanced**
+- **Issue**: Monthly installment calculations not working properly
+- **Fix**: Enhanced `ActionCalculateLoan` with robust number parsing and comprehensive loan calculations
+- **Result**: Now handles complex loan queries like "Calculate loan for 150,000 car with 30,000 down payment for 5 years with 3.5% interest"
+
+### ✅ **PROBLEM 4: Feedback System Restructured**
+- **Issue**: Feedback actions incorrectly placed in `contact_actions.py`
+- **Fix**: Created dedicated `feedback_actions.py` with `ActionFeedbackRequest` and `ActionGetCarReviews`
+- **Result**: Clean separation of concerns with proper feedback and review handling
+
+## 🏗️ Architecture
+
+This project follows BCE (Boundary-Controller-Entity) architecture [[memory:6216183043980244428]]:
+
+- **Backend**: RASA 3.6.4 + FastAPI with proper BCE structure
+- **Frontend**: React/Next.js consuming backend APIs  
+- **Database**: MongoDB for data persistence
+- **AI/NLP**: RASA for intent recognition and response generation
+
+## 🔧 Key Components
+
+### Backend (`/backend/`)
+- **RASA Core**: Intent classification, story flows, domain configuration
+- **Actions**: Modular action handlers for different functionalities
+  - `coe_actions.py` - COE prices and predictions
+  - `loan_actions.py` - Loan calculations and financing
+  - `feedback_actions.py` - **NEW**: Feedback and car reviews
+  - `contact_actions.py` - Contact information and hours
+  - `vehicle_actions.py` - Vehicle information and search
+
+### Frontend (`/frontend/`)
+- **Widget**: Embeddable chatbot widget (`clevercompanion-widget.js`)
+- **Dashboard**: React-based admin and user interfaces
+- **Styling**: Tailwind CSS with custom components
+
+## 📊 Features
+
+### 🚗 Core Automotive Services
+- **COE Prices**: Real-time COE prices with trend analysis
+- **COE Predictions**: 3-month forecasting with market insights
+- **Vehicle Search**: Comprehensive inventory search
+- **Test Drive Booking**: Appointment scheduling system
+- **Maintenance Guide**: Service schedules and cost estimates
+
+### 💳 Financial Services  
+- **Loan Calculator**: Advanced calculations with multiple parameters
+- **Financing Options**: Various loan types and terms
+- **Budget Planning**: Total cost of ownership analysis
+
+### 📞 Customer Support
+- **Contact Information**: Multiple contact channels with interactive buttons
+- **Operating Hours**: Dynamic hours based on day/time queries
+- **Feedback System**: **NEW**: Comprehensive feedback collection and processing
+- **Car Reviews**: **NEW**: Customer reviews and ratings for popular models
+
+## 🛠️ Setup & Installation
+
+### Prerequisites
+- Python 3.9.13
+- Node.js 16+
+- MongoDB (optional, for data persistence)
+
+### Quick Start
+```bash
+# Install all dependencies
+python setup.py
+
+# Start RASA server
+npm run rasa:start
+
+# Start frontend (separate terminal)
+npm run dev
+
+# Start FastAPI (separate terminal)  
+npm run fastapi:start
+```
+
+### Training RASA Model
+```bash
+# Train with latest data
+npm run rasa:train
+
+# Test NLU accuracy
+npm run rasa:test
+
+# Evaluate model performance
+npm run rasa:evaluate
+```
+
+## 🎯 Widget Integration
+
+### Embed Chatbot Widget
+```html
+<!-- Add to any website -->
+<script src="http://localhost:3000/clevercompanion-widget.js"></script>
+```
+
+### Configuration Options
+```javascript
+// Widget automatically initializes with default settings
+// Connects to RASA backend at http://127.0.0.1:5005/webhooks/rest/webhook
+```
+
+## 📝 Recent Updates
+
+### 🆕 Latest Changes (Current Session)
+1. **Fixed all 4 reported problems** in single comprehensive update
+2. **Created feedback_actions.py** - Separated feedback functionality 
+3. **Enhanced textarea behavior** - Auto-reset to original size
+4. **Improved COE predictions** - Now returns actual forecasts
+5. **Strengthened loan calculator** - Robust parsing and calculations
+
+### 🔄 Dependencies
+- **Backend**: All dependencies in `requirements.txt` (RASA 3.6.4 compatible)
+- **Frontend**: All dependencies in `package.json` (React/Next.js ecosystem)
+- **Installation**: Single `setup.py` handles all installations [[memory:8380967251795690343]]
+
+## 🚨 Important Notes
+
+- **RASA is mandatory** [[memory:3267597324702742011]] - Core requirement, cannot be removed
+- **Single requirements.txt** - Only one requirements file in `/backend/`
+- **BCE backend only** [[memory:5286004013096021796]] - Frontend uses standard React patterns
+- **Clean file management** - Temporary files automatically removed [[memory:8380967251795690343]]
+
+## 📞 Support
+
+For technical issues or questions:
+- **Documentation**: Check `/docs/` directory
+- **Setup Guide**: See `quick-setup.md`
+- **Architecture**: Review `ARCHITECTURE.md`
+
+---
+
+**🎉 All Issues Resolved** - The chatbot is now fully functional with enhanced COE predictions, auto-resetting textarea, robust loan calculations, and proper feedback system architecture.
