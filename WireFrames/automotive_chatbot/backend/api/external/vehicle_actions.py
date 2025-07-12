@@ -15,6 +15,8 @@ import time
 import pandas as pd
 import re
 from datetime import datetime, timedelta
+import asyncio
+from config.database import db_config
 
 def load_vehicle_data():
     """Load vehicle data from Excel file for RAG"""
@@ -30,6 +32,35 @@ def load_vehicle_data():
     except Exception as e:
         logging.error(f"Error loading vehicle data: {e}")
         return None
+
+
+async def _fetch_vehicles(filters: Dict[str, Any], limit: int = 3) -> List[Dict[str, Any]]:
+    """Internal async helper to fetch vehicles from MongoDB"""
+    connected = await db_config.connect()
+    if not connected:
+        return []
+    try:
+        collection = db_config.get_collection("vehicles")
+        cursor = collection.find(filters).sort("Price", 1).limit(limit)
+        results = await cursor.to_list(length=limit)
+        return results
+    except Exception as e:
+        logging.error(f"Error fetching vehicles: {e}")
+        return []
+    finally:
+        await db_config.disconnect()
+
+
+def fetch_vehicles_from_db(filters: Dict[str, Any], limit: int = 3) -> List[Dict[str, Any]]:
+    """Synchronous wrapper to fetch vehicles from MongoDB"""
+    try:
+        return asyncio.run(_fetch_vehicles(filters, limit))
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+        try:
+            return loop.run_until_complete(_fetch_vehicles(filters, limit))
+        finally:
+            loop.close()
 
 class ActionGetVehicleInfo(Action):
     def name(self) -> Text:
@@ -364,8 +395,14 @@ class ActionSearchVehicles(Action):
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
         
         user_text = tracker.latest_message.get("text", "").lower()
+
+        # Attempt MongoDB search based on explicit filters (seating, budget)
+        filters = self.extract_filters(user_text)
+        vehicles = []
+        if filters:
+            vehicles = fetch_vehicles_from_db(filters)
         
-        # Hardcoded car listings based on Singapore user personas
+        # Hardcoded car listings based on Singapore user personas (fallback)
         car_listings = {
             "budget": [
                 {
@@ -434,8 +471,20 @@ class ActionSearchVehicles(Action):
         
         # Determine search category based on user input
         category = self.determine_search_category(user_text)
-        
-        if category and category in car_listings:
+
+        if vehicles:
+            response = "🚗 **Recommended Vehicles** 📋\n\n"
+            for i, car in enumerate(vehicles, 1):
+                response += (
+                    f"**{car.get('Brand', 'Unknown')} {car.get('Model', '')}**\n"
+                    f"• **Price:** ${car.get('Price', 0):,}\n"
+                    f"• **Seating:** {car.get('Seating_Capacity', 'N/A')} seats\n"
+                )
+                features = car.get('Features')
+                if features:
+                    response += f"• **Features:** {features}\n"
+                response += "\n"
+        elif category and category in car_listings:
             cars = car_listings[category]
             category_names = {
                 "budget": "Budget-Friendly Cars",
@@ -503,8 +552,27 @@ What would you like to see? 🚗"""
             return "eco"
         elif any(word in text for word in ['mid range', 'medium', '100k', '120k']):
             return "family"  # Default mid-range to family cars
-        
-        return None 
+
+        return None
+
+    def extract_filters(self, text: str) -> Dict[str, Any]:
+        """Extract seating capacity and budget from user text"""
+        filters: Dict[str, Any] = {}
+        seat_match = re.search(r"(\d+)\s*seater", text)
+        if seat_match:
+            seats = int(seat_match.group(1))
+            filters["Seating_Capacity"] = {"$gte": seats}
+
+        budget_match = re.search(r"(\d{2,3})\s?k", text)
+        if budget_match:
+            budget = int(budget_match.group(1)) * 1000
+            filters.setdefault("Price", {})["$lte"] = budget
+        else:
+            numeric = re.search(r"\b(\d{5,6})\b", text)
+            if numeric:
+                filters.setdefault("Price", {})["$lte"] = int(numeric.group(1))
+
+        return filters
 
 class ActionPersonaBasedRecommendations(Action):
     """Provide vehicle recommendations based on user personas - PROTOTYPE DEMO"""
@@ -551,7 +619,23 @@ class ActionPersonaBasedRecommendations(Action):
         elif ("family oriented" in user_text or "family car" in user_text or "kids" in user_text or "children" in user_text or
               "safety features" in user_text or "7 seater" in user_text or "spacious" in user_text or "suv" in user_text or
               "mpv" in user_text or "child safety" in user_text or "school runs" in user_text or "weekend trips" in user_text):
-            response = """👨‍👩‍👧‍👦 **Family-Oriented Vehicle Recommendations** 🚗
+            filters = {"Seating_Capacity": {"$gte": 7}, "Price": {"$lte": 100000}}
+            cars = fetch_vehicles_from_db(filters, limit=3)
+            if cars:
+                response = "👨‍👩‍👧‍👦 **Family-Oriented Vehicle Recommendations** 🚗\n\n"
+                for i, car in enumerate(cars, 1):
+                    response += (
+                        f"**{i}. {car.get('Brand', 'Unknown')} {car.get('Model', '')}**\n"
+                        f"• **Price:** ${car.get('Price', 0):,}\n"
+                        f"• **Seating:** {car.get('Seating_Capacity', 'N/A')} seats\n"
+                    )
+                    feats = car.get('Features')
+                    if feats:
+                        response += f"• **Features:** {feats}\n"
+                    response += "\n"
+                response += "💡 **Your Profile:** Safety-first, space for family, practical features"
+            else:
+                response = """👨‍👩‍👧‍👦 **Family-Oriented Vehicle Recommendations** 🚗
 
 **🎯 Perfect matches for your family needs:**
 
@@ -564,7 +648,7 @@ class ActionPersonaBasedRecommendations(Action):
 **2. Toyota Sienta 1.5L (7-seater)**
 • **Price:** $145,000 - $155,000
 • **Safety:** Pre-collision system, lane assist
-• **Why Perfect:** 7 seats, sliding doors, child-friendly features  
+• **Why Perfect:** 7 seats, sliding doors, child-friendly features
 • **Features:** Dual power sliding doors, 3rd row seating, multiple cup holders
 
 **3. Mazda CX-5 2.0L**
